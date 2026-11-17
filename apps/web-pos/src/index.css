@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #EAE2D3;
+    color: #241C16;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  .brand-font {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E0D6C5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C4B7A3;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8ABFF8;
+}
+
+/* Touch responsiveness optimizations */
+button,
+input,
+select {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}

@@ -1,0 +1,22 @@
+{
+  "name": "coffee-shop-pos-crm",
+  "version": "1.0.0",
+  "private": true,
+  "description": "In-House Coffee Shop POS & Retention Engine",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:hub": "npm --workspace=apps/local-hub run dev",
+    "dev:pos": "npm --workspace=apps/web-pos run dev",
+    "dev": "concurrently \"npm run dev:hub\" \"npm run dev:pos\"",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.6.3"
+  }
+}
+
