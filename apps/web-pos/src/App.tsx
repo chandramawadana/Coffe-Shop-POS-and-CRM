@@ -102,6 +102,12 @@ export const App: React.FC = () => {
         )}
       </main>
 
+      {/* Footer Attribution */}
+      <footer className="h-6 bg-[#FDFBF7] border-t border-[#D5CBB8] px-4 flex items-center justify-between text-xs text-[#574B42] select-none">
+        <span>☕ Warung Kopi Luhur — POS &amp; CRM</span>
+        <span className="font-semibold">powered by <strong className="text-[#241C16] font-bold">Amperix Technology</strong></span>
+      </footer>
+
       <PinLoginModal
         isOpen={isPinModalOpen}
         onClose={() => setIsPinModalOpen(false)}
