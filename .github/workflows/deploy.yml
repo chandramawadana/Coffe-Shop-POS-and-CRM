@@ -1,0 +1,38 @@
+name: 🚀 Auto Deploy to cPanel (warungkopiluhur.xyz)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  web-deploy:
+    name: 🌐 Sync to cPanel public_html
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📂 Ensure index.html exists
+        run: |
+          if [ ! -f index.html ]; then
+            cp warung-kopi-luhur-pos.html index.html
+          fi
+
+      - name: 📡 Sync Files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER || '103.247.8.23' }}
+          username: ${{ secrets.FTP_USERNAME || 'warz9844' }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: public_html/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/apps/local-hub/data/**
+            **/apps/local-hub/backups/**
+            **/*.py
+            **/package-lock.json
