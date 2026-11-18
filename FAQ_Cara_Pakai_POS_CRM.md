@@ -349,3 +349,82 @@ Di pojok kanan atas kartu **Laporan Keuangan Laba Rugi**, terdapat tombol toggle
    * `http://[IP_TABLET_KASIR]:8088/warung-kopi-luhur-pos.html` atau
    * `http://192.168.1.15:3000/` (untuk versi React PWA).
 3. Pilih tab navigasi yang sesuai (**👨‍🍳 Barista KDS** untuk stasiun seduh, **🍳 Kitchen KDS** untuk stasiun snack).
+
+---
+
+## 🚀 Bagian 8: Panduan 7 Fitur Inti Operasional Terbaru
+
+### Q24: Bagaimana cara menyimpan dan mengelola Open Bill (Tab Meja)?
+1. **Simpan Open Bill**: Saat tamu dine-in memesan tetapi belum langsung membayar, kasir memilih menu ke keranjang, memasukkan nomor meja (misal: *Meja 03*), lalu klik **📋 Simpan Open Bill**.
+2. **KDS Otomatis Terupdate**: Pesanan langsung terkirim ke KDS Barista & Kitchen agar pesanan segera dibuat.
+3. **Buka / Kelola Tab**: Klik badge/tombol **📋 Open Bill (X)** di kasir. Daftar tab meja yang aktif akan terbuka dengan 4 aksi:
+   * **✏️ Tambah Menu**: Membuka kembali pesanan ke keranjang kasir jika tamu ingin menambah menu (add order).
+   * **💳 Bayar Tab**: Membuka dialog pembayaran saat tamu hendak melunasi tagihan di kasir.
+   * **🖨️ Cetak Bill**: Mencetak lembar pra-bayar (proforma bill) untuk diserahkan ke meja tamu.
+   * **✕ Batalkan Tab**: Membatalkan open bill jika pesanan tidak jadi diproses.
+
+---
+
+### Q25: Bagaimana alur Self-Order Meja dengan Barcode QR & Auto-Print Kasir?
+1. **Cetak Barcode Meja**: Klik tombol **📱 QR Meja** di topbar kasir -> pilih nomor meja (Meja 01 s/d 15) -> klik **🖨️ Cetak Stiker Meja** untuk ditempel di meja kafe.
+2. **Pemesanan Mandiri Tamu**: Tamu men-scan QR code meja dengan smartphone mereka (atau klik *📱 Buka Tampilan Tamu Meja* untuk simulasi). Tamu memilih menu, menentukan jumlah, dan memasukkan nama.
+3. **Pembayaran Mandiri QRIS**: Tamu menekan tombol *💳 Lanjut Bayar QRIS* -> layar menampilkan barcode QRIS dinamis -> tamu menyelesaikan pembayaran di aplikasi bank/e-wallet lalu konfirmasi.
+4. **Respon Otomatis di Kasir**:
+   * **Audio Chime**: Kasir berbunyi *ding-dong* secara otomatis.
+   * **Tiket KDS**: Pesanan otomatis diteruskan ke stasiun Barista dan Kitchen.
+   * **Auto-Print Thermal Kasir**: Printer kasir secara otomatis mencetak struk bertuliskan `[SELF-ORDER MEJA X - LUNAS QRIS]` tanpa perlu dipencet kasir.
+
+---
+
+### Q26: Bagaimana cara mengubah satuan gramasi dan mengelola Master Data HPP?
+1. **Pilihan Satuan Gramasi Fleksibel**: Saat Supervisor membuat resep menu baru di BOM builder, kolom satuan bahan kini berupa dropdown dinamis (`g`, `ml`, `pcs`, `butir`, `porsi`, `shot`, `set`, `pack`, `kg`, `liter`).
+2. **Akses Master Data HPP**: Hanya akun berlevel **Supervisor (MANAGER)** dan **Superadmin (SUPERADMIN)** yang dapat membuka menu **📦 Master Data Bahan Baku & HPP**.
+3. **Kelola Harga Beli Bahan**: Supervisor dapat mengubah harga beli per kemasan (misal: *HB Lokadjaya 1000g Rp 220.000* -> HPP otomatis terhitung *Rp 220/g*). Setiap perubahan harga master bahan baku akan langsung memperbarui kalkulasi HPP resep pada seluruh menu terkait.
+
+---
+
+### Q27: Bagaimana cara melihat Laporan Omset Makanan & Minuman Per Kategori (Harian, Mingguan, Bulanan)?
+1. Buka tab **📊 Owner Hub** -> lihat bagian **Laporan Performa Kategori & Margin**.
+2. Tersedia 3 tombol filter periode:
+   * **☀️ Per Hari**: Rekapitulasi transaksi sesi hari ini / shift aktif.
+   * **📅 Per Minggu**: Rekapitulasi performa 7 hari terakhir.
+   * **📆 Per Bulan**: Rekapitulasi bulanan utuh beserta alokasi biaya tetap & gaji.
+3. Tabel menyajikan 8 kategori resmi Warung Kopi Luhur: *Kopi Luhur Signature*, *Teh & Susu Luhur*, *Mocktail Segar*, *Camilan Klasik*, *Paket Cuanki Hemat*, *Cuanki Ala Carte*, *Topping Minuman*, dan *Kuah & Topping Cuanki* lengkap dengan Qty Porsi, Total Omset, Total HPP, Margin Kotor (Rp), dan Margin %.
+
+---
+
+### Q28: Bagaimana pengeluaran harian kasir otomatis memotong total kasir tiap shift?
+1. Saat kasir mengeluarkan uang tunai dari laci kas (misal: beli Es Batu Rp 30.000, Gas LPG Rp 25.000, atau Tissue Rp 20.000), catat di formulir pengeluaran harian kasir.
+2. Sistem otomatis menghitung saldo akhir laci kasir:
+   `Kas Seharusnya = Modal Awal Kas + Penjualan Tunai (CASH) - Pengeluaran Kas Shift`
+3. Klik tombol **🖨️ Cetak Struk Rekonsiliasi Kas** pada modal penutupan shift untuk mencetak struk thermal resmi lengkap dengan rincian pengeluaran petty cash, status selisih kas (Pas/Lebih/Kurang), serta kolom tanda tangan Kasir dan Supervisor.
+
+---
+
+### Q29: Bagaimana cara mengaktifkan Diskon, Service Fee, Platform Services & PPN?
+Pada panel keranjang belanja kasir POS:
+1. **Channel / Platform**: Pilih channel penjualan:
+   * `🍽️ Dine-In` / `🥡 Takeaway`: Tarif normal outlet.
+   * `🟢 GoFood (+20%)`, `🟢 GrabFood (+20%)`, `🟠 ShopeeFood (+20%)`: Otomatis mengenakan surcharge platform 20%.
+2. **Master Diskon**: Pilih diskon dari dropdown:
+   * `Member Kedai (10%)`, `Loyalty Buy 7 Free 1 Stamp`, `Voucher Rp 5.000`, `Voucher Rp 10.000`, atau `Custom Diskon (Rp)`.
+3. **Biaya Tambahan & Pajak**:
+   * Centang `Biaya Layanan (5%)` untuk pesanan dine-in.
+   * Centang `PPN PB1 (10%)` untuk restoran/pajak daerah.
+4. Rincian potongan dan biaya tambahan langsung tertera di footer keranjang, struk pembayaran, dan layar display pelanggan.
+
+---
+
+### Q30: Bagaimana sistem Absensi Karyawan berbasis PIN staf bekerja?
+1. Klik tombol **⏱️ Absensi** di bilah navigasi atas kasir.
+2. Pilih nama staf dan masukkan PIN 4 digit:
+   * **Siti Rahma** (Kasir / Kitchen): PIN `1234`
+   * **Budi Santoso** (Barista): PIN `2345`
+   * **Agus Setiawan** (Supervisor): PIN `8888`
+   * **Chandra Mawadana** (Superadmin / Owner): PIN `9999`
+3. Pilih salah satu tombol aksi:
+   * **🟢 Masuk Kerja**: Jam masuk shift kerja.
+   * **☕ Mulai Istirahat**: Jam keluar istirahat staf.
+   * **🔙 Selesai Istirahat**: Jam kembali dari istirahat.
+   * **🔴 Pulang Kerja**: Jam selesai tugas shift.
+4. Log kehadiran tersimpan secara persistent di sistem lokal dan ditampilkan pada riwayat Owner Hub serta dapat dicetak struk rekapnya via **🖨️ Cetak Rekap Absensi**.
