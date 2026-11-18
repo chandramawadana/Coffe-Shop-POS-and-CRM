@@ -1017,9 +1017,9 @@
         <button class="pill-status" style="cursor:pointer;background:#FEF3C7;color:#92400E;border-color:#F59E0B;font-weight:700;" onclick="openAbsensiModal()" title="Absensi Masuk / Pulang Shift Karyawan">
           ⏱️ Absensi
         </button>
-        <!-- Tombol QR Barcode Self-Order Meja -->
-        <button class="pill-status" style="cursor:pointer;background:#E0F2FE;color:#0369A1;border-color:#BAE6FD;font-weight:700;" onclick="openSelfOrderQrModal()" title="QR Barcode Self-Order Pelanggan per Meja">
-          📱 QR Meja
+        <!-- Tombol Manajemen Meja & QR Self-Order -->
+        <button class="pill-status" style="cursor:pointer;background:#FDF2F4;color:#BC012E;border-color:#F7CCD3;font-weight:700;display:inline-flex;align-items:center;gap:4px;" onclick="openTableMgmtModal()" title="Manajemen Meja Kedai & Download/Print QR Code">
+          🪑 Meja &amp; QR (<span id="headerTableCount">12</span>)
         </button>
         <button class="pill-status" style="cursor:pointer;background:var(--accent-sky);color:var(--ink-espresso);border-color:var(--accent-sky);font-weight:700;" onclick="openShiftModal()" id="shiftHeaderBtn">
           <span id="activeShiftLabel">☀️ Shift Pagi (07:00 - 15:00)</span>
@@ -1056,6 +1056,7 @@
                 <button class="btn-dark" id="cashierCreateMenuBtn" style="display:none;background:#15803D;color:#FFF;border-color:#166534;padding:6px 12px;font-size:11.5px;border-radius:999px;font-weight:700;align-items:center;gap:4px;cursor:pointer;" onclick="openAddMenuModal()" title="Tambah Menu Baru (Khusus Supervisor &amp; Superadmin)">
                   ➕ Create Menu
                 </button>
+                <button class="btn-dark" style="background:var(--surface-card);color:var(--ink-espresso);border:1px solid var(--border-hairline);" onclick="openTableMgmtModal()" title="Buka Manajemen Meja Kedai">🪑 Meja (<span id="cashierTableCount">12</span>)</button>
                 <button class="btn-dark" onclick="openTabsModal()">Open Tab (<span id="openTabCount">0</span>)</button>
                 <input type="text" class="search-input field" style="width:160px;" id="menuSearch" placeholder="Cari menu..." oninput="renderMenu()" />
               </div>
@@ -1159,7 +1160,12 @@
                 <button type="button" class="cat-pill" id="channelShopee" style="font-size:10px;padding:3px 8px;" onclick="setChannelOrder('SHOPEEFOOD')">🛵 Shopee (+20%)</button>
               </div>
 
-              <input type="text" class="field" id="tableNameInput" placeholder="No. Meja / Nama Pemesan (Contoh: Meja 03 - Budi)" style="width:100%;" />
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="text" class="field" id="tableNameInput" placeholder="No. Meja / Nama Pemesan (Contoh: Meja 03 - Budi)" style="flex:1;" />
+                <select class="field" id="cartTableQuickSelect" style="width:125px;font-size:11px;padding:8px 6px;font-weight:700;border-radius:10px;" onchange="onCartTableQuickSelect(this.value)">
+                  <option value="">Pilih Meja...</option>
+                </select>
+              </div>
             </div>
 
             <div class="cart-items" id="cartItems"></div>
@@ -2060,47 +2066,145 @@
     </div>
   </div>
 
-  <!-- MODAL: BARCODE QR SELF-ORDER MEJA -->
-  <div class="modal-backdrop" id="selfOrderQrModal">
+  <!-- MODAL: MANAJEMEN MEJA & GENERATOR QR SELF-ORDER (SUPERVISOR / KASIR / OWNER) -->
+  <div class="modal-backdrop" id="tableMgmtModal">
+    <div class="modal-box" style="max-width:980px;width:95vw;max-height:92vh;padding:22px 24px;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(17,24,39,0.35);">
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border-hairline);margin-bottom:14px;flex-shrink:0;">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <h3 class="serif" style="font-size:20px;font-weight:700;color:var(--ink-espresso);margin:0;">🪑 Manajemen Meja &amp; QR Code Self-Order</h3>
+            <span class="badge" style="background:#FDF2F4;color:#BC012E;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;border:1px solid #F7CCD3;">● Auto Generate QR</span>
+          </div>
+          <p style="font-size:11.5px;color:var(--ink-muted);margin-top:2px;">Daftarkan nomor meja kedai, generate QR unik otomatis, pantau meja terisi, cetak stiker thermal, dan unduh gambar QR untuk akrilik meja.</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn-pay" style="padding:7px 14px;font-size:12px;border-radius:999px;cursor:pointer;" onclick="toggleAddTableForm()">
+            ➕ Daftarkan Meja Baru
+          </button>
+          <button class="btn-dark" style="padding:4px 10px;font-size:12px;" onclick="closeModal('tableMgmtModal')">✕</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Modal Body -->
+      <div style="overflow-y:auto;padding-right:4px;display:flex;flex-direction:column;gap:14px;">
+        
+        <!-- Form Tambah / Edit Meja (Hidden by default, toggleable) -->
+        <div id="addTableFormContainer" style="display:none;background:#F8F9FA;border:1.5px solid #BC012E;border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(188,1,46,0.08);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <strong style="font-size:13px;color:#BC012E;" id="tableFormTitle">➕ Input Pendaftaran Meja Baru</strong>
+            <button type="button" style="background:transparent;border:none;cursor:pointer;font-size:12px;color:var(--ink-muted);" onclick="toggleAddTableForm(false)">Tutup Form ✕</button>
+          </div>
+          <input type="hidden" id="editTableId" value="" />
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:10px;">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">Nomor Meja *:</label>
+              <input type="text" class="field" id="tableFormNumber" placeholder="Contoh: 14 atau VIP-02" style="width:100%;font-weight:800;" />
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">Nama / Label Meja:</label>
+              <input type="text" class="field" id="tableFormName" placeholder="Contoh: Meja 14 (Lantai 2 Balkon)" style="width:100%;" />
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">Zona / Area Kedai:</label>
+              <select class="field" id="tableFormZone" style="width:100%;">
+                <option value="INDOOR">🏢 Indoor AC</option>
+                <option value="OUTDOOR">🌿 Outdoor Garden / Smoking</option>
+                <option value="BAR">☕ Bar Counter / High Chair</option>
+                <option value="VIP">⭐ VIP Private Room</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">Kapasitas Kursi:</label>
+              <select class="field" id="tableFormCapacity" style="width:100%;">
+                <option value="2">2 Orang</option>
+                <option value="4" selected>4 Orang</option>
+                <option value="6">6 Orang</option>
+                <option value="8">8 Orang</option>
+                <option value="10">10+ Orang</option>
+              </select>
+            </div>
+            <div style="grid-column:1/-1;">
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">Fasilitas / Catatan Khusus:</label>
+              <input type="text" class="field" id="tableFormNote" placeholder="Contoh: Dekat colokan listrik, sofa empuk, view jendela..." style="width:100%;" />
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
+            <button type="button" class="btn-dark" style="background:#6B7280;color:#FFF;padding:8px 16px;border-radius:10px;font-size:12px;" onclick="toggleAddTableForm(false)">Batal</button>
+            <button type="button" class="btn-pay" style="padding:8px 18px;border-radius:10px;font-size:12px;" onclick="saveMasterTable()">
+              💾 Simpan &amp; Generate QR Meja
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Cards -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:10px;">
+          <div class="card" style="padding:12px;background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Total Meja</div>
+            <div class="serif" style="font-size:22px;font-weight:800;color:var(--ink-espresso);margin-top:3px;" id="statTableTotal">0</div>
+            <div style="font-size:10px;color:var(--ink-muted);">Didaftarkan di sistem</div>
+          </div>
+          <div class="card" style="padding:12px;background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">🟢 Meja Tersedia</div>
+            <div class="serif" style="font-size:22px;font-weight:800;color:#15803D;margin-top:3px;" id="statTableAvailable">0</div>
+            <div style="font-size:10px;color:#15803D;">Siap menerima tamu</div>
+          </div>
+          <div class="card" style="padding:12px;background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">🔴 Meja Terisi</div>
+            <div class="serif" style="font-size:22px;font-weight:800;color:#BC012E;margin-top:3px;" id="statTableOccupied">0</div>
+            <div style="font-size:10px;color:#BC012E;">Sedang aktif Open Tab</div>
+          </div>
+          <div class="card" style="padding:12px;background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:12px;">
+            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">👥 Total Kapasitas</div>
+            <div class="serif" style="font-size:22px;font-weight:800;color:var(--ink-espresso);margin-top:3px;" id="statTablePax">0</div>
+            <div style="font-size:10px;color:var(--ink-muted);">Kapasitas kursi kedai</div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg-oat-dark);padding:8px 12px;border-radius:10px;">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <button class="cat-pill active" id="tblFilterAll" onclick="filterTables('ALL', this)">Semua Meja</button>
+            <button class="cat-pill" id="tblFilterIndoor" onclick="filterTables('INDOOR', this)">🏢 Indoor</button>
+            <button class="cat-pill" id="tblFilterOutdoor" onclick="filterTables('OUTDOOR', this)">🌿 Outdoor</button>
+            <button class="cat-pill" id="tblFilterBar" onclick="filterTables('BAR', this)">☕ Bar</button>
+            <button class="cat-pill" id="tblFilterVip" onclick="filterTables('VIP', this)">⭐ VIP</button>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="text" class="field" id="tableSearchInput" placeholder="Cari nomor / label meja..." style="width:190px;padding:6px 10px;font-size:11.5px;" oninput="renderTableManagement()" />
+          </div>
+        </div>
+
+        <!-- Grid Meja Terdaftar -->
+        <div id="tableCardsGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(290px, 1fr));gap:12px;min-height:160px;">
+          <!-- Populated dynamically by JS -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PREVIEW BESAR QR CODE MEJA -->
+  <div class="modal-backdrop" id="tableQrLargePreviewModal">
     <div class="modal-box" style="max-width:440px;padding:24px;text-align:center;">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:14px;">
-        <h3 class="serif" style="font-size:18px;">📱 Barcode QR <span class="italic">Self-Order Meja</span></h3>
-        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('selfOrderQrModal')">✕</button>
+        <h3 class="serif" style="font-size:18px;margin:0;" id="largeQrModalTitle">QR Code Meja</h3>
+        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('tableQrLargePreviewModal')">✕</button>
       </div>
-
-      <div style="margin-bottom:14px;">
-        <label style="font-size:11.5px;font-weight:700;color:var(--ink-muted);">Pilih Nomor Meja Kedai:</label>
-        <select class="field" id="selfOrderTableSelect" style="width:160px;margin:6px auto 0;font-size:13px;font-weight:800;text-align:center;" onchange="updateSelfOrderQr()">
-          <option value="01">Meja 01</option>
-          <option value="02">Meja 02</option>
-          <option value="03" selected>Meja 03</option>
-          <option value="04">Meja 04</option>
-          <option value="05">Meja 05</option>
-          <option value="06">Meja 06</option>
-          <option value="07">Meja 07</option>
-          <option value="08">Meja 08</option>
-          <option value="09">Meja 09</option>
-          <option value="10">Meja 10</option>
-          <option value="11">Meja 11</option>
-          <option value="12">Meja 12</option>
-          <option value="15">Meja 15 (Outdoor)</option>
-        </select>
+      <div style="background:#FFF;border:2px dashed var(--border-hairline);border-radius:16px;padding:18px;display:inline-block;margin:0 auto 14px;box-shadow:0 4px 14px rgba(0,0,0,0.06);">
+        <div id="largeQrContainer"></div>
+        <div style="font-size:13px;font-weight:800;margin-top:10px;color:var(--ink-espresso);" id="largeQrLabel">Warung Kopi Luhur</div>
+        <div style="font-size:10.5px;color:var(--ink-muted);margin-top:2px;">Scan untuk Self-Order &amp; Bayar Mandiri dari HP</div>
       </div>
-
-      <!-- Container Barcode QR Meja -->
-      <div style="background:var(--surface-card);border:2px dashed var(--border-hairline);border-radius:16px;padding:18px;display:inline-block;margin:0 auto 14px;box-shadow:var(--shadow-subtle);">
-        <div id="selfOrderQrContainer"></div>
-        <div style="font-size:12px;font-weight:800;margin-top:8px;color:var(--ink-espresso);" id="selfOrderQrLabel">Scan QR Meja 03 untuk Pesan dari HP</div>
-        <div style="font-size:10px;color:var(--ink-muted);margin-top:2px;">Tamu langsung memilih menu &amp; bayar QRIS mandiri</div>
-      </div>
-
-      <!-- Tombol Aksi Meja -->
-      <div style="display:flex;gap:8px;justify-content:center;">
-        <button type="button" class="btn-dark" style="background:#4B5563;color:#FFF;padding:10px 14px;font-size:12px;font-weight:700;border:none;border-radius:10px;cursor:pointer;" onclick="printTableQrSticker()">
-          🖨️ Cetak Stiker Meja
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button type="button" class="btn-dark" id="largeQrPrintBtn" style="padding:9px 14px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+          🖨️ Cetak Stiker
         </button>
-        <button type="button" class="btn-pay" style="padding:10px 14px;font-size:12px;font-weight:700;border-radius:10px;" onclick="openCustomerSelfOrderModal()">
-          📱 Buka Tampilan Tamu Meja
+        <button type="button" class="btn-pay" id="largeQrDownloadBtn" style="padding:9px 14px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+          ⬇️ Download PNG
+        </button>
+        <button type="button" class="btn-dark" id="largeQrTestBtn" style="background:#1E40AF;color:#FFF;padding:9px 14px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+          📱 Tes Buka Tamu
         </button>
       </div>
     </div>
@@ -6401,15 +6505,464 @@
     // POINT 2: SELF ORDER MEJA DENGAN BARCODE QR
     // AUTO KDS & AUTO PRINT THERMAL DI KASIR
     // ==========================================
+    // ==========================================
+    // MODULE: MANAJEMEN MEJA & GENERATOR QR SELF-ORDER
+    // ==========================================
+    const DEFAULT_TABLES = [
+      { id: 'tbl-01', number: '01', name: 'Meja 01 (Indoor Depan)', zone: 'INDOOR', capacity: 2, note: 'Dekat Bar & Colokan Listrik', createdAt: '2026-11-01' },
+      { id: 'tbl-02', number: '02', name: 'Meja 02 (Indoor Tengah)', zone: 'INDOOR', capacity: 4, note: 'Sofa Nyaman', createdAt: '2026-11-01' },
+      { id: 'tbl-03', number: '03', name: 'Meja 03 (Indoor Tengah)', zone: 'INDOOR', capacity: 4, note: 'Dekat AC Utama', createdAt: '2026-11-01' },
+      { id: 'tbl-04', number: '04', name: 'Meja 04 (Indoor Jendela)', zone: 'INDOOR', capacity: 4, note: 'Pemandangan Jalan Depan', createdAt: '2026-11-01' },
+      { id: 'tbl-05', number: '05', name: 'Meja 05 (Indoor Belakang)', zone: 'INDOOR', capacity: 6, note: 'Meja Komunal Rombongan', createdAt: '2026-11-01' },
+      { id: 'tbl-06', number: '06', name: 'Meja 06 (Bar Counter)', zone: 'BAR', capacity: 2, note: 'High Chair / Barista View', createdAt: '2026-11-01' },
+      { id: 'tbl-07', number: '07', name: 'Meja 07 (Outdoor Garden)', zone: 'OUTDOOR', capacity: 4, note: 'Taman Asri & Smoking', createdAt: '2026-11-01' },
+      { id: 'tbl-08', number: '08', name: 'Meja 08 (Outdoor Garden)', zone: 'OUTDOOR', capacity: 4, note: 'Taman Payung Teduh', createdAt: '2026-11-01' },
+      { id: 'tbl-09', number: '09', name: 'Meja 09 (Outdoor Panjang)', zone: 'OUTDOOR', capacity: 6, note: 'Area Smoking Komunal', createdAt: '2026-11-01' },
+      { id: 'tbl-10', number: '10', name: 'Meja 10 (Outdoor Samping)', zone: 'OUTDOOR', capacity: 4, note: 'Dekat Tanaman Hias', createdAt: '2026-11-01' },
+      { id: 'tbl-11', number: '11', name: 'Meja 11 (VIP Room AC)', zone: 'VIP', capacity: 8, note: 'Private Meeting / Smart TV', createdAt: '2026-11-01' },
+      { id: 'tbl-12', number: '12', name: 'Meja 12 (VIP Room AC)', zone: 'VIP', capacity: 6, note: 'Private Working Station', createdAt: '2026-11-01' }
+    ];
+
+    let tableActiveZoneFilter = 'ALL';
     let selfOrderCart = [];
     let selfOrderActiveTable = '03';
     let selfOrderActiveFilter = 'all';
 
-    function openSelfOrderQrModal() {
-      const select = document.getElementById('selfOrderTableSelect');
-      if (select) selfOrderActiveTable = select.value;
-      updateSelfOrderQr();
-      openModal('selfOrderQrModal');
+    function getMasterTables() {
+      const stored = localStorage.getItem('wkl_master_tables_v2');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) {}
+      }
+      localStorage.setItem('wkl_master_tables_v2', JSON.stringify(DEFAULT_TABLES));
+      return DEFAULT_TABLES;
+    }
+
+    function saveMasterTables(tables) {
+      localStorage.setItem('wkl_master_tables_v2', JSON.stringify(tables));
+      renderTableManagement();
+      populateTableDropdowns();
+      const hCount = document.getElementById('headerTableCount');
+      if (hCount) hCount.textContent = tables.length;
+      const cCount = document.getElementById('cashierTableCount');
+      if (cCount) cCount.textContent = tables.length;
+    }
+
+    function isTableOccupied(tableNumber) {
+      if (!Array.isArray(openTabs) || openTabs.length === 0) return false;
+      const numStr = String(tableNumber).trim().toLowerCase();
+      return openTabs.some(tab => {
+        const tabTable = String(tab.table || tab.customer || '').toLowerCase();
+        return tabTable.includes(numStr) || tabTable.includes('meja ' + numStr);
+      });
+    }
+
+    function openTableMgmtModal() {
+      renderTableManagement();
+      openModal('tableMgmtModal');
+    }
+
+    // Alias for backward compatibility
+    function openSelfOrderQrModal(tableNum) {
+      if (tableNum) selfOrderActiveTable = tableNum;
+      openTableMgmtModal();
+    }
+
+    function filterTables(zone, btn) {
+      tableActiveZoneFilter = zone;
+      document.querySelectorAll('#tableMgmtModal .cat-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderTableManagement();
+    }
+
+    function toggleAddTableForm(show) {
+      const container = document.getElementById('addTableFormContainer');
+      if (!container) return;
+      if (show === undefined) {
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+      } else {
+        container.style.display = show ? 'block' : 'none';
+      }
+      if (container.style.display === 'block') {
+        document.getElementById('tableFormNumber')?.focus();
+      } else {
+        // Reset form
+        document.getElementById('editTableId').value = '';
+        document.getElementById('tableFormNumber').value = '';
+        document.getElementById('tableFormName').value = '';
+        document.getElementById('tableFormCapacity').value = '4';
+        document.getElementById('tableFormNote').value = '';
+        document.getElementById('tableFormTitle').textContent = '➕ Input Pendaftaran Meja Baru';
+      }
+    }
+
+    function saveMasterTable() {
+      const editId = document.getElementById('editTableId').value.trim();
+      const num = document.getElementById('tableFormNumber').value.trim();
+      const name = document.getElementById('tableFormName').value.trim() || ('Meja ' + num);
+      const zone = document.getElementById('tableFormZone').value;
+      const cap = parseInt(document.getElementById('tableFormCapacity').value) || 4;
+      const note = document.getElementById('tableFormNote').value.trim();
+
+      if (!num) return showToast('Nomor meja harus diisi!');
+
+      const tables = getMasterTables();
+      const duplicate = tables.find(t => t.number.toLowerCase() === num.toLowerCase() && t.id !== editId);
+      if (duplicate) return showToast(`Nomor meja ${num} sudah terdaftar! Gunakan nomor lain.`);
+
+      const qrData = `https://warungkopiluhur.xyz/?meja=${encodeURIComponent(num)}`;
+
+      if (editId) {
+        const idx = tables.findIndex(t => t.id === editId);
+        if (idx !== -1) {
+          tables[idx] = { ...tables[idx], number: num, name, zone, capacity: cap, note, qrData };
+          showToast(`✅ Data Meja ${num} berhasil diperbarui & QR Code ter-update!`);
+        }
+      } else {
+        const newTable = {
+          id: 'tbl-' + Date.now(),
+          number: num,
+          name,
+          zone,
+          capacity: cap,
+          note,
+          qrData,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+        tables.push(newTable);
+        showToast(`✅ Meja ${num} berhasil didaftarkan & QR Code unik langsung aktif!`);
+      }
+
+      saveMasterTables(tables);
+      toggleAddTableForm(false);
+    }
+
+    function editMasterTable(id) {
+      const tables = getMasterTables();
+      const tbl = tables.find(t => t.id === id);
+      if (!tbl) return;
+
+      document.getElementById('editTableId').value = tbl.id;
+      document.getElementById('tableFormNumber').value = tbl.number;
+      document.getElementById('tableFormName').value = tbl.name;
+      document.getElementById('tableFormZone').value = tbl.zone;
+      document.getElementById('tableFormCapacity').value = tbl.capacity;
+      document.getElementById('tableFormNote').value = tbl.note || '';
+      document.getElementById('tableFormTitle').textContent = `✏️ Edit Data Meja ${tbl.number}`;
+
+      toggleAddTableForm(true);
+      document.getElementById('addTableFormContainer')?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deleteMasterTable(id) {
+      const tables = getMasterTables();
+      const tbl = tables.find(t => t.id === id);
+      if (!tbl) return;
+
+      if (isTableOccupied(tbl.number)) {
+        return showToast(`⛔ Meja ${tbl.number} sedang aktif terisi Open Bill! Selesaikan tagihan terlebih dahulu sebelum menghapus.`);
+      }
+
+      if (!confirm(`Yakin ingin menghapus Meja ${tbl.number} (${tbl.name})?\n\nQR Code yang sudah dicetak tidak akan bisa digunakan lagi.`)) return;
+
+      const filtered = tables.filter(t => t.id !== id);
+      saveMasterTables(filtered);
+      showToast(`🗑️ Meja ${tbl.number} berhasil dihapus.`);
+    }
+
+    function renderTableManagement() {
+      const tables = getMasterTables();
+      const grid = document.getElementById('tableCardsGrid');
+      const search = (document.getElementById('tableSearchInput')?.value || '').trim().toLowerCase();
+
+      // Stats
+      const total = tables.length;
+      let occupiedCount = 0;
+      let totalPax = 0;
+      tables.forEach(t => {
+        totalPax += parseInt(t.capacity) || 0;
+        if (isTableOccupied(t.number)) occupiedCount++;
+      });
+      const availableCount = total - occupiedCount;
+
+      if (document.getElementById('statTableTotal')) document.getElementById('statTableTotal').textContent = total;
+      if (document.getElementById('statTableAvailable')) document.getElementById('statTableAvailable').textContent = availableCount;
+      if (document.getElementById('statTableOccupied')) document.getElementById('statTableOccupied').textContent = occupiedCount;
+      if (document.getElementById('statTablePax')) document.getElementById('statTablePax').textContent = totalPax + ' Pax';
+      if (document.getElementById('headerTableCount')) document.getElementById('headerTableCount').textContent = total;
+      if (document.getElementById('cashierTableCount')) document.getElementById('cashierTableCount').textContent = total;
+
+      if (!grid) return;
+
+      let filtered = tables;
+      if (tableActiveZoneFilter !== 'ALL') {
+        filtered = filtered.filter(t => t.zone === tableActiveZoneFilter);
+      }
+      if (search) {
+        filtered = filtered.filter(t => t.number.toLowerCase().includes(search) || t.name.toLowerCase().includes(search) || (t.note && t.note.toLowerCase().includes(search)));
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:36px;color:var(--ink-muted);">
+            <div style="font-size:36px;margin-bottom:8px;">🪑</div>
+            <strong style="font-size:14px;color:var(--ink-espresso);">Tidak Ada Meja yang Sesuai Filter</strong>
+            <p style="font-size:11.5px;margin-top:4px;">Klik tombol "➕ Daftarkan Meja Baru" di atas untuk menambahkan meja kedai.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const zoneMeta = {
+        INDOOR: { label: '🏢 Indoor AC', bg: '#EFF6FF', color: '#1D4ED8' },
+        OUTDOOR: { label: '🌿 Outdoor Garden', bg: '#F0FDF4', color: '#15803D' },
+        BAR: { label: '☕ Bar Counter', bg: '#FEF3C7', color: '#B45309' },
+        VIP: { label: '⭐ VIP Room', bg: '#FDF2F4', color: '#BC012E' }
+      };
+
+      grid.innerHTML = filtered.map(tbl => {
+        const occ = isTableOccupied(tbl.number);
+        const meta = zoneMeta[tbl.zone] || { label: tbl.zone, bg: '#F1F5F9', color: '#475569' };
+        const qrUrl = tbl.qrData || `https://warungkopiluhur.xyz/?meja=${encodeURIComponent(tbl.number)}`;
+        const qrSvg = makeQrSvg(qrUrl, 68);
+
+        return `
+          <div style="background:var(--surface-card);border:1.5px solid ${occ ? '#FECACA' : 'var(--border-hairline)'};border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,0.03);position:relative;">
+            
+            <!-- Table Header & Status -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span class="serif" style="font-size:18px;font-weight:800;color:var(--ink-espresso);">Meja ${tbl.number}</span>
+                  <span class="badge" style="font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;background:${meta.bg};color:${meta.color};">${meta.label}</span>
+                </div>
+                <div style="font-size:11px;color:var(--ink-muted);margin-top:2px;">${tbl.name} • 👥 <strong>${tbl.capacity} Kursi</strong></div>
+                ${tbl.note ? `<div style="font-size:10px;color:#6B7280;margin-top:2px;">💡 ${tbl.note}</div>` : ''}
+              </div>
+              <span class="badge" style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:${occ ? '#FEE2E2' : '#DCFCE7'};color:${occ ? '#991B1B' : '#166534'};border:1px solid ${occ ? '#FCA5A5' : '#86EFAC'};">
+                ${occ ? '🔴 Terisi' : '🟢 Kosong'}
+              </span>
+            </div>
+
+            <!-- QR Code Card Box -->
+            <div style="display:flex;align-items:center;gap:12px;background:#F8F9FA;padding:10px 12px;border-radius:12px;border:1px dashed var(--border-hairline);">
+              <div style="width:72px;height:72px;background:#FFFFFF;border:1px solid var(--border-hairline);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.05);" onclick="previewTableQrLarge('${tbl.number}', '${tbl.name}')" title="Klik untuk memperbesar QR Code">
+                ${qrSvg}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:11.5px;font-weight:800;color:var(--ink-espresso);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">QR Self-Order Meja ${tbl.number}</div>
+                <div style="font-size:10px;color:var(--ink-muted);margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Auto Print Kasir &amp; Tiket KDS</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <button type="button" class="btn-dark" style="padding:4px 9px;font-size:10.5px;background:#111827;color:#FFF;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;" onclick="printTableQrSticker('${tbl.number}')" title="Cetak Stiker Ukuran Thermal Struk">
+                    🖨️ Cetak
+                  </button>
+                  <button type="button" class="btn-pay" style="padding:4px 9px;font-size:10.5px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;" onclick="downloadTableQrPng('${tbl.number}', '${tbl.name}')" title="Download Gambar PNG untuk Cetak Akrilik Meja">
+                    ⬇️ Download QR
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid var(--border-hairline);">
+              <div style="display:flex;gap:4px;">
+                <button type="button" class="btn-dark" style="padding:4px 8px;font-size:10.5px;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;border-radius:6px;cursor:pointer;" onclick="testOpenCustomerSelfOrder('${tbl.number}')" title="Tes buka tampilan HP tamu untuk meja ini">
+                  📱 Buka Tamu
+                </button>
+                <button type="button" class="btn-dark" style="padding:4px 8px;font-size:10.5px;background:#F1F5F9;color:var(--ink-espresso);border:1px solid var(--border-hairline);border-radius:6px;cursor:pointer;" onclick="editMasterTable('${tbl.id}')" title="Ubah data meja">
+                  ✏️ Edit
+                </button>
+              </div>
+              <button type="button" style="background:transparent;border:none;color:#991B1B;cursor:pointer;font-size:11px;font-weight:700;padding:2px 6px;" onclick="deleteMasterTable('${tbl.id}')" title="Hapus meja ini">
+                🗑️ Hapus
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function populateTableDropdowns() {
+      const tables = getMasterTables();
+      const cartSel = document.getElementById('cartTableQuickSelect');
+      if (cartSel) {
+        cartSel.innerHTML = '<option value="">Pilih Meja...</option>' + tables.map(t => `
+          <option value="${t.number}">Meja ${t.number} (${t.zone})</option>
+        `).join('');
+      }
+    }
+
+    function onCartTableQuickSelect(num) {
+      if (!num) return;
+      const inp = document.getElementById('tableNameInput');
+      if (inp) {
+        const tables = getMasterTables();
+        const found = tables.find(t => t.number === num);
+        inp.value = found ? found.name : ('Meja ' + num);
+        showToast(`🪑 Meja ${num} dipilih untuk transaksi ini.`);
+      }
+    }
+
+    function downloadTableQrPng(tableNumber, tableName) {
+      const qrData = `https://warungkopiluhur.xyz/?meja=${encodeURIComponent(tableNumber)}`;
+      const svgString = makeQrSvg(qrData, 280);
+
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const DOMURL = window.URL || window.webkitURL || window;
+      const url = DOMURL.createObjectURL(svgBlob);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 380;
+      canvas.height = 520;
+      const ctx = canvas.getContext('2d');
+
+      const img = new Image();
+      img.onload = function() {
+        // Background white
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Outer rounded card border
+        ctx.strokeStyle = '#E5E7EB';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+        // Top Crimson Accent Banner
+        ctx.fillStyle = '#BC012E';
+        ctx.fillRect(10, 10, canvas.width - 20, 12);
+
+        // Header Title
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('WARUNG KOPI LUHUR', canvas.width / 2, 50);
+
+        ctx.fillStyle = '#6B7280';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('Cita Rasa Luhur Warisan Nusantara', canvas.width / 2, 70);
+
+        // Table Pill
+        ctx.fillStyle = '#FDF2F4';
+        ctx.fillRect(60, 88, canvas.width - 120, 46);
+        ctx.strokeStyle = '#F7CCD3';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(60, 88, canvas.width - 120, 46);
+
+        ctx.fillStyle = '#BC012E';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.fillText('MEJA ' + tableNumber, canvas.width / 2, 120);
+
+        // Draw QR Image
+        ctx.drawImage(img, 50, 146, 280, 280);
+
+        // Instructions Footer
+        ctx.fillStyle = '#111827';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText('SCAN UNTUK ORDER & BAYAR MANDIRI', canvas.width / 2, 452);
+
+        ctx.fillStyle = '#6B7280';
+        ctx.font = '10.5px sans-serif';
+        ctx.fillText('Pesanan otomatis terkirim langsung ke Barista & Dapur', canvas.width / 2, 472);
+
+        ctx.fillStyle = '#9CA3AF';
+        ctx.font = '9px sans-serif';
+        ctx.fillText('powered by Amperix Technology', canvas.width / 2, 498);
+
+        // Download trigger
+        const pngData = canvas.toDataURL('image/png');
+        const dlLink = document.createElement('a');
+        dlLink.download = `QR_Meja_${tableNumber}_KopiLuhur.png`;
+        dlLink.href = pngData;
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+        DOMURL.revokeObjectURL(url);
+        showToast(`✅ Berhasil mengunduh stiker gambar QR Meja ${tableNumber}!`);
+      };
+      img.src = url;
+    }
+
+    function printTableQrSticker(tableNum) {
+      const table = tableNum || selfOrderActiveTable || '03';
+      const w = window.open('', '_blank', 'width=380,height=560');
+      if (!w) return showToast('Izinkan popup browser untuk mencetak stiker QR meja.');
+
+      const qrSvg = makeQrSvg(`https://warungkopiluhur.xyz/?meja=${encodeURIComponent(table)}`, 200);
+      w.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Stiker QR Meja ${table} - Warung Kopi Luhur</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; color: #111827; margin: 0; background: #FFF; }
+            .card { border: 2.5px solid #BC012E; border-radius: 16px; padding: 20px 14px; background: #FFF; }
+            .title { margin: 0 0 2px; font-size: 18px; font-weight: 800; letter-spacing: 0.5px; }
+            .sub { font-size: 10.5px; color: #6B7280; margin-bottom: 12px; }
+            .pill { display: inline-block; background: #BC012E; color: #FFF; font-weight: 800; font-size: 18px; padding: 6px 20px; border-radius: 999px; margin-bottom: 14px; letter-spacing: 1px; }
+            .qr-wrap { display: flex; justify-content: center; margin: 10px 0; }
+            .inst { font-size: 13px; font-weight: 800; margin: 12px 0 3px; color: #111827; }
+            .desc { font-size: 10.5px; color: #4B5563; line-height: 1.4; margin: 0; }
+            .footer { font-size: 9px; color: #9CA3AF; margin-top: 14px; border-top: 1px dashed #E5E7EB; padding-top: 8px; }
+            @media print {
+              body { padding: 0; }
+              .card { border: 2px solid #000; }
+              .pill { background: #000 !important; color: #FFF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="title">WARUNG KOPI LUHUR</div>
+            <div class="sub">Cita Rasa Luhur Warisan Nusantara</div>
+            <div class="pill">MEJA ${table}</div>
+            <div class="qr-wrap">${qrSvg}</div>
+            <div class="inst">SCAN UNTUK ORDER &amp; BAYAR MANDIRI</div>
+            <p class="desc">Buka kamera HP atau scanner QRIS Anda,<br>pilih menu &amp; pesanan langsung terkirim ke dapur.</p>
+            <div class="footer">powered by Amperix Technology</div>
+          </div>
+          <script>
+            window.onload = function() { window.print(); };
+          <\/script>
+        </body>
+        </html>
+      `);
+      w.document.close();
+      showToast(`🖨️ Stiker QR Barcode Meja ${table} dikirim ke printer!`);
+    }
+
+    function previewTableQrLarge(tableNum, tableName) {
+      const qrData = `https://warungkopiluhur.xyz/?meja=${encodeURIComponent(tableNum)}`;
+      const titleEl = document.getElementById('largeQrModalTitle');
+      const labelEl = document.getElementById('largeQrLabel');
+      const containerEl = document.getElementById('largeQrContainer');
+
+      if (titleEl) titleEl.textContent = `Barcode QR Meja ${tableNum}`;
+      if (labelEl) labelEl.textContent = `${tableName || ('Meja ' + tableNum)} • Warung Kopi Luhur`;
+      if (containerEl) containerEl.innerHTML = makeQrSvg(qrData, 240);
+
+      const printBtn = document.getElementById('largeQrPrintBtn');
+      if (printBtn) printBtn.onclick = () => printTableQrSticker(tableNum);
+
+      const dlBtn = document.getElementById('largeQrDownloadBtn');
+      if (dlBtn) dlBtn.onclick = () => downloadTableQrPng(tableNum, tableName);
+
+      const testBtn = document.getElementById('largeQrTestBtn');
+      if (testBtn) testBtn.onclick = () => {
+        closeModal('tableQrLargePreviewModal');
+        testOpenCustomerSelfOrder(tableNum);
+      };
+
+      openModal('tableQrLargePreviewModal');
+    }
+
+    function testOpenCustomerSelfOrder(tableNum) {
+      closeModal('tableMgmtModal');
+      closeModal('tableQrLargePreviewModal');
+      selfOrderActiveTable = tableNum;
+      openCustomerSelfOrderModal(tableNum);
     }
 
     function updateSelfOrderQr() {
@@ -7206,6 +7759,8 @@
     renderLoyaltyCard();
     renderInventory();
     renderOwnerHub();
+    getMasterTables();
+    populateTableDropdowns();
     document.getElementById('waQrContainer').innerHTML = makeQrSvg('WKL-WA-PAIRING-2026', 150);
 
     // Set Login Modal Logo
