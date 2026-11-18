@@ -2350,127 +2350,42 @@
 
   <!-- MODAL: LOGIN PORTAL (ROLE-BASED AUTH) -->
   <div class="modal-backdrop open" id="loginPortalModal">
-    <div class="modal-box" style="max-width:500px;padding:26px 24px;box-shadow: 0 25px 60px rgba(36,28,22,0.4);max-height:90vh;overflow-y:auto;">
+    <div class="modal-box" style="max-width:440px;padding:28px 24px;box-shadow: 0 25px 60px rgba(36,28,22,0.4);max-height:90vh;overflow-y:auto;">
       <!-- Brand & Title -->
-      <div style="text-align:center;margin-bottom:18px;">
+      <div style="text-align:center;margin-bottom:20px;">
         <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 10px;background:var(--surface-card);border:2px solid var(--border-hairline);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 4px 12px rgba(36,28,22,0.1);">
           <img id="loginLogoImg" src="" style="width:100%;height:100%;object-fit:cover;" alt="WKL Logo" />
         </div>
         <h2 class="serif" style="font-size:22px;color:var(--ink-espresso);margin-bottom:3px;">Warung Kopi <span class="italic" style="color:#BC012E;">Luhur</span></h2>
         <p style="font-size:12px;color:var(--ink-muted);font-weight:600;">Sistem Otorisasi Peran &amp; Akses Halaman (RBAC)</p>
-        <p style="font-size:11px;color:var(--ink-muted);margin-top:2px;">Setiap role hanya dapat melihat dan mengerjakan task khusus miliknya.</p>
+        <p style="font-size:11px;color:var(--ink-muted);margin-top:2px;">Silakan login dengan Username / Email dan Password Anda.</p>
       </div>
 
-      <!-- Mode Switcher (Email/Password vs PIN Numpad) -->
-      <div style="display:flex;gap:4px;background:var(--bg-oat-dark);padding:4px;border-radius:999px;margin-bottom:16px;">
-        <button id="tabBtnEmail" class="btn-dark" style="flex:1;padding:8px;font-size:11.5px;border-radius:999px;border:none;cursor:pointer;background:var(--surface-card);color:var(--ink-espresso);font-weight:700;box-shadow:0 2px 4px rgba(0,0,0,0.06);" onclick="switchLoginMode('email')">📧 Email &amp; Password</button>
-        <button id="tabBtnPin" class="btn-dark" style="flex:1;padding:8px;font-size:11.5px;border-radius:999px;border:none;cursor:pointer;background:transparent;color:var(--ink-muted);font-weight:700;" onclick="switchLoginMode('pin')">🔢 PIN Numpad Cepat</button>
-      </div>
-
-      <!-- Form Email & Password -->
+      <!-- Form Email / Username & Password -->
       <div id="loginFormEmail" style="display:block;">
-        <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
           <div>
-            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:5px;">Email / Username Akun:</label>
-            <input type="text" id="loginEmailInput" class="field" placeholder="contoh: reza.pratama.putra@gmail.com" style="width:100%;box-sizing:border-box;padding:10px 14px;font-size:13px;border-radius:12px;" />
+            <label style="display:block;font-size:11.5px;font-weight:700;color:var(--ink-espresso);margin-bottom:6px;">Username atau Email Akun:</label>
+            <input type="text" id="loginEmailInput" class="field" placeholder="contoh: reza, kasir, barista, atau admin" style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:13px;border-radius:12px;" onkeydown="if(event.key==='Enter') document.getElementById('loginPasswordInput').focus();" />
           </div>
           <div>
-            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:5px;">Password Akun:</label>
+            <label style="display:block;font-size:11.5px;font-weight:700;color:var(--ink-espresso);margin-bottom:6px;">Password Akun:</label>
             <div style="position:relative;">
-              <input type="password" id="loginPasswordInput" class="field" placeholder="••••••••" style="width:100%;box-sizing:border-box;padding:10px 42px 10px 14px;font-size:13px;border-radius:12px;" onkeydown="if(event.key==='Enter') submitEmailLogin()" />
-              <button type="button" onclick="togglePasswordVisibility('loginPasswordInput', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:transparent;cursor:pointer;color:var(--ink-muted);font-size:14px;">👁️</button>
+              <input type="password" id="loginPasswordInput" class="field" placeholder="••••••••" style="width:100%;box-sizing:border-box;padding:11px 42px 11px 14px;font-size:13px;border-radius:12px;" onkeydown="if(event.key==='Enter') submitEmailLogin()" />
+              <button type="button" onclick="togglePasswordVisibility('loginPasswordInput', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:transparent;cursor:pointer;color:var(--ink-muted);font-size:15px;">👁️</button>
             </div>
           </div>
 
-          <div id="loginErrorMsg" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:8px 12px;border-radius:10px;font-size:11.5px;font-weight:600;"></div>
+          <div id="loginErrorMsg" style="display:none;background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:600;"></div>
 
-          <button class="btn-pay" style="width:100%;padding:12px;font-size:13px;margin-top:4px;border-radius:12px;" onclick="submitEmailLogin()">
+          <button class="btn-pay" style="width:100%;padding:13px;font-size:13.5px;margin-top:6px;border-radius:12px;font-weight:700;" onclick="submitEmailLogin()">
             🔑 Masuk ke Sistem (Login)
           </button>
         </div>
       </div>
 
-      <!-- Form PIN Cepat -->
-      <div id="loginFormPin" style="display:none;">
-        <div style="text-align:center;margin-bottom:12px;">
-          <p style="font-size:11.5px;color:var(--ink-muted);">Ketik 4-digit PIN staf untuk masuk langsung:</p>
-        </div>
-        <div id="loginPortalPinDots" style="display:flex;justify-content:center;gap:14px;margin-bottom:16px;"></div>
-        <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;max-width:260px;margin:0 auto 10px;">
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('1')">1</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('2')">2</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('3')">3</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('4')">4</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('5')">5</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('6')">6</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('7')">7</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('8')">8</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('9')">9</button>
-          <button class="btn-dark" style="padding:12px;font-size:14px;font-weight:700;background:var(--bg-oat-dark);" onclick="clearLoginPin()">C</button>
-          <button class="btn-dark" style="padding:12px;font-size:18px;font-weight:700;" onclick="pressLoginPin('0')">0</button>
-          <button class="btn-dark" style="padding:12px;font-size:16px;font-weight:700;background:var(--bg-oat-dark);" onclick="backspaceLoginPin()">⌫</button>
-        </div>
-      </div>
-
-      <!-- Quick Demo Role Selector -->
-      <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border-hairline);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-size:10.5px;font-weight:800;color:var(--ink-espresso);text-transform:uppercase;letter-spacing:0.5px;">⚡ Akses Cepat Demo Role (1-Klik):</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;max-height:190px;overflow-y:auto;padding-right:2px;">
-          <!-- Superadmin 1 -->
-          <button type="button" onclick="quickFillLogin('reza.pratama.putra@gmail.com', 'Luhur2026')" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-card);border:1px solid var(--border-hairline);padding:7px 10px;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.15s ease;">
-            <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);">👑 Superadmin Reza Pratama</div>
-              <div style="font-size:9.5px;color:var(--ink-muted);">reza.pratama.putra@gmail.com • Akses Semua Role &amp; Daftar User</div>
-            </div>
-            <span class="role-tag" style="background:#B91C1C;color:#FFF;">SUPERADMIN</span>
-          </button>
-          <!-- Superadmin 2 -->
-          <button type="button" onclick="quickFillLogin('Kopiluhur@gmail.com', 'Luhur2026')" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-card);border:1px solid var(--border-hairline);padding:7px 10px;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.15s ease;">
-            <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);">☕ Superadmin Kopi Luhur</div>
-              <div style="font-size:9.5px;color:var(--ink-muted);">Kopiluhur@gmail.com • Akses Semua Role &amp; Daftar User</div>
-            </div>
-            <span class="role-tag" style="background:#B91C1C;color:#FFF;">SUPERADMIN</span>
-          </button>
-          <!-- Kasir -->
-          <button type="button" onclick="quickFillLogin('kasir@kopiluhur.id', 'Kasir123')" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-card);border:1px solid var(--border-hairline);padding:7px 10px;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.15s ease;">
-            <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);">☕ Kasir POS (Siti Rahma)</div>
-              <div style="font-size:9.5px;color:var(--ink-muted);">kasir@kopiluhur.id • Khusus Halaman Kasir POS &amp; QRIS</div>
-            </div>
-            <span class="role-tag" style="background:var(--accent-sky);color:var(--ink-espresso);">KASIR ONLY</span>
-          </button>
-          <!-- Barista -->
-          <button type="button" onclick="quickFillLogin('barista@kopiluhur.id', 'Barista123')" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-card);border:1px solid var(--border-hairline);padding:7px 10px;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.15s ease;">
-            <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);">👨‍🍳 Barista KDS (Budi Santoso)</div>
-              <div style="font-size:9.5px;color:var(--ink-muted);">barista@kopiluhur.id • Khusus Antrean Minuman Barista</div>
-            </div>
-            <span class="role-tag" style="background:var(--accent-gold);color:#FFF;">BARISTA ONLY</span>
-          </button>
-          <!-- Kitchen -->
-          <button type="button" onclick="quickFillLogin('kitchen@kopiluhur.id', 'Kitchen123')" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-card);border:1px solid var(--border-hairline);padding:7px 10px;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.15s ease;">
-            <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);">🍳 Kitchen KDS (Agus Pratama)</div>
-              <div style="font-size:9.5px;color:var(--ink-muted);">kitchen@kopiluhur.id • Khusus Antrean Dapur &amp; Snack</div>
-            </div>
-            <span class="role-tag" style="background:#D97706;color:#FFF;">KITCHEN ONLY</span>
-          </button>
-          <!-- Manager -->
-          <button type="button" onclick="quickFillLogin('manager@kopiluhur.id', 'Manager123')" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface-card);border:1px solid var(--border-hairline);padding:7px 10px;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.15s ease;">
-            <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);">📊 Supervisor (Dewi Lestari)</div>
-              <div style="font-size:9.5px;color:var(--ink-muted);">manager@kopiluhur.id • Akses Kelola Menu (Create Menu), Kasir, KDS, Stok &amp; P&amp;L</div>
-            </div>
-            <span class="role-tag" style="background:var(--accent-green);color:#FFF;">SUPERVISOR</span>
-          </button>
-        </div>
-
-        <div style="text-align:center;margin-top:16px;padding-top:10px;border-top:1px solid var(--border-hairline);font-size:11px;color:var(--ink-muted);">
-          powered by <strong style="color:var(--ink-espresso);font-weight:800;">Amperix Technology</strong>
-        </div>
+      <div style="text-align:center;margin-top:22px;padding-top:14px;border-top:1px solid var(--border-hairline);font-size:11px;color:var(--ink-muted);">
+        powered by <strong style="color:var(--ink-espresso);font-weight:800;">Amperix Technology</strong>
       </div>
     </div>
   </div>
@@ -3500,6 +3415,7 @@
       {
         id: 'usr-super-1',
         name: 'Reza Pratama Putra',
+        username: 'reza',
         email: 'reza.pratama.putra@gmail.com',
         password: 'Luhur2026',
         role: 'SUPERADMIN',
@@ -3510,6 +3426,7 @@
       {
         id: 'usr-super-2',
         name: 'Kopi Luhur Admin',
+        username: 'admin',
         email: 'Kopiluhur@gmail.com',
         password: 'Luhur2026',
         role: 'SUPERADMIN',
@@ -3520,6 +3437,7 @@
       {
         id: 'usr-cashier-1',
         name: 'Siti Rahma (Kasir)',
+        username: 'kasir',
         email: 'kasir@kopiluhur.id',
         password: 'Kasir123',
         role: 'CASHIER',
@@ -3530,6 +3448,7 @@
       {
         id: 'usr-barista-1',
         name: 'Budi Santoso (Barista)',
+        username: 'barista',
         email: 'barista@kopiluhur.id',
         password: 'Barista123',
         role: 'BARISTA',
@@ -3540,6 +3459,7 @@
       {
         id: 'usr-kitchen-1',
         name: 'Agus Pratama (Kitchen)',
+        username: 'kitchen',
         email: 'kitchen@kopiluhur.id',
         password: 'Kitchen123',
         role: 'KITCHEN',
@@ -3550,6 +3470,7 @@
       {
         id: 'usr-mgr-1',
         name: 'Dewi Lestari (Supervisor)',
+        username: 'manager',
         email: 'manager@kopiluhur.id',
         password: 'Manager123',
         role: 'MANAGER',
@@ -3604,22 +3525,35 @@
 
     function getUsers() {
       const stored = localStorage.getItem('wkl_registered_users_v2');
+      let users = DEFAULT_USERS;
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          const hasReza = parsed.some(u => u.email.toLowerCase() === 'reza.pratama.putra@gmail.com');
-          const hasKopi = parsed.some(u => u.email.toLowerCase() === 'kopiluhur@gmail.com');
-          if (!hasReza || !hasKopi) {
-            localStorage.setItem('wkl_registered_users_v2', JSON.stringify(DEFAULT_USERS));
-            return DEFAULT_USERS;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            users = parsed;
           }
-          return parsed;
         } catch(e) {
-          return DEFAULT_USERS;
+          users = DEFAULT_USERS;
         }
       }
-      localStorage.setItem('wkl_registered_users_v2', JSON.stringify(DEFAULT_USERS));
-      return DEFAULT_USERS;
+      // Ensure all users have username attached
+      let modified = false;
+      users = users.map(u => {
+        const def = DEFAULT_USERS.find(d => 
+          (d.email && u.email && d.email.toLowerCase() === u.email.toLowerCase()) || 
+          (d.id && u.id && d.id === u.id)
+        );
+        let uname = u.username || (def ? def.username : (u.email ? u.email.split('@')[0] : u.id));
+        if (u.username !== uname) {
+          modified = true;
+          u.username = uname;
+        }
+        return u;
+      });
+      if (modified || !stored) {
+        localStorage.setItem('wkl_registered_users_v2', JSON.stringify(users));
+      }
+      return users;
     }
 
     function saveUsers(users) {
@@ -6156,20 +6090,22 @@
     // LOGIN PORTAL (ROLE-BASED AUTHENTICATION)
     // ==========================================
     function openLoginPortal() {
-      document.getElementById('loginEmailInput').value = '';
-      document.getElementById('loginPasswordInput').value = '';
+      const emailInput = document.getElementById('loginEmailInput');
+      const passInput = document.getElementById('loginPasswordInput');
+      if (emailInput) emailInput.value = '';
+      if (passInput) passInput.value = '';
       const err = document.getElementById('loginErrorMsg');
       if (err) err.style.display = 'none';
-
-      loginPortalPinBuffer = '';
-      renderLoginPortalPinDots();
 
       const logoImg = document.getElementById('loginLogoImg');
       const avatarImg = document.querySelector('.brand-avatar img');
       if (logoImg && avatarImg) logoImg.src = avatarImg.src;
 
-      switchLoginMode('email');
-      document.getElementById('loginPortalModal').classList.add('open');
+      const modal = document.getElementById('loginPortalModal');
+      if (modal) modal.classList.add('open');
+      setTimeout(() => {
+        if (emailInput) emailInput.focus();
+      }, 100);
     }
 
     function switchLoginMode(mode) {
@@ -6211,24 +6147,30 @@
     }
 
     function submitEmailLogin() {
-      const email = document.getElementById('loginEmailInput').value.trim().toLowerCase();
-      const pass = document.getElementById('loginPasswordInput').value.trim();
+      const identifier = (document.getElementById('loginEmailInput').value || '').trim();
+      const pass = (document.getElementById('loginPasswordInput').value || '').trim();
       const errEl = document.getElementById('loginErrorMsg');
 
-      if (!email || !pass) {
-        errEl.textContent = 'Harap masukkan email dan password akun!';
+      if (!identifier || !pass) {
+        errEl.textContent = 'Harap masukkan Username / Email dan Password!';
         errEl.style.display = 'block';
         return;
       }
 
       const users = getUsers();
-      const matched = users.find(u => u.email.toLowerCase() === email && u.password === pass);
+      const lowerId = identifier.toLowerCase();
+      const matched = users.find(u => 
+        ((u.username && u.username.toLowerCase() === lowerId) || 
+         (u.email && u.email.toLowerCase() === lowerId) ||
+         (u.name && u.name.toLowerCase() === lowerId)) &&
+        u.password === pass
+      );
 
       if (matched) {
         errEl.style.display = 'none';
         applyUserSession(matched);
       } else {
-        errEl.textContent = 'Email atau password salah! Pastikan kredensial Anda benar.';
+        errEl.textContent = 'Username/Email atau Password salah! Periksa kembali kredensial Anda.';
         errEl.style.display = 'block';
       }
     }
@@ -6382,11 +6324,11 @@
             <td style="padding:10px;">${idx + 1}</td>
             <td style="padding:10px;">
               <div style="font-weight:700;color:var(--ink-espresso);">${u.name} ${isCurrent ? '<span style="font-size:9.5px;color:#15803D;">(Anda)</span>' : ''}</div>
-              <div style="font-size:10px;color:var(--ink-muted);">PIN: <code>${u.pin || '----'}</code></div>
+              <div style="font-size:10.5px;color:var(--ink-muted);">Username: <strong style="color:#BC012E;">${u.username || u.email.split('@')[0]}</strong> • PIN: <code>${u.pin || '----'}</code></div>
             </td>
             <td style="padding:10px;">
               <div style="font-weight:600;color:var(--ink-espresso);">${u.email}</div>
-              <div style="font-size:10px;color:var(--ink-muted);">Pass: ••••••••</div>
+              <div style="font-size:10.5px;color:var(--ink-muted);">Password: <code>${u.password || '••••••••'}</code></div>
             </td>
             <td style="padding:10px;">
               <span class="role-tag" style="${roleCfg.badgeStyle}">${roleCfg.badge}</span>
