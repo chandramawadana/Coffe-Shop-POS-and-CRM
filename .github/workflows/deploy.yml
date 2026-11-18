@@ -27,6 +27,8 @@ jobs:
           username: ${{ secrets.FTP_USERNAME || 'warz9844' }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: public_html/
+          timeout: 120000
+          security: loose
           dangerous-clean-slate: false
           exclude: |
             **/.git*
