@@ -2638,7 +2638,7 @@
         <div class="panel-card" style="display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
           <div id="payMethodDetail"></div>
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <button class="btn-pay" onclick="confirmPayment(false)">✅ Konfirmasi Lunas (Kirim ke Barista/Kitchen)</button>
+            <button class="btn-pay" id="btnConfirmPayment" onclick="confirmPayment(false)">✅ Konfirmasi Lunas (Kirim ke Barista/Kitchen)</button>
             <button class="btn-dark" style="border-radius:999px;padding:10px;" onclick="confirmPayment(true)">🧾 Simpan Sebagai Open Tab</button>
           </div>
         </div>
@@ -3759,6 +3759,8 @@
     let payMethod = 'CASH';
     let orderType = 'DINE_IN';
     let cashReceived = 0;
+    let splitCashAmt = 0;
+    let splitQrisAmt = 0;
 
     // Surcharges & Pricing Engine
     let currentChannel = 'DINE_IN'; // 'DINE_IN', 'TAKEAWAY', 'GOFOOD', 'GRABFOOD', 'SHOPEEFOOD'
@@ -5224,9 +5226,13 @@
     // CASHIER PAYMENT, RECONCILIATION & TABS
     // ==========================================
     function openPaymentModal() {
-      const total = cart.reduce((s, it) => s + it.unitPrice * it.qty, 0);
+      const total = getCartBillingSummary().finalTotal;
       cashReceived = total;
+      splitCashAmt = Math.floor(total / 2);
+      splitQrisAmt = total - splitCashAmt;
       document.getElementById('payModalTotal').textContent = rp(total);
+      const confirmBtn = document.getElementById('btnConfirmPayment');
+      if (confirmBtn) confirmBtn.disabled = false;
       selectPayMethod('CASH');
       document.getElementById('paymentModal').classList.add('open');
     }
@@ -5237,13 +5243,69 @@
       document.getElementById('typeTakeaway')?.classList.toggle('active', t === 'TAKEAWAY');
     }
 
+    function updateSplitValidation(total) {
+      const sum = (Number(splitCashAmt) || 0) + (Number(splitQrisAmt) || 0);
+      const box = document.getElementById('splitValidationBox');
+      const confirmBtn = document.getElementById('btnConfirmPayment');
+      const isNegative = splitCashAmt < 0 || splitQrisAmt < 0;
+      const isValid = !isNegative && sum === total;
+
+      if (confirmBtn && payMethod === 'SPLIT') {
+        confirmBtn.disabled = !isValid;
+      }
+      if (!box) return;
+
+      if (isNegative) {
+        box.style.background = '#FEE2E2';
+        box.style.borderColor = '#FCA5A5';
+        box.style.color = '#991B1B';
+        box.innerHTML = `⛔ Nominal tidak boleh negatif.`;
+      } else if (sum < total) {
+        box.style.background = '#FEF3C7';
+        box.style.borderColor = '#F59E0B';
+        box.style.color = '#92400E';
+        box.innerHTML = `⚠️ Total Split: <strong>${rp(sum)}</strong> — Kurang <strong>${rp(total - sum)}</strong> dari tagihan (${rp(total)}).`;
+      } else if (sum > total) {
+        box.style.background = '#FEE2E2';
+        box.style.borderColor = '#FCA5A5';
+        box.style.color = '#991B1B';
+        box.innerHTML = `⛔ Total Split: <strong>${rp(sum)}</strong> — Melebihi total tagihan sebesar <strong>${rp(sum - total)}</strong>! Tidak boleh lebih dari ${rp(total)}.`;
+      } else {
+        box.style.background = '#DCFCE7';
+        box.style.borderColor = '#86EFAC';
+        box.style.color = '#166534';
+        box.innerHTML = `✅ Total Split Pas: <strong>${rp(sum)}</strong> (${rp(splitCashAmt)} Tunai + ${rp(splitQrisAmt)} QRIS)`;
+      }
+    }
+
+    function onSplitInputChange(which, rawVal) {
+      const total = getCartBillingSummary().finalTotal;
+      const parsed = Math.max(0, Math.floor(Number(rawVal) || 0));
+      if (which === 'CASH') splitCashAmt = parsed;
+      else splitQrisAmt = parsed;
+      updateSplitValidation(total);
+    }
+
+    function resetSplitEqual() {
+      const total = getCartBillingSummary().finalTotal;
+      splitCashAmt = Math.floor(total / 2);
+      splitQrisAmt = total - splitCashAmt;
+      const cInp = document.getElementById('splitCashInput');
+      const qInp = document.getElementById('splitQrisInput');
+      if (cInp) cInp.value = splitCashAmt;
+      if (qInp) qInp.value = splitQrisAmt;
+      updateSplitValidation(total);
+    }
+
     function selectPayMethod(m) {
       payMethod = m;
       ['CASH', 'QRIS', 'EDC', 'SPLIT'].forEach(x => {
         const el = document.getElementById(`pm-${x}`);
         if (el) el.classList.toggle('active', x === m);
       });
-      const total = cart.reduce((s, it) => s + it.unitPrice * it.qty, 0);
+      const total = getCartBillingSummary().finalTotal;
+      const confirmBtn = document.getElementById('btnConfirmPayment');
+      if (confirmBtn && m !== 'SPLIT') confirmBtn.disabled = false;
       const box = document.getElementById('payMethodDetail');
       if (!box) return;
 
@@ -5275,18 +5337,40 @@
           <p style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Gesek / tap kartu sebesar <strong>${rp(total)}</strong></p>
         </div>`;
       } else {
-        const half = Math.floor(total / 2);
-        box.innerHTML = `<div>
-          <div style="font-size:11px;font-weight:700;margin-bottom:6px;">SPLIT BILL</div>
-          <div style="font-size:12px;margin-bottom:6px;">Tunai: <strong>${rp(half)}</strong></div>
-          <div style="font-size:12px;">EDC / QRIS: <strong>${rp(total - half)}</strong></div>
+        box.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:11px;font-weight:800;color:var(--ink-espresso);">SPLIT BILL (TUNAI + QRIS)</span>
+            <button type="button" class="cat-pill" style="padding:3px 9px;font-size:10px;" onclick="resetSplitEqual()">Bagi 50:50</button>
+          </div>
+          <div>
+            <label style="font-size:10.5px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:3px;">💵 Nominal Tunai (Cash):</label>
+            <input type="number" min="0" max="${total}" id="splitCashInput" class="field" style="font-size:15px;font-weight:800;width:100%;box-sizing:border-box;" value="${splitCashAmt}" oninput="onSplitInputChange('CASH', this.value)" />
+          </div>
+          <div>
+            <label style="font-size:10.5px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:3px;">📱 Nominal QRIS / EDC:</label>
+            <input type="number" min="0" max="${total}" id="splitQrisInput" class="field" style="font-size:15px;font-weight:800;width:100%;box-sizing:border-box;" value="${splitQrisAmt}" oninput="onSplitInputChange('QRIS', this.value)" />
+          </div>
+          <div id="splitValidationBox" style="padding:8px 10px;border-radius:10px;border:1px solid var(--border-hairline);font-size:11px;line-height:1.35;"></div>
         </div>`;
+        updateSplitValidation(total);
       }
     }
 
     function confirmPayment(isOpenTab) {
       if (cart.length === 0) return showToast('Keranjang belanja kosong!');
       const bill = getCartBillingSummary();
+      if (!isOpenTab && payMethod === 'SPLIT') {
+        const splitSum = (Number(splitCashAmt) || 0) + (Number(splitQrisAmt) || 0);
+        if (splitCashAmt < 0 || splitQrisAmt < 0) {
+          return showToast('⛔ Nominal Split Bill tidak boleh negatif!');
+        }
+        if (splitSum < bill.finalTotal) {
+          return showToast(`⚠️ Nominal Split Bill kurang ${rp(bill.finalTotal - splitSum)} dari total tagihan!`);
+        }
+        if (splitSum > bill.finalTotal) {
+          return showToast(`⛔ Nominal Split Bill tidak boleh melebihi total tagihan (${rp(bill.finalTotal)})!`);
+        }
+      }
       const num = String(orderSeq++).padStart(3, '0');
       const table = document.getElementById('tableNameInput')?.value.trim() || 'Meja Walk-In';
 
