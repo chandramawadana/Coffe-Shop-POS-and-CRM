@@ -2265,7 +2265,7 @@
                     ℹ️ <strong>Kasir POS</strong>: Kasir POS, Layar QRIS.
                   </div>
                 </div>
-                <button class="btn-pay" style="padding:10px;font-size:12px;margin-top:6px;border-radius:10px;" onclick="registerNewUser()">
+                <button type="button" class="btn-pay" style="padding:10px;font-size:12px;margin-top:6px;border-radius:10px;" onclick="registerNewUser()">
                   💾 Simpan &amp; Daftarkan Pengguna
                 </button>
                 <div id="userCreateFeedback" style="display:none;font-size:11px;font-weight:700;padding:8px 10px;border-radius:8px;"></div>
@@ -7909,7 +7909,9 @@
         isProtected: false
       };
 
-      users.push(newUser);
+      const firstNonProtectedIdx = users.findIndex(u => !u.isProtected);
+      if (firstNonProtectedIdx === -1) users.push(newUser);
+      else users.splice(firstNonProtectedIdx, 0, newUser);
       saveUsers(users);
 
       document.getElementById('newUserName').value = '';
