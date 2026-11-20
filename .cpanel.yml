@@ -4,6 +4,7 @@ deployment:
     - export DEPLOYPATH=/home/warz9844/public_html/
     - /bin/cp -f index.html $DEPLOYPATH/index.html
     - /bin/cp -f warung-kopi-luhur-pos.html $DEPLOYPATH/warung-kopi-luhur-pos.html
+    - /bin/cp -f api.php $DEPLOYPATH/api.php
     - /bin/cp -f presentation.html $DEPLOYPATH/presentation.html
     - /bin/cp -f FAQ_Cara_Pakai_POS_CRM.pdf $DEPLOYPATH/FAQ_Cara_Pakai_POS_CRM.pdf
     - /bin/cp -f FAQ_Cara_Pakai_POS_CRM.md $DEPLOYPATH/FAQ_Cara_Pakai_POS_CRM.md

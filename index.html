@@ -4218,6 +4218,96 @@
 
     function saveUsers(users) {
       localStorage.setItem('wkl_registered_users_v2', JSON.stringify(users));
+      syncToServer('users', users);
+    }
+
+    const WKL_CAN_SYNC = typeof location !== 'undefined' && location.protocol && location.protocol.startsWith('http');
+    let wklSyncInProgress = false;
+
+    function syncToServer(key, data) {
+      if (!WKL_CAN_SYNC) return;
+      try {
+        fetch(`api.php?action=save&key=${encodeURIComponent(key)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data }),
+          keepalive: true
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    function saveOrdersState() {
+      try { localStorage.setItem('wkl_orders_v1', JSON.stringify(orders)); } catch (e) {}
+      syncToServer('orders', orders);
+    }
+
+    function savePendingQrisState() {
+      try { localStorage.setItem('wkl_pending_qris_v1', JSON.stringify(pendingQrisOrders)); } catch (e) {}
+      syncToServer('pendingQris', pendingQrisOrders);
+    }
+
+    async function syncFromServer() {
+      if (!WKL_CAN_SYNC || wklSyncInProgress) return;
+      wklSyncInProgress = true;
+      try {
+        const res = await fetch(`api.php?action=load_all&_=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!json || !json.ok || !json.data) return;
+        const d = json.data;
+
+        if (Array.isArray(d.deletedDefaultUsers)) {
+          localStorage.setItem('wkl_deleted_default_users_v1', JSON.stringify(d.deletedDefaultUsers));
+        }
+        if (Array.isArray(d.users) && d.users.length > 0) {
+          localStorage.setItem('wkl_registered_users_v2', JSON.stringify(d.users));
+        } else {
+          syncToServer('users', getUsers());
+        }
+        if (Array.isArray(d.promos) && d.promos.length > 0) {
+          localStorage.setItem('wkl_master_promos_v1', JSON.stringify(d.promos));
+          syncCartDiscountOptions();
+        }
+        if (Array.isArray(d.products) && d.products.length > 0) {
+          localStorage.setItem('wkl_products_data', JSON.stringify(d.products));
+          loadProductsState();
+          renderMenu();
+        }
+        if (Array.isArray(d.tables) && d.tables.length > 0) {
+          localStorage.setItem('wkl_master_tables_v2', JSON.stringify(d.tables));
+          populateTableDropdowns();
+        }
+        if (Array.isArray(d.orders)) {
+          orders = d.orders;
+          localStorage.setItem('wkl_orders_v1', JSON.stringify(orders));
+        }
+        if (Array.isArray(d.openTabs)) {
+          openTabs = d.openTabs;
+          localStorage.setItem('wkl_open_tabs', JSON.stringify(openTabs));
+          updateOpenTabBadge();
+        }
+        if (Array.isArray(d.pendingQris)) {
+          pendingQrisOrders = d.pendingQris;
+          localStorage.setItem('wkl_pending_qris_v1', JSON.stringify(pendingQrisOrders));
+          updatePendingQrisBadge();
+        }
+        if (Array.isArray(d.attendance)) {
+          attendanceRecords = d.attendance;
+          localStorage.setItem('wkl_attendance_records', JSON.stringify(attendanceRecords));
+        }
+        if (Array.isArray(d.expenses)) {
+          dailyExpenses = d.expenses;
+        }
+
+        if (document.getElementById('view-users')?.classList.contains('active')) renderUserManagement();
+        if (document.getElementById('view-promo-mgmt')?.classList.contains('active')) renderPromoManagement();
+        if (document.getElementById('view-owner')?.classList.contains('active')) renderOwnerHub();
+        if (document.getElementById('view-kds-barista')?.classList.contains('active')) renderKds('BARISTA');
+        if (document.getElementById('view-kds-kitchen')?.classList.contains('active')) renderKds('KITCHEN');
+      } catch (e) {
+      } finally {
+        wklSyncInProgress = false;
+      }
     }
 
     let currentUser = null;
@@ -4275,6 +4365,7 @@
     })();
     function saveOpenTabsState() {
       try { localStorage.setItem('wkl_open_tabs', JSON.stringify(openTabs)); } catch (e) {}
+      syncToServer('openTabs', openTabs);
     }
     function updateOpenTabBadge() {
       const otBadge = document.getElementById('openTabCount');
@@ -4780,6 +4871,7 @@
 
     function saveMasterPromos(promos) {
       try { localStorage.setItem('wkl_master_promos_v1', JSON.stringify(promos)); } catch (e) {}
+      syncToServer('promos', promos);
     }
 
     function isPromoInTimeWindow(promo) {
@@ -5560,6 +5652,7 @@
     // ==========================================
     function saveProductsState() {
       localStorage.setItem('wkl_products_data', JSON.stringify(PRODUCTS));
+      syncToServer('products', PRODUCTS);
     }
 
     function loadProductsState() {
@@ -6289,6 +6382,7 @@
         showToast(`✅ Open Bill #${num} (${table}) disimpan ke Open Tab! Tiket pesanan diteruskan ke Barista & Kitchen.`);
       } else {
         orders.push(order);
+        saveOrdersState();
         showToast(`✅ Pembayaran #${num} lunas (${rp(bill.finalTotal)})! Struk otomatis tercetak.`);
       }
 
@@ -7943,6 +8037,7 @@
             const delList = rawDel ? JSON.parse(rawDel) : [];
             if (!delList.includes(id)) delList.push(id);
             localStorage.setItem('wkl_deleted_default_users_v1', JSON.stringify(delList));
+            syncToServer('deletedDefaultUsers', delList);
           } catch(e) {}
         }
         saveUsers(users);
@@ -8015,6 +8110,7 @@
 
     function saveMasterTables(tables) {
       localStorage.setItem('wkl_master_tables_v2', JSON.stringify(tables));
+      syncToServer('tables', tables);
       renderTableManagement();
       populateTableDropdowns();
       const hCount = document.getElementById('headerTableCount');
@@ -8721,6 +8817,8 @@
       const ord = pendingQrisOrders.splice(idx, 1)[0];
       ord.status = 'PAID';
       orders.push(ord);
+      saveOrdersState();
+      savePendingQrisState();
 
       updatePendingQrisBadge();
       renderPendingQrisList();
@@ -8784,6 +8882,7 @@
       };
 
       pendingQrisOrders.push(newOrder);
+      savePendingQrisState();
       updatePendingQrisBadge();
 
       // Play Sound Chime on Cashier Screen
@@ -9225,6 +9324,7 @@
 
       attendanceRecords.unshift(newRecord);
       localStorage.setItem('wkl_attendance_records', JSON.stringify(attendanceRecords));
+      syncToServer('attendance', attendanceRecords);
 
       if (pinInput) pinInput.value = '';
       if (notesInput) notesInput.value = '';
@@ -9347,6 +9447,8 @@
       // Default to opening login portal so user can select their role
       openLoginPortal();
     }
+    syncFromServer();
+    if (WKL_CAN_SYNC) setInterval(syncFromServer, 10000);
   </script>
 </body>
 </html>
