@@ -62,16 +62,17 @@
 
     /* Top Navigation Header */
     .topbar {
-      height: 60px;
+      height: auto;
       background: var(--surface-card);
       border-bottom: 1px solid var(--border-hairline);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      flex-wrap: wrap;
+      padding: 8px 16px;
       flex-shrink: 0;
       z-index: 30;
-      gap: 12px;
+      gap: 8px 12px;
     }
 
     .brand {
@@ -134,17 +135,21 @@
     }
 
     .nav-tabs {
+      order: 3;
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
       display: flex;
       align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
       gap: 3px;
       background: var(--bg-oat-dark);
-      padding: 3px 6px;
-      border-radius: 999px;
+      padding: 4px 6px;
+      border-radius: 12px;
       overflow-x: auto;
       overflow-y: hidden;
-      flex: 1 1 auto;
       min-width: 0;
-      max-width: max-content;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
@@ -1033,35 +1038,16 @@
       flex-shrink: 0;
     }
 
-    @media (max-width: 1680px) {
-      .topbar {
-        height: auto;
-        padding: 8px 16px;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
+    @media (max-width: 1280px) {
+      .topbar { padding: 8px 14px; }
+      .brand-sub { display: none; }
       .header-actions {
         flex-wrap: wrap;
         justify-content: flex-end;
         gap: 6px;
       }
-      .nav-tabs {
-        order: 3;
-        width: 100%;
-        max-width: 100%;
-        flex: 0 0 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        border-radius: 12px;
-        padding: 4px;
-      }
-      .nav-tab { padding: 5px 10px; font-size: 11px; }
-    }
-
-    @media (max-width: 1280px) {
-      .topbar { padding: 8px 14px; }
-      .brand-sub { display: none; }
       .header-actions .status-lan { display: none; }
+      .nav-tab { padding: 5px 10px; font-size: 11px; }
       .cart-pane { width: 315px; }
       .menu-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
     }
