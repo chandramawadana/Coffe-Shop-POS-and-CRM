@@ -1039,84 +1039,63 @@
     }
 
     @media (max-width: 1280px) {
-      .topbar { padding: 8px 14px; }
+      .topbar { padding: 6px 12px; gap: 6px 10px; }
+      .brand-avatar { width: 32px; height: 32px; }
+      .brand-title { font-size: 14px; }
       .brand-sub { display: none; }
       .header-actions {
         flex-wrap: wrap;
         justify-content: flex-end;
-        gap: 6px;
+        gap: 5px;
       }
       .header-actions .status-lan { display: none; }
-      .nav-tab { padding: 5px 10px; font-size: 11px; }
-      .cart-pane { width: 315px; }
-      .menu-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
+      .header-actions .pill-status { padding: 4px 8px; font-size: 10.5px; }
+      .user-pill { padding: 3px 8px; max-width: 185px; }
+      .user-pill-name { max-width: 95px; font-size: 11px; }
+      .btn-logout { padding: 4px 10px; font-size: 10.5px; }
+      .nav-tab { padding: 4px 9px; font-size: 10.5px; }
+      .cart-pane { width: 300px; }
+      .menu-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+      .sub-header { padding: 7px 12px; gap: 6px; }
+      .sub-header .ribbon-legend { display: none; }
+      .cat-bar { padding: 6px 12px; }
+      .modifier-bar { padding: 5px 12px; gap: 4px; }
+      .menu-scroll { padding: 10px 12px; }
+      .menu-card { padding: 12px 10px 10px; min-height: 106px; }
     }
 
     @media (max-width: 1280px), (max-height: 860px) {
       .cart-pane { overflow-y: auto; }
-      .cart-crm { padding: 8px 12px; gap: 5px; }
-      .loyalty-card-box { padding: 6px 10px; margin-top: 2px; }
-      .cart-items { min-height: 140px; padding: 8px 12px; gap: 6px; }
-      .cart-footer { padding: 8px 12px; gap: 6px; }
+      .cart-crm { padding: 6px 10px; gap: 4px; }
+      .cart-crm .field { padding: 6px 8px; font-size: 11px; }
+      .loyalty-card-box { padding: 5px 8px; margin-top: 2px; }
+      .cart-items { min-height: 130px; padding: 6px 10px; gap: 5px; }
+      .cart-footer { padding: 6px 10px; gap: 4px; }
+      .cart-footer #cartTotal { font-size: 18px !important; }
+      .cart-footer #btnSaveOpenBill, .cart-footer #btnPayNow { padding: 9px 10px !important; font-size: 11.5px !important; }
     }
 
     @media (max-width: 980px) {
-      .topbar {
-        padding: 8px 12px;
-        gap: 6px;
-      }
-      .brand-avatar { width: 34px; height: 34px; }
-      .brand-title { font-size: 14px; }
+      .topbar { padding: 6px 10px; gap: 5px; }
       .brand .badge-sky { font-size: 9px; padding: 2px 6px; }
-      .header-actions .pill-status { padding: 4px 8px; font-size: 10.5px; }
-      .user-pill { padding: 3px 8px; max-width: 175px; }
-      .user-pill-name { max-width: 90px; font-size: 11px; }
-      .btn-logout { padding: 5px 10px; font-size: 10.5px; }
-      .nav-tab { padding: 5px 8px; font-size: 10.5px; }
       .users-mgmt-grid { grid-template-columns: 1fr; }
       .page-body { padding: 14px; }
-    }
-
-    @media (max-width: 900px) {
-      .cashier-layout { flex-direction: column; }
-      .catalog-pane { flex: 1 1 56%; min-height: 0; border-right: none; }
-      .sub-header { padding: 8px 12px; gap: 6px; }
-      .modifier-bar { padding: 6px 12px; }
-      .menu-scroll { padding: 10px 12px; }
-      .cart-pane {
-        width: 100%;
-        flex: 0 0 44%;
-        height: auto;
-        min-height: 230px;
-        max-height: 46dvh;
-        border-left: none;
-        border-top: 1px solid var(--border-hairline);
-        overflow: hidden;
-      }
-      .cart-crm {
-        padding: 8px 12px;
-        gap: 5px;
-        max-height: 135px;
-        overflow-y: auto;
-        flex-shrink: 0;
-      }
-      .loyalty-card-box { padding: 6px 10px; }
-      .cart-items {
-        flex: 1;
-        min-height: 50px;
-        overflow-y: auto;
-        padding: 8px 12px;
-      }
-      .cart-footer {
-        flex-shrink: 0;
-        padding: 8px 12px;
-        gap: 6px;
-      }
       .kds-board { padding: 12px 14px; gap: 12px; }
       .kds-ticket { width: 275px; }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 900px) and (min-width: 721px) {
+      /* 11" Tablet Portrait: side-by-side 2-col catalog + compact cart sidebar */
+      .cashier-layout { flex-direction: row; }
+      .catalog-pane { flex: 1; min-width: 0; border-right: 1px solid var(--border-hairline); }
+      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .cart-pane { width: 285px; flex-shrink: 0; border-left: 1px solid var(--border-hairline); border-top: none; }
+      #cartTableQuickSelect { width: 98px !important; }
+      #cartDiscountSelect { width: 130px !important; }
+    }
+
+    @media (max-width: 720px) {
+      /* HP & Small Tablet: full-screen catalog + bottom cart drawer */
       .topbar { padding: 6px 10px; gap: 6px; }
       .brand .badge-sky { display: none; }
       .header-actions {
@@ -1138,7 +1117,8 @@
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
       }
-      .catalog-pane { flex: 1 1 100%; min-height: 0; }
+      .cashier-layout { flex-direction: column; }
+      .catalog-pane { flex: 1 1 100%; min-height: 0; border-right: none; }
       .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .menu-card { padding: 12px 10px 10px; min-height: 104px; }
       .menu-tag-wrap { padding-right: 0; margin-top: 14px; }
@@ -1157,7 +1137,7 @@
         flex: none;
       }
       .cart-pane.mobile-open .mobile-cart-head { display: flex; }
-      .cart-pane.mobile-open .cart-crm { max-height: 36dvh; }
+      .cart-pane.mobile-open .cart-crm { max-height: 36dvh; overflow-y: auto; }
       .modal-box { border-radius: 16px; max-height: 94dvh; }
     }
   </style>
@@ -1231,7 +1211,7 @@
                 <span class="serif" style="font-weight:700;font-size:15px;">Katalog <span class="italic">Racikan Luhur</span></span>
                 <span class="badge-sky" style="background:var(--ink-espresso);color:var(--accent-sky);">31 Menu Utama + 16 Add-on</span>
                 <!-- Soft Ribbon Legend -->
-                <div style="display:inline-flex;align-items:center;gap:10px;padding:3px 10px;background:rgba(36,28,22,0.04);border-radius:999px;font-size:10.5px;color:var(--ink-muted);border:1px solid var(--border-hairline);">
+                <div class="ribbon-legend" style="display:inline-flex;align-items:center;gap:10px;padding:3px 10px;background:rgba(36,28,22,0.04);border-radius:999px;font-size:10.5px;color:var(--ink-muted);border:1px solid var(--border-hairline);">
                   <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#7DD3FC;display:inline-block;"></span> ☕ Minuman</span>
                   <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#FB923C;display:inline-block;"></span> 🍲 Makanan</span>
                   <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#C084FC;display:inline-block;"></span> ✨ Add-on</span>
