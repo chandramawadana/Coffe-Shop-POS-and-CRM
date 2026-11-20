@@ -5020,6 +5020,10 @@
         if (ppnRow) ppnRow.style.display = 'none';
         if (btnPay) btnPay.disabled = true;
         if (btnSaveTab) btnSaveTab.disabled = true;
+        const mobCount = document.getElementById('mobileCartCount');
+        const mobTotal = document.getElementById('mobileCartTotal');
+        if (mobCount) mobCount.textContent = '0 item';
+        if (mobTotal) mobTotal.textContent = 'Rp 0';
         renderCustomerDisplay();
         return;
       }
