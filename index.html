@@ -7915,7 +7915,7 @@
 
       renderUserManagement();
       const merged = getMergedRoleConfig(newUser);
-      setUserCreateFeedback(`✅ Pengguna ${name} (${username} • ${merged.badge}) berhasil didaftarkan!`, false);
+      setUserCreateFeedback(`✅ Pengguna ${name} (Login: ${username} • PIN Absensi: ${newUser.pin} • Role: ${merged.badge}) berhasil didaftarkan!`, false);
     }
 
     function deleteUser(id) {
@@ -9157,7 +9157,21 @@
     // ==========================================
     // POINT 7: ABSENSI KARYAWAN & JAM KERJA
     // ==========================================
+    function populateAbsensiStaffSelect() {
+      const sel = document.getElementById('absensiStaffSelect');
+      if (!sel) return;
+      const users = getUsers();
+      sel.innerHTML = users.map(u => {
+        const cfg = getMergedRoleConfig(u);
+        return `<option value="${u.id}">${u.name} (${cfg.badge})</option>`;
+      }).join('');
+      if (currentUser && users.some(u => u.id === currentUser.id)) {
+        sel.value = currentUser.id;
+      }
+    }
+
     function openAbsensiModal() {
+      populateAbsensiStaffSelect();
       const pinEl = document.getElementById('absensiPinInput');
       if (pinEl) pinEl.value = '';
       const notesEl = document.getElementById('absensiNotesInput');
@@ -9172,23 +9186,20 @@
       const pinInput = document.getElementById('absensiPinInput');
       const notesInput = document.getElementById('absensiNotesInput');
 
-      const staffVal = staffSelect?.value || 'siti';
+      const staffId = staffSelect?.value || '';
       const enteredPin = pinInput?.value?.trim() || '';
       const notes = notesInput?.value?.trim() || '-';
 
-      const staffMap = {
-        'siti': { name: 'Siti Rahma', role: 'CASHIER', pin: '1234' },
-        'budi': { name: 'Budi Santoso', role: 'BARISTA', pin: '2345' },
-        'agus': { name: 'Agus Setiawan', role: 'MANAGER', pin: '8888' },
-        'chandra': { name: 'Chandra Mawadana', role: 'SUPERADMIN', pin: '9999' }
-      };
-
-      const staff = staffMap[staffVal];
+      const users = getUsers();
+      const staff = users.find(u => u.id === staffId);
       if (!staff) return showToast('Pilih karyawan terlebih dahulu!');
 
-      if (enteredPin !== staff.pin) {
-        return showToast('⛔ PIN Karyawan Salah! Masukkan PIN 4 digit yang benar.');
+      const expectedPin = String(staff.pin || '1234');
+      if (enteredPin !== expectedPin) {
+        return showToast(`⛔ PIN Karyawan Salah! Masukkan PIN 4 digit yang benar untuk ${staff.name}.`);
       }
+
+      const staffRoleBadge = getMergedRoleConfig(staff).badge;
 
       let typeLabel = 'Masuk Kerja';
       let status = 'Tepat Waktu';
@@ -9201,7 +9212,7 @@
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
         date: new Date().toLocaleDateString('id-ID'),
         name: staff.name,
-        role: staff.role,
+        role: staffRoleBadge,
         type: typeLabel,
         status: status,
         notes: notes
