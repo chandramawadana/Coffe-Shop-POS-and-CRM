@@ -1471,9 +1471,9 @@
               <p style="font-size:13px;color:#C8BEB0;margin-top:6px;">Silakan periksa pesanan Anda &amp; scan QRIS untuk pembayaran cepat</p>
             </div>
             
-            <div style="background:var(--surface-card);color:var(--ink-espresso);padding:18px;border-radius:24px;max-width:300px;width:100%;margin:16px 0;">
-              <div class="serif" style="font-weight:700;font-size:17px;margin-bottom:10px;">QRIS Warung Kopi Luhur</div>
-              <div id="customerQrBox" style="width:210px;min-height:170px;margin:0 auto;background:#fff;border:1px solid var(--border-hairline);border-radius:14px;display:flex;align-items:center;justify-content:center;padding:6px;overflow:hidden;"></div>
+            <div style="background:var(--surface-card);color:var(--ink-espresso);padding:18px;border-radius:24px;max-width:360px;width:100%;margin:16px 0;">
+              <div class="serif" style="font-weight:700;font-size:18px;margin-bottom:10px;">QRIS Warung Kopi Luhur</div>
+              <div id="customerQrBox" style="width:280px;max-width:100%;min-height:220px;margin:0 auto;background:#fff;border:1px solid var(--border-hairline);border-radius:14px;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden;"></div>
               <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-hairline);">
                 <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">TOTAL PEMBAYARAN</div>
                 <div style="font-size:26px;font-weight:800;" id="custDisplayTotal">Rp 0</div>
@@ -2594,7 +2594,7 @@
         <div id="soPaymentSection" style="display:none;background:var(--bg-oat);padding:12px;border-radius:12px;border:1px solid var(--border-hairline);margin-bottom:10px;text-align:center;">
           <div style="font-size:11.5px;font-weight:700;color:var(--ink-espresso);margin-bottom:4px;">💳 Bayar QRIS Warung Kopi Luhur</div>
           <div style="font-size:10px;color:var(--ink-muted);margin-bottom:8px;">Scan QRIS di bawah via BCA Mobile, GoPay, OVO, Dana, ShopeePay, atau Livin. Setelah transfer, kasir akan verifikasi &amp; klik Lunas.</div>
-          <div id="soQrisContainer" style="display:inline-block;padding:6px;background:#FFF;border-radius:10px;border:1px solid var(--border-hairline);max-width:230px;"></div>
+          <div id="soQrisContainer" style="display:inline-block;padding:8px;background:#FFF;border-radius:10px;border:1px solid var(--border-hairline);max-width:290px;width:100%;"></div>
           <div style="font-size:14px;font-weight:800;font-family:monospace;color:#15803D;margin-top:6px;" id="soQrisAmt">Rp 0</div>
         </div>
 
@@ -2837,7 +2837,7 @@
 
   <!-- MODAL: PEMBAYARAN -->
   <div class="modal-backdrop" id="paymentModal">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width:780px;">
       <div class="modal-head">
         <div>
           <div class="serif" style="font-size:18px;font-weight:700;">Penyelesaian <span class="italic">Pembayaran</span></div>
@@ -6205,10 +6205,10 @@
           </div>`;
       } else if (m === 'QRIS') {
         box.innerHTML = `<div style="text-align:center;">
-          <div style="font-size:11px;font-weight:800;color:#BC012E;margin-bottom:6px;">SCAN QRIS WARUNG KOPI LUHUR</div>
-          <div style="display:inline-block;padding:6px;background:#fff;border-radius:12px;border:1px solid var(--border-hairline);max-width:210px;">${makeOfficialQrisHtml(195)}</div>
-          <div style="font-size:12px;margin-top:8px;">Nominal Tagihan: <strong style="color:#15803D;">${rp(total)}</strong></div>
-          <div style="font-size:10px;color:var(--ink-muted);margin-top:4px;">Setelah dana masuk, klik <strong>Konfirmasi Lunas</strong> agar pesanan masuk ke Barista / Kitchen.</div>
+          <div style="font-size:12px;font-weight:800;color:#BC012E;margin-bottom:8px;">SCAN QRIS WARUNG KOPI LUHUR</div>
+          <div style="display:inline-block;padding:8px;background:#fff;border-radius:14px;border:1px solid var(--border-hairline);width:100%;max-width:320px;">${makeOfficialQrisHtml(300)}</div>
+          <div style="font-size:13px;margin-top:8px;">Nominal Tagihan: <strong style="color:#15803D;">${rp(total)}</strong></div>
+          <div style="font-size:10.5px;color:var(--ink-muted);margin-top:4px;">Setelah dana masuk, klik <strong>Konfirmasi Lunas</strong> agar pesanan masuk ke Barista / Kitchen.</div>
         </div>`;
       } else if (m === 'EDC') {
         box.innerHTML = `<div style="text-align:center;padding:24px 0;">
@@ -7459,7 +7459,7 @@
     function renderCustomerDisplay() {
       const total = cart.reduce((s, it) => s + it.unitPrice * it.qty, 0);
       document.getElementById('custDisplayTotal').textContent = rp(total);
-      document.getElementById('customerQrBox').innerHTML = makeOfficialQrisHtml(196);
+      document.getElementById('customerQrBox').innerHTML = makeOfficialQrisHtml(265);
 
       const itemsBox = document.getElementById('custDisplayItems');
       if (cart.length === 0) {
@@ -8651,7 +8651,7 @@
 
       if (qrisAmt) qrisAmt.textContent = rp(totalAmt);
       if (qrisCont) {
-        qrisCont.innerHTML = makeOfficialQrisHtml(210);
+        qrisCont.innerHTML = makeOfficialQrisHtml(275);
       }
 
       if (paySection) paySection.style.display = 'block';
