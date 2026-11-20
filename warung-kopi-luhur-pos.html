@@ -1224,6 +1224,7 @@
                 <button class="btn-dark" style="background:var(--surface-card);color:var(--ink-espresso);border:1px solid var(--border-hairline);" onclick="openTableMgmtModal()" title="Buka Manajemen Meja Kedai">🪑 Meja (<span id="cashierTableCount">12</span>)</button>
                 <button class="btn-dark" id="pendingQrisBtn" style="background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;" onclick="openPendingQrisModal()" title="Verifikasi pembayaran QRIS masuk sebelum diteruskan ke Barista/Kitchen">📱 Verifikasi QRIS (<span id="pendingQrisCount">0</span>)</button>
                 <button class="btn-dark" id="openTabBtn" onclick="showOpenTabsModal()">Open Tab (<span id="openTabCount">0</span>)</button>
+                <button class="btn-dark" style="background:var(--surface-card);color:var(--ink-espresso);border:1px solid var(--border-hairline);" onclick="openTxHistoryModal()" title="Lihat Riwayat Transaksi Kasir">📜 Riwayat</button>
                 <input type="text" class="search-input field" style="width:160px;" id="menuSearch" placeholder="Cari menu..." oninput="renderMenu()" />
               </div>
             </div>
@@ -3001,7 +3002,7 @@
   </div>
 
   <!-- MODAL: PERIODE TRANSAKSI (LAPORAN RIWAYAT TRANSAKSI) -->
-  <div class="modal-backdrop" id="txPeriodModal">
+  <div class="modal-backdrop" id="txPeriodModal" style="z-index:1020;">
     <div class="modal-box" style="max-width:420px;padding:22px;">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;">
         <div class="serif" style="font-size:17px;font-weight:700;">Periode Transaksi</div>
@@ -3048,13 +3049,49 @@
   </div>
 
   <!-- MODAL: DETAIL TRANSAKSI -->
-  <div class="modal-backdrop" id="txDetailModal">
+  <div class="modal-backdrop" id="txDetailModal" style="z-index:1015;">
     <div class="modal-box" style="max-width:440px;padding:22px;">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;">
         <div class="serif" style="font-size:17px;font-weight:700;" id="txDetailTitle">Detail Transaksi</div>
         <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('txDetailModal')">✕</button>
       </div>
       <div id="txDetailBody" style="font-size:12px;display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: RIWAYAT TRANSAKSI (AKSES KASIR, SUPERVISOR, OWNER & SUPERADMIN) -->
+  <div class="modal-backdrop" id="txHistoryModal" style="z-index:1005;">
+    <div class="modal-box" style="max-width:760px;padding:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
+        <div>
+          <div class="serif" style="font-size:18px;font-weight:700;">📜 Riwayat Transaksi</div>
+          <div style="font-size:11px;color:var(--ink-muted);">Klik baris transaksi untuk melihat rincian &amp; cetak ulang struk</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button type="button" class="cat-pill" onclick="openTxPeriodModal()" style="background:var(--bg-oat);border-color:var(--border-hairline);">
+            📅 <span id="modalTxPeriodLabel">14 hari terakhir</span> ▾
+          </button>
+          <button type="button" class="btn-dark" style="padding:5px 10px;font-size:11px;border-radius:999px;" onclick="exportTransactionHistoryCsv()">⬇️ CSV</button>
+          <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('txHistoryModal')">✕</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+        <input type="text" id="modalTxHistorySearch" class="field" placeholder="🔍 Cari no. struk, meja, atau nama pelanggan..." style="min-width:200px;flex:1;" oninput="syncTxSearch(this.value)" />
+        <div style="font-size:11.5px;font-weight:700;color:var(--ink-muted);">
+          Total: <strong id="modalTxFilteredTotal" style="color:#BC012E;">Rp 0</strong> (<span id="modalTxFilteredCount">0</span>)
+        </div>
+      </div>
+
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;">
+        <button type="button" class="cat-pill active" data-txm="ALL" onclick="setTxMethodFilter('ALL', this)">Semua</button>
+        <button type="button" class="cat-pill" data-txm="CASH" onclick="setTxMethodFilter('CASH', this)">💵 Tunai</button>
+        <button type="button" class="cat-pill" data-txm="QRIS" onclick="setTxMethodFilter('QRIS', this)">📱 QRIS</button>
+        <button type="button" class="cat-pill" data-txm="EDC" onclick="setTxMethodFilter('EDC', this)">💳 EDC</button>
+        <button type="button" class="cat-pill" data-txm="SPLIT" onclick="setTxMethodFilter('SPLIT', this)">✂️ Split Bill</button>
+      </div>
+
+      <div id="modalTxHistoryAccordion" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;"></div>
     </div>
   </div>
 
@@ -6741,12 +6778,30 @@
     let txCustomEndDate = '';
     const txExpandedDates = new Set();
 
+    function openTxHistoryModal() {
+      renderTransactionHistory();
+      openModal('txHistoryModal');
+    }
+
+    function syncTxSearch(val) {
+      const a = document.getElementById('txHistorySearch');
+      const b = document.getElementById('modalTxHistorySearch');
+      if (a && a.value !== val) a.value = val;
+      if (b && b.value !== val) b.value = val;
+      renderTransactionHistory();
+    }
+
     function setTxMethodFilter(method, btn) {
       txMethodFilter = method;
       ['txMethodAll', 'txMethodCash', 'txMethodQris', 'txMethodEdc', 'txMethodSplit'].forEach(id => {
         document.getElementById(id)?.classList.remove('active');
       });
+      document.querySelectorAll('#txHistoryModal [data-txm]').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('data-txm') === method);
+      });
       if (btn) btn.classList.add('active');
+      const mapId = { ALL: 'txMethodAll', CASH: 'txMethodCash', QRIS: 'txMethodQris', EDC: 'txMethodEdc', SPLIT: 'txMethodSplit' };
+      document.getElementById(mapId[method])?.classList.add('active');
       renderTransactionHistory();
     }
 
@@ -6780,7 +6835,9 @@
         'CUSTOM': (txCustomStartDate || txCustomEndDate) ? `${txCustomStartDate || '...'} s/d ${txCustomEndDate || '...'}` : 'Periode Khusus'
       };
       const lblEl = document.getElementById('txPeriodLabel');
+      const modalLblEl = document.getElementById('modalTxPeriodLabel');
       if (lblEl) lblEl.textContent = labels[val] || '14 hari terakhir';
+      if (modalLblEl) modalLblEl.textContent = labels[val] || '14 hari terakhir';
       closeModal('txPeriodModal');
       renderTransactionHistory();
     }
@@ -6826,17 +6883,24 @@
 
     function renderTransactionHistory() {
       const box = document.getElementById('txHistoryAccordion');
-      if (!box) return;
+      const modalBox = document.getElementById('modalTxHistoryAccordion');
+      if (!box && !modalBox) return;
       const list = getFilteredTransactions();
 
       const sumTotal = list.reduce((s, o) => s + (o.total || 0), 0);
       const totEl = document.getElementById('txFilteredTotal');
       const cntEl = document.getElementById('txFilteredCount');
+      const mTotEl = document.getElementById('modalTxFilteredTotal');
+      const mCntEl = document.getElementById('modalTxFilteredCount');
       if (totEl) totEl.textContent = rp(sumTotal);
       if (cntEl) cntEl.textContent = list.length;
+      if (mTotEl) mTotEl.textContent = rp(sumTotal);
+      if (mCntEl) mCntEl.textContent = list.length;
 
       if (list.length === 0) {
-        box.innerHTML = `<div style="text-align:center;color:var(--ink-muted);padding:28px;background:var(--bg-oat);border-radius:12px;border:1px dashed var(--border-hairline);font-size:12px;">Belum ada transaksi sesuai filter periode/metode ini.</div>`;
+        const emptyHtml = `<div style="text-align:center;color:var(--ink-muted);padding:28px;background:var(--bg-oat);border-radius:12px;border:1px dashed var(--border-hairline);font-size:12px;">Belum ada transaksi sesuai filter periode/metode ini.</div>`;
+        if (box) box.innerHTML = emptyHtml;
+        if (modalBox) modalBox.innerHTML = emptyHtml;
         return;
       }
 
@@ -6860,7 +6924,7 @@
         SPLIT: { icon: '✂️', label: 'Split Bill', color: '#7C3AED' }
       };
 
-      box.innerHTML = dateKeys.map(key => {
+      const accordionHtml = dateKeys.map(key => {
         const rows = groups[key];
         const dayTotal = rows.reduce((s, o) => s + (o.total || 0), 0);
         const isOpen = txExpandedDates.has(key);
@@ -6900,6 +6964,8 @@
             ` : ''}
           </div>`;
       }).join('');
+      if (box) box.innerHTML = accordionHtml;
+      if (modalBox) modalBox.innerHTML = accordionHtml;
     }
 
     function openTxDetailModal(orderId) {
