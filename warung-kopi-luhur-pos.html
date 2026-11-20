@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
   <title>Warung Kopi Luhur — POS &amp; CRM Master Node</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2279,10 +2281,13 @@
                   <span style="font-size:18px;">📋</span>
                   <div>
                     <h3 class="serif" style="font-size:16px;color:var(--ink-espresso);">Daftar Pengguna &amp; Hak Akses Terdaftar</h3>
-                    <div style="font-size:10.5px;color:var(--ink-muted);">Data tersimpan aman di database lokal browser</div>
+                    <div style="font-size:10.5px;color:var(--ink-muted);">Tersinkron otomatis ke Server Pusat (warungkopiluhur.xyz)</div>
                   </div>
                 </div>
-                <span class="badge" style="background:#DCFCE7;color:#166534;font-size:10px;padding:3px 8px;border-radius:999px;">Status: Aktif</span>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <button type="button" class="btn-dark" style="padding:4px 10px;font-size:10.5px;border-radius:999px;" onclick="manualSyncFromServer()">🔄 Sinkron Server</button>
+                  <span class="badge" style="background:#DCFCE7;color:#166534;font-size:10px;padding:3px 8px;border-radius:999px;">Status: Aktif</span>
+                </div>
               </div>
 
               <div style="overflow-x:auto;">
@@ -4218,42 +4223,58 @@
 
     function saveUsers(users) {
       localStorage.setItem('wkl_registered_users_v2', JSON.stringify(users));
-      syncToServer('users', users);
+      return syncToServer('users', users);
     }
 
     const WKL_CAN_SYNC = typeof location !== 'undefined' && location.protocol && location.protocol.startsWith('http');
     let wklSyncInProgress = false;
+    let wklLastLocalWriteAt = 0;
 
-    function syncToServer(key, data) {
-      if (!WKL_CAN_SYNC) return;
+    async function syncToServer(key, data) {
+      wklLastLocalWriteAt = Date.now();
+      if (!WKL_CAN_SYNC) return false;
       try {
-        fetch(`api.php?action=save&key=${encodeURIComponent(key)}`, {
+        const res = await fetch(`api.php?action=save&key=${encodeURIComponent(key)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ data }),
           keepalive: true
-        }).catch(() => {});
-      } catch (e) {}
+        });
+        if (!res.ok) return false;
+        const json = await res.json();
+        return !!(json && json.ok);
+      } catch (e) {
+        return false;
+      }
     }
 
     function saveOrdersState() {
       try { localStorage.setItem('wkl_orders_v1', JSON.stringify(orders)); } catch (e) {}
-      syncToServer('orders', orders);
+      return syncToServer('orders', orders);
     }
 
     function savePendingQrisState() {
       try { localStorage.setItem('wkl_pending_qris_v1', JSON.stringify(pendingQrisOrders)); } catch (e) {}
-      syncToServer('pendingQris', pendingQrisOrders);
+      return syncToServer('pendingQris', pendingQrisOrders);
     }
 
-    async function syncFromServer() {
-      if (!WKL_CAN_SYNC || wklSyncInProgress) return;
+    async function manualSyncFromServer() {
+      wklLastLocalWriteAt = 0;
+      const ok = await syncFromServer(true);
+      showToast(ok ? '✅ Data berhasil disinkronkan dari Server Pusat!' : '⚠️ Gagal terhubung ke server, memakai cache lokal.');
+    }
+
+    async function syncFromServer(force = false) {
+      if (!WKL_CAN_SYNC || wklSyncInProgress) return false;
+      if (!force && Date.now() - wklLastLocalWriteAt < 4000) return false;
+      const reqStartedAt = Date.now();
       wklSyncInProgress = true;
       try {
         const res = await fetch(`api.php?action=load_all&_=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) return;
+        if (!res.ok) return false;
         const json = await res.json();
-        if (!json || !json.ok || !json.data) return;
+        if (!json || !json.ok || !json.data) return false;
+        if (!force && wklLastLocalWriteAt > reqStartedAt) return false;
         const d = json.data;
 
         if (Array.isArray(d.deletedDefaultUsers)) {
@@ -4304,7 +4325,9 @@
         if (document.getElementById('view-owner')?.classList.contains('active')) renderOwnerHub();
         if (document.getElementById('view-kds-barista')?.classList.contains('active')) renderKds('BARISTA');
         if (document.getElementById('view-kds-kitchen')?.classList.contains('active')) renderKds('KITCHEN');
+        return true;
       } catch (e) {
+        return false;
       } finally {
         wklSyncInProgress = false;
       }
@@ -7953,7 +7976,7 @@
       showToast(msg);
     }
 
-    function registerNewUser() {
+    async function registerNewUser() {
       if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
         setUserCreateFeedback('⛔ Hanya Superadmin yang berhak mendaftarkan user baru!', true);
         return;
@@ -8006,7 +8029,7 @@
       const firstNonProtectedIdx = users.findIndex(u => !u.isProtected);
       if (firstNonProtectedIdx === -1) users.push(newUser);
       else users.splice(firstNonProtectedIdx, 0, newUser);
-      saveUsers(users);
+      const synced = await saveUsers(users);
 
       document.getElementById('newUserName').value = '';
       document.getElementById('newUserEmail').value = '';
@@ -8014,7 +8037,8 @@
 
       renderUserManagement();
       const merged = getMergedRoleConfig(newUser);
-      setUserCreateFeedback(`✅ Pengguna ${name} (Login: ${username} • PIN Absensi: ${newUser.pin} • Role: ${merged.badge}) berhasil didaftarkan!`, false);
+      const syncTag = synced ? 'Tersinkron ke Server' : 'Tersimpan Lokal';
+      setUserCreateFeedback(`✅ ${name} (Login: ${username} • PIN: ${newUser.pin} • ${merged.badge}) berhasil didaftarkan (${syncTag})!`, false);
     }
 
     function deleteUser(id) {
