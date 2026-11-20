@@ -611,6 +611,9 @@
       margin-top: 4px;
       box-shadow: 0 4px 12px rgba(36, 28, 22, 0.04);
     }
+    .loyalty-card-box.is-collapsed #loyaltyStampBody {
+      display: none !important;
+    }
     .stamp-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -1063,7 +1066,6 @@
       .cart-pane { overflow-y: auto; }
       .cart-crm { padding: 8px 12px; gap: 5px; }
       .loyalty-card-box { padding: 6px 10px; margin-top: 2px; }
-      .loyalty-card-box.is-collapsed #loyaltyStampBody { display: none; }
       .cart-items { min-height: 140px; padding: 8px 12px; gap: 6px; }
       .cart-footer { padding: 8px 12px; gap: 6px; }
     }
