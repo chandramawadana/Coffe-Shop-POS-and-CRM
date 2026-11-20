@@ -4043,9 +4043,15 @@
           users = DEFAULT_USERS;
         }
       }
-      // Ensure all users have username attached and new built-in defaults exist
+      // Ensure all users have username attached and new built-in defaults exist (unless explicitly deleted)
+      let deletedDefaults = [];
+      try {
+        const rawDel = localStorage.getItem('wkl_deleted_default_users_v1');
+        if (rawDel) deletedDefaults = JSON.parse(rawDel) || [];
+      } catch(e) {}
       let modified = false;
       DEFAULT_USERS.forEach(def => {
+        if (deletedDefaults.includes(def.id)) return;
         if (!users.some(u => u.id === def.id || (u.email && def.email && u.email.toLowerCase() === def.email.toLowerCase()))) {
           users.push({ ...def });
           modified = true;
@@ -7426,6 +7432,14 @@
       }
       if (confirm(`Yakin ingin menghapus pengguna ${target.name} (${target.email})?`)) {
         users = users.filter(u => u.id !== id);
+        if (DEFAULT_USERS.some(d => d.id === id)) {
+          try {
+            const rawDel = localStorage.getItem('wkl_deleted_default_users_v1');
+            const delList = rawDel ? JSON.parse(rawDel) : [];
+            if (!delList.includes(id)) delList.push(id);
+            localStorage.setItem('wkl_deleted_default_users_v1', JSON.stringify(delList));
+          } catch(e) {}
+        }
         saveUsers(users);
         renderUserManagement();
         showToast(`Pengguna ${target.name} telah dihapus.`);
