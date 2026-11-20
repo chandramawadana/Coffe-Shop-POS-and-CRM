@@ -1972,6 +1972,41 @@
               </table>
             </div>
 
+            <!-- RIWAYAT & LAPORAN TRANSAKSI (ACCORDION PER TANGGAL + FILTER PERIODE & METODE) -->
+            <div class="pnl-container" style="margin-bottom:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:12px;">
+                <div>
+                  <h3 class="serif" style="font-size:18px;margin:0;">📜 Laporan &amp; Riwayat Transaksi</h3>
+                  <p style="font-size:11px;color:var(--ink-muted);margin-top:2px;">Riwayat transaksi tercatat dikelompokkan per tanggal • Klik baris transaksi untuk rincian struk</p>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <button type="button" class="cat-pill" id="txPeriodBtn" onclick="openTxPeriodModal()" style="background:var(--bg-oat);border-color:var(--border-hairline);">
+                    📅 <span id="txPeriodLabel">14 hari terakhir</span> ▾
+                  </button>
+                  <button type="button" class="btn-dark" style="padding:6px 12px;font-size:11px;border-radius:999px;" onclick="exportTransactionHistoryCsv()">
+                    ⬇️ Export CSV
+                  </button>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+                <input type="text" id="txHistorySearch" class="field" placeholder="🔍 Cari no. struk, meja, atau nama pelanggan..." style="min-width:220px;flex:1;" oninput="renderTransactionHistory()" />
+                <div style="font-size:11.5px;font-weight:700;color:var(--ink-muted);">
+                  Total Filter: <strong id="txFilteredTotal" style="color:#BC012E;">Rp 0</strong> (<span id="txFilteredCount">0</span> transaksi)
+                </div>
+              </div>
+
+              <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;">
+                <button type="button" class="cat-pill active" id="txMethodAll" onclick="setTxMethodFilter('ALL', this)">Semua</button>
+                <button type="button" class="cat-pill" id="txMethodCash" onclick="setTxMethodFilter('CASH', this)">💵 Tunai</button>
+                <button type="button" class="cat-pill" id="txMethodQris" onclick="setTxMethodFilter('QRIS', this)">📱 QRIS</button>
+                <button type="button" class="cat-pill" id="txMethodEdc" onclick="setTxMethodFilter('EDC', this)">💳 EDC</button>
+                <button type="button" class="cat-pill" id="txMethodSplit" onclick="setTxMethodFilter('SPLIT', this)">✂️ Split Bill</button>
+              </div>
+
+              <div id="txHistoryAccordion" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+
             <!-- LAPORAN HPP & MANAJEMEN MENU KEDAI (REPORTING & EDIT HPP / HARGA) -->
             <div class="panel-card" style="padding:0;overflow-x:auto;margin-bottom:20px;">
               <div style="padding:16px 20px;border-bottom:1px solid var(--border-hairline);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--bg-oat-dark);">
@@ -2962,6 +2997,64 @@
           <button type="button" class="btn-pay" style="width:auto;padding:10px 18px;font-size:12px;border-radius:10px;" onclick="saveMasterPromo()">💾 Simpan Promo</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PERIODE TRANSAKSI (LAPORAN RIWAYAT TRANSAKSI) -->
+  <div class="modal-backdrop" id="txPeriodModal">
+    <div class="modal-box" style="max-width:420px;padding:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;">
+        <div class="serif" style="font-size:17px;font-weight:700;">Periode Transaksi</div>
+        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('txPeriodModal')">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;font-weight:600;margin-bottom:14px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="radio" name="txPeriodRadio" value="14D" checked onchange="toggleTxCustomRange()" />
+          <span>14 hari terakhir</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="radio" name="txPeriodRadio" value="TODAY" onchange="toggleTxCustomRange()" />
+          <span>Hari ini</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="radio" name="txPeriodRadio" value="30D" onchange="toggleTxCustomRange()" />
+          <span>30 hari terakhir</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="radio" name="txPeriodRadio" value="THIS_MONTH" onchange="toggleTxCustomRange()" />
+          <span>Bulan ini</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="radio" name="txPeriodRadio" value="LAST_MONTH" onchange="toggleTxCustomRange()" />
+          <span>Bulan lalu</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="radio" name="txPeriodRadio" value="CUSTOM" onchange="toggleTxCustomRange()" />
+          <span>Pilih Periode Transaksi</span>
+        </label>
+        <div id="txCustomDateBox" style="display:none;grid-template-columns:1fr 1fr;gap:8px;padding:8px;background:var(--bg-oat);border-radius:10px;border:1px solid var(--border-hairline);">
+          <div>
+            <label style="font-size:10px;color:var(--ink-muted);display:block;">Dari Tanggal</label>
+            <input type="date" id="txCustomStart" class="field" style="width:100%;" />
+          </div>
+          <div>
+            <label style="font-size:10px;color:var(--ink-muted);display:block;">Sampai Tanggal</label>
+            <input type="date" id="txCustomEnd" class="field" style="width:100%;" />
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-pay" style="width:100%;padding:12px;border-radius:999px;" onclick="applyTxPeriodFilter()">Tampilkan</button>
+    </div>
+  </div>
+
+  <!-- MODAL: DETAIL TRANSAKSI -->
+  <div class="modal-backdrop" id="txDetailModal">
+    <div class="modal-box" style="max-width:440px;padding:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;">
+        <div class="serif" style="font-size:17px;font-weight:700;" id="txDetailTitle">Detail Transaksi</div>
+        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('txDetailModal')">✕</button>
+      </div>
+      <div id="txDetailBody" style="font-size:12px;display:flex;flex-direction:column;gap:8px;"></div>
     </div>
   </div>
 
@@ -6639,6 +6732,226 @@
       renderOwnerHub();
     }
 
+    // ==========================================
+    // RIWAYAT & LAPORAN TRANSAKSI
+    // ==========================================
+    let txPeriodFilter = '14D';
+    let txMethodFilter = 'ALL';
+    let txCustomStartDate = '';
+    let txCustomEndDate = '';
+    const txExpandedDates = new Set();
+
+    function setTxMethodFilter(method, btn) {
+      txMethodFilter = method;
+      ['txMethodAll', 'txMethodCash', 'txMethodQris', 'txMethodEdc', 'txMethodSplit'].forEach(id => {
+        document.getElementById(id)?.classList.remove('active');
+      });
+      if (btn) btn.classList.add('active');
+      renderTransactionHistory();
+    }
+
+    function openTxPeriodModal() {
+      document.querySelectorAll('input[name="txPeriodRadio"]').forEach(r => {
+        r.checked = (r.value === txPeriodFilter);
+      });
+      toggleTxCustomRange();
+      openModal('txPeriodModal');
+    }
+
+    function toggleTxCustomRange() {
+      const checked = document.querySelector('input[name="txPeriodRadio"]:checked')?.value;
+      const box = document.getElementById('txCustomDateBox');
+      if (box) box.style.display = checked === 'CUSTOM' ? 'grid' : 'none';
+    }
+
+    function applyTxPeriodFilter() {
+      const val = document.querySelector('input[name="txPeriodRadio"]:checked')?.value || '14D';
+      txPeriodFilter = val;
+      if (val === 'CUSTOM') {
+        txCustomStartDate = document.getElementById('txCustomStart')?.value || '';
+        txCustomEndDate = document.getElementById('txCustomEnd')?.value || '';
+      }
+      const labels = {
+        '14D': '14 hari terakhir',
+        'TODAY': 'Hari ini',
+        '30D': '30 hari terakhir',
+        'THIS_MONTH': 'Bulan ini',
+        'LAST_MONTH': 'Bulan lalu',
+        'CUSTOM': (txCustomStartDate || txCustomEndDate) ? `${txCustomStartDate || '...'} s/d ${txCustomEndDate || '...'}` : 'Periode Khusus'
+      };
+      const lblEl = document.getElementById('txPeriodLabel');
+      if (lblEl) lblEl.textContent = labels[val] || '14 hari terakhir';
+      closeModal('txPeriodModal');
+      renderTransactionHistory();
+    }
+
+    function getFilteredTransactions() {
+      const q = (document.getElementById('txHistorySearch')?.value || '').trim().toLowerCase();
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+      return [...orders].filter(o => {
+        if (txMethodFilter !== 'ALL' && (o.method || 'CASH') !== txMethodFilter) return false;
+        const t = new Date(o.createdAt || Date.now()).getTime();
+        if (txPeriodFilter === 'TODAY') {
+          if (t < todayStart) return false;
+        } else if (txPeriodFilter === '14D') {
+          if (t < todayStart - 13 * 86400000) return false;
+        } else if (txPeriodFilter === '30D') {
+          if (t < todayStart - 29 * 86400000) return false;
+        } else if (txPeriodFilter === 'THIS_MONTH') {
+          const d = new Date(t);
+          if (d.getFullYear() !== now.getFullYear() || d.getMonth() !== now.getMonth()) return false;
+        } else if (txPeriodFilter === 'LAST_MONTH') {
+          const d = new Date(t);
+          const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          if (d.getFullYear() !== lm.getFullYear() || d.getMonth() !== lm.getMonth()) return false;
+        } else if (txPeriodFilter === 'CUSTOM') {
+          if (txCustomStartDate && t < new Date(txCustomStartDate + 'T00:00:00').getTime()) return false;
+          if (txCustomEndDate && t > new Date(txCustomEndDate + 'T23:59:59').getTime()) return false;
+        }
+        if (q) {
+          const hay = `${o.number || ''} ${o.table || ''} ${o.customer || ''} ${o.method || ''} ${(o.items || []).map(i => i.name).join(' ')}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      }).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    }
+
+    function toggleTxDateGroup(dateKey) {
+      if (txExpandedDates.has(dateKey)) txExpandedDates.delete(dateKey);
+      else txExpandedDates.add(dateKey);
+      renderTransactionHistory();
+    }
+
+    function renderTransactionHistory() {
+      const box = document.getElementById('txHistoryAccordion');
+      if (!box) return;
+      const list = getFilteredTransactions();
+
+      const sumTotal = list.reduce((s, o) => s + (o.total || 0), 0);
+      const totEl = document.getElementById('txFilteredTotal');
+      const cntEl = document.getElementById('txFilteredCount');
+      if (totEl) totEl.textContent = rp(sumTotal);
+      if (cntEl) cntEl.textContent = list.length;
+
+      if (list.length === 0) {
+        box.innerHTML = `<div style="text-align:center;color:var(--ink-muted);padding:28px;background:var(--bg-oat);border-radius:12px;border:1px dashed var(--border-hairline);font-size:12px;">Belum ada transaksi sesuai filter periode/metode ini.</div>`;
+        return;
+      }
+
+      const groups = {};
+      list.forEach(o => {
+        const d = new Date(o.createdAt || Date.now());
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(o);
+      });
+
+      const dateKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+      if (txExpandedDates.size === 0 && dateKeys.length > 0) {
+        txExpandedDates.add(dateKeys[0]);
+      }
+
+      const methodMeta = {
+        CASH: { icon: '💵', label: 'Tunai', color: '#1D4ED8' },
+        QRIS: { icon: '📱', label: 'QRIS', color: '#BC012E' },
+        EDC: { icon: '💳', label: 'EDC', color: '#0369A1' },
+        SPLIT: { icon: '✂️', label: 'Split Bill', color: '#7C3AED' }
+      };
+
+      box.innerHTML = dateKeys.map(key => {
+        const rows = groups[key];
+        const dayTotal = rows.reduce((s, o) => s + (o.total || 0), 0);
+        const isOpen = txExpandedDates.has(key);
+        const dObj = new Date(key + 'T12:00:00');
+        const dateLabel = dObj.toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+
+        return `
+          <div style="border:1px solid var(--border-hairline);border-radius:14px;overflow:hidden;background:var(--surface-card);">
+            <div onclick="toggleTxDateGroup('${key}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-oat);cursor:pointer;font-size:13px;">
+              <strong style="color:var(--ink-espresso);">${dateLabel} <span style="font-size:11px;font-weight:600;color:var(--ink-muted);">(${rows.length} transaksi)</span></strong>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <strong style="font-size:14px;color:var(--ink-espresso);">${rp(dayTotal)}</strong>
+                <span style="font-size:12px;color:var(--ink-muted);">${isOpen ? '▲' : '▼'}</span>
+              </div>
+            </div>
+            ${isOpen ? `
+              <div style="display:flex;flex-direction:column;">
+                ${rows.map(o => {
+                  const mm = methodMeta[o.method] || methodMeta.CASH;
+                  const timeStr = new Date(o.createdAt || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                  return `
+                    <div onclick="openTxDetailModal('${o.id}')" style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid var(--border-hairline);cursor:pointer;gap:10px;">
+                      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                        <span style="width:32px;height:32px;border-radius:10px;background:var(--bg-oat-dark);display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${mm.icon}</span>
+                        <div style="min-width:0;">
+                          <div style="font-size:12.5px;font-weight:700;color:var(--ink-espresso);">${mm.label} <span style="font-weight:600;color:var(--ink-muted);">• #${o.number || '-'}</span></div>
+                          <div style="font-size:11px;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.table || '-'} • ${o.customer || 'Pelanggan'} • <span style="color:#15803D;font-weight:700;">Tercatat</span></div>
+                        </div>
+                      </div>
+                      <div style="text-align:right;flex-shrink:0;">
+                        <div style="font-size:13px;font-weight:800;color:var(--ink-espresso);">${rp(o.total || 0)}</div>
+                        <div style="font-size:10.5px;color:var(--ink-muted);">${timeStr}</div>
+                      </div>
+                    </div>`;
+                }).join('')}
+              </div>
+            ` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    function openTxDetailModal(orderId) {
+      const o = orders.find(x => x.id === orderId);
+      if (!o) return;
+      document.getElementById('txDetailTitle').textContent = `Struk #${o.number} • ${o.table || '-'}`;
+      const timeStr = new Date(o.createdAt || Date.now()).toLocaleString('id-ID');
+      document.getElementById('txDetailBody').innerHTML = `
+        <div style="background:var(--bg-oat);padding:10px 12px;border-radius:10px;border:1px solid var(--border-hairline);">
+          <div><strong>Pelanggan:</strong> ${o.customer || '-'}</div>
+          <div><strong>Waktu:</strong> ${timeStr}</div>
+          <div><strong>Metode Bayar:</strong> ${o.method || 'CASH'}</div>
+        </div>
+        <div style="border-top:1px dashed var(--border-hairline);padding-top:8px;display:flex;flex-direction:column;gap:4px;">
+          ${(o.items || []).map(it => `
+            <div style="display:flex;justify-content:space-between;">
+              <span>${it.qty}x ${it.name}</span>
+              <strong>${rp((it.unitPrice || 0) * (it.qty || 1))}</strong>
+            </div>`).join('')}
+        </div>
+        ${o.discount > 0 ? `<div style="display:flex;justify-content:space-between;color:#15803D;"><span>Diskon (${o.discountType || 'Promo'}):</span><strong>-${rp(o.discount)}</strong></div>` : ''}
+        <div style="display:flex;justify-content:space-between;border-top:1.5px solid var(--ink-espresso);padding-top:8px;font-size:14px;">
+          <strong>Total Dibayar</strong>
+          <strong style="color:#BC012E;">${rp(o.total || 0)}</strong>
+        </div>
+        <button type="button" class="btn-dark" style="margin-top:6px;padding:10px;border-radius:999px;" onclick="printSelfOrderReceipt(orders.find(x=>x.id==='${o.id}'))">🖨️ Cetak Ulang Struk</button>`;
+      openModal('txDetailModal');
+    }
+
+    function exportTransactionHistoryCsv() {
+      const list = getFilteredTransactions();
+      if (list.length === 0) return showToast('Tidak ada data transaksi untuk di-export.');
+      const header = ['No Struk', 'Tanggal', 'Meja', 'Pelanggan', 'Metode', 'Total'];
+      const lines = list.map(o => [
+        `"${o.number || ''}"`,
+        `"${new Date(o.createdAt || Date.now()).toLocaleString('id-ID')}"`,
+        `"${o.table || ''}"`,
+        `"${(o.customer || '').replace(/"/g, '""')}"`,
+        `"${o.method || 'CASH'}"`,
+        o.total || 0
+      ].join(','));
+      const csv = [header.join(','), ...lines].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Laporan_Transaksi_WKL_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`✅ Berhasil export ${list.length} transaksi ke CSV!`);
+    }
+
     function renderOwnerCharts({ allOrders, totalRev, totalCogs, grossProfit, totalExpenses, netProfit, grossMarginPct, netMarginPct }) {
       // 1. Grafik Produk Terlaris
       const prodBox = document.getElementById('ownerTopProductsChart');
@@ -6778,6 +7091,7 @@
       }
 
       renderOwnerCharts({ allOrders, totalRev, totalCogs, grossProfit, totalExpenses, netProfit, grossMarginPct, netMarginPct });
+      renderTransactionHistory();
 
       // Update PnL Table Elements
       const pnlRevDrinksEl = document.getElementById('pnlRevDrinks');
