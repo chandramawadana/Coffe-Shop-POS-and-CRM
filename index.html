@@ -1195,6 +1195,7 @@
         <button class="nav-tab" data-view="inventory" onclick="switchView('inventory')">📦 Stok &amp; BOM</button>
         <button class="nav-tab" data-view="whatsapp" onclick="switchView('whatsapp')">💬 WhatsApp CRM</button>
         <button class="nav-tab" data-view="menu-mgmt" onclick="switchView('menu-mgmt')">🍽️ Kelola Menu</button>
+        <button class="nav-tab" data-view="promo-mgmt" onclick="switchView('promo-mgmt')">🎁 Master Promo</button>
         <button class="nav-tab" data-view="owner" onclick="switchView('owner')">📊 Owner Hub</button>
         <button class="nav-tab" data-view="users" onclick="switchView('users')">👥 Kelola User</button>
       </nav>
@@ -1722,6 +1723,69 @@
         </div>
       </section>
 
+      <!-- 6C. MASTER PROMO & POTONGAN (SUPERVISOR, OWNER & SUPERADMIN) -->
+      <section class="view-panel" id="view-promo-mgmt">
+        <div class="page-container">
+          <div class="page-body" style="padding:20px 24px;">
+            <div class="kds-wrapper" style="max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
+              <div style="background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:var(--radius-lg);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;box-shadow:var(--shadow-sm);">
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <h2 class="serif" style="font-size:20px;font-weight:700;color:var(--ink-espresso);margin:0;">🎁 Master Promo &amp; Potongan Harga</h2>
+                    <span class="badge" style="background:#FDF2F4;color:#BC012E;border:1px solid #F7CCD3;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;">🔒 Khusus Supervisor, Owner &amp; Superadmin</span>
+                  </div>
+                  <p style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Kelola promo Beli X Gratis Y (seperti Beli 2 Gratis 1 jam 18.00–Closed), diskon persen (%), dan potongan nominal (Rp). Promo aktif otomatis muncul di Kasir POS.</p>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <button class="btn-pay" style="width:auto;padding:10px 20px;font-size:13px;border-radius:999px;font-weight:700;" onclick="openPromoModal()">
+                    ➕ Buat Promo Baru
+                  </button>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));gap:12px;">
+                <div class="panel-card" style="padding:14px 18px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">TOTAL MASTER PROMO</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--ink-espresso);margin-top:4px;" id="promoStatTotal">0</div>
+                  <div style="font-size:10px;color:var(--ink-muted);margin-top:2px;">Semua promo terdaftar</div>
+                </div>
+                <div class="panel-card" style="padding:14px 18px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">PROMO AKTIF</div>
+                  <div style="font-size:22px;font-weight:800;color:#15803D;margin-top:4px;" id="promoStatActive">0</div>
+                  <div style="font-size:10px;color:#15803D;margin-top:2px;">● Tersedia di Kasir POS</div>
+                </div>
+                <div class="panel-card" style="padding:14px 18px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">BELI X GRATIS Y</div>
+                  <div style="font-size:22px;font-weight:800;color:#BC012E;margin-top:4px;" id="promoStatBxgy">0</div>
+                  <div style="font-size:10px;color:var(--ink-muted);margin-top:2px;">Promo paket gratis item</div>
+                </div>
+                <div class="panel-card" style="padding:14px 18px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">POTONGAN (% / Rp)</div>
+                  <div style="font-size:22px;font-weight:800;color:#D97706;margin-top:4px;" id="promoStatDisc">0</div>
+                  <div style="font-size:10px;color:var(--ink-muted);margin-top:2px;">Diskon persen &amp; voucher nominal</div>
+                </div>
+              </div>
+
+              <div class="panel-card">
+                <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                  <thead>
+                    <tr>
+                      <th>Nama Promo</th>
+                      <th>Tipe &amp; Aturan</th>
+                      <th>Target Menu</th>
+                      <th>Jam Berlaku</th>
+                      <th>Status</th>
+                      <th style="text-align:center;">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="promoMgmtTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- 7. OWNER HUB: LABA RUGI, PENGELUARAN HARIAN, HPP & REKONSILIASI KASIR -->
       <section class="view-panel" id="view-owner">
         <div class="page-container">
@@ -2148,7 +2212,11 @@
                     </label>
                     <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
                       <input type="checkbox" name="newUserRoleCheck" value="MANAGER" onchange="updateRoleHint()" />
-                      <span>📊 Supervisor / Manager <span style="color:var(--ink-muted);font-weight:400;">(Stok, Kelola Menu &amp; P&amp;L)</span></span>
+                      <span>📊 Supervisor / Manager <span style="color:var(--ink-muted);font-weight:400;">(Stok, Menu, Promo &amp; P&amp;L)</span></span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
+                      <input type="checkbox" name="newUserRoleCheck" value="OWNER" onchange="updateRoleHint()" />
+                      <span>💼 Owner <span style="color:var(--ink-muted);font-weight:400;">(Owner Hub, Promo, Menu &amp; P&amp;L)</span></span>
                     </label>
                     <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
                       <input type="checkbox" name="newUserRoleCheck" value="SUPERADMIN" onchange="updateRoleHint()" />
@@ -2807,7 +2875,11 @@
         </label>
         <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
           <input type="checkbox" name="editUserRoleCheck" value="MANAGER" />
-          <span>📊 Supervisor / Manager <span style="color:var(--ink-muted);font-weight:400;">(Stok, Kelola Menu &amp; P&amp;L)</span></span>
+          <span>📊 Supervisor / Manager <span style="color:var(--ink-muted);font-weight:400;">(Stok, Menu, Promo &amp; P&amp;L)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" name="editUserRoleCheck" value="OWNER" />
+          <span>💼 Owner <span style="color:var(--ink-muted);font-weight:400;">(Owner Hub, Promo, Menu &amp; P&amp;L)</span></span>
         </label>
         <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
           <input type="checkbox" name="editUserRoleCheck" value="SUPERADMIN" />
@@ -2817,6 +2889,78 @@
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button type="button" class="btn-dark" style="background:var(--bg-oat-dark);color:var(--ink-espresso);" onclick="closeModal('editUserRolesModal')">Batal</button>
         <button type="button" class="btn-pay" style="width:auto;padding:10px 18px;font-size:12px;border-radius:10px;" onclick="saveEditedUserRoles()">💾 Simpan Role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE / EDIT MASTER PROMO -->
+  <div class="modal-backdrop" id="promoModal">
+    <div class="modal-box" style="max-width:500px;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:14px;">
+        <div>
+          <div class="serif" style="font-size:17px;font-weight:700;" id="promoModalTitle">🎁 Buat Master Promo Baru</div>
+          <div style="font-size:11px;color:var(--ink-muted);">Promo aktif akan langsung muncul di pilihan Diskon / Promo Kasir POS</div>
+        </div>
+        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('promoModal')">✕</button>
+      </div>
+      <input type="hidden" id="promoEditId" />
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Nama Promo:</label>
+          <input type="text" id="promoNameInput" class="field" placeholder="Contoh: Beli 2 Gratis 1 (18.00 - Closed)" style="width:100%;" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Tipe Promo:</label>
+            <select id="promoTypeSelect" class="field" style="width:100%;" onchange="togglePromoTypeFields()">
+              <option value="BUY_X_GET_Y">🎁 Beli X Gratis Y</option>
+              <option value="PERCENT">🏷️ Potongan Persen (%)</option>
+              <option value="NOMINAL">💵 Potongan Nominal (Rp)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Berlaku Untuk Menu:</label>
+            <select id="promoTargetSelect" class="field" style="width:100%;">
+              <option value="ALL">Semua Menu</option>
+              <option value="DRINK">Khusus Minuman</option>
+              <option value="FOOD">Khusus Makanan / Cuanki</option>
+            </select>
+          </div>
+        </div>
+        <div id="promoBxgyFields" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--bg-oat);padding:10px;border-radius:10px;border:1px solid var(--border-hairline);">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Jumlah Beli (X):</label>
+            <input type="number" min="1" id="promoBuyQtyInput" class="field" value="2" style="width:100%;" />
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Gratis (Y):</label>
+            <input type="number" min="1" id="promoGetQtyInput" class="field" value="1" style="width:100%;" />
+          </div>
+        </div>
+        <div id="promoValueField" style="display:none;background:var(--bg-oat);padding:10px;border-radius:10px;border:1px solid var(--border-hairline);">
+          <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;" id="promoValueLabel">Persentase Diskon (%):</label>
+          <input type="number" min="1" id="promoValueInput" class="field" value="10" style="width:100%;" />
+        </div>
+        <div style="background:var(--bg-oat);padding:10px;border-radius:10px;border:1px solid var(--border-hairline);">
+          <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;cursor:pointer;margin-bottom:6px;">
+            <input type="checkbox" id="promoAllDayCheck" onchange="togglePromoTimeInputs()" />
+            <span>Berlaku Sepanjang Jam Operasional (Tanpa Batas Jam)</span>
+          </label>
+          <div id="promoTimeInputs" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:10.5px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:3px;">Jam Mulai:</label>
+              <input type="time" id="promoStartTime" class="field" value="18:00" style="width:100%;" />
+            </div>
+            <div>
+              <label style="font-size:10.5px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:3px;">Jam Selesai (Closed):</label>
+              <input type="time" id="promoEndTime" class="field" value="23:59" style="width:100%;" />
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+          <button type="button" class="btn-dark" style="background:var(--bg-oat-dark);color:var(--ink-espresso);" onclick="closeModal('promoModal')">Batal</button>
+          <button type="button" class="btn-pay" style="width:auto;padding:10px 18px;font-size:12px;border-radius:10px;" onclick="saveMasterPromo()">💾 Simpan Promo</button>
+        </div>
       </div>
     </div>
   </div>
@@ -3767,6 +3911,17 @@
         pin: '4567',
         createdAt: '2026-11-20',
         isProtected: false
+      },
+      {
+        id: 'usr-owner-1',
+        name: 'Owner Warung Kopi Luhur',
+        username: 'owner',
+        email: 'owner@kopiluhur.id',
+        password: 'Owner123',
+        role: 'OWNER',
+        pin: '7777',
+        createdAt: '2026-11-20',
+        isProtected: false
       }
     ];
 
@@ -3797,23 +3952,31 @@
       },
       MANAGER: {
         label: 'Supervisor / Manager',
-        allowedViews: ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'menu-mgmt', 'owner'],
+        allowedViews: ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'menu-mgmt', 'promo-mgmt', 'owner'],
         defaultView: 'menu-mgmt',
         badge: 'SUPERVISOR',
         badgeStyle: 'background:var(--accent-green);color:#FFF;',
-        description: 'Akses operasional, kasir, KDS, stok, kelola & buat menu, dan laporan keuangan'
+        description: 'Akses operasional, kasir, KDS, stok, kelola menu, master promo & laporan keuangan'
+      },
+      OWNER: {
+        label: 'Owner (Pemilik)',
+        allowedViews: ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'menu-mgmt', 'promo-mgmt', 'owner'],
+        defaultView: 'owner',
+        badge: 'OWNER',
+        badgeStyle: 'background:#7C3AED;color:#FFF;',
+        description: 'Akses Owner Hub, Laba Rugi, Master Promo, Kelola Menu & monitoring operasional'
       },
       SUPERADMIN: {
         label: 'Superadmin (Akses Penuh)',
-        allowedViews: ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'whatsapp', 'menu-mgmt', 'owner', 'users'],
+        allowedViews: ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'whatsapp', 'menu-mgmt', 'promo-mgmt', 'owner', 'users'],
         defaultView: 'cashier',
         badge: 'SUPERADMIN',
         badgeStyle: 'background:#B91C1C;color:#FFF;',
-        description: 'Akses penuh ke semua halaman sistem, kelola menu & mendaftarkan pengguna'
+        description: 'Akses penuh ke semua halaman sistem, kelola menu, master promo & mendaftarkan pengguna'
       }
     };
 
-    const NAV_VIEW_ORDER = ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'whatsapp', 'menu-mgmt', 'owner', 'users'];
+    const NAV_VIEW_ORDER = ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'whatsapp', 'menu-mgmt', 'promo-mgmt', 'owner', 'users'];
     const VIEW_LABELS = {
       'cashier': 'Kasir POS',
       'kds-barista': 'Barista KDS',
@@ -3822,6 +3985,7 @@
       'inventory': 'Stok & BOM',
       'whatsapp': 'WhatsApp CRM',
       'menu-mgmt': 'Kelola Menu',
+      'promo-mgmt': 'Master Promo',
       'owner': 'Owner Hub',
       'users': 'Kelola User'
     };
@@ -4221,6 +4385,7 @@
 
       if (viewId === 'inventory') renderInventory();
       if (viewId === 'menu-mgmt') renderMenuMgmtTable();
+      if (viewId === 'promo-mgmt') renderPromoManagement();
       if (viewId === 'owner') renderOwnerHub();
       if (viewId === 'customer') renderCustomerDisplay();
       if (viewId === 'kds-barista') renderKds('BARISTA');
@@ -4405,13 +4570,313 @@
       }
     }
 
+    // ==========================================
+    // MASTER PROMO & POTONGAN ENGINE
+    // ==========================================
+    const DEFAULT_PROMOS = [
+      {
+        id: 'prm-b2g1-18',
+        name: 'Beli 2 Gratis 1 (18.00 - Closed)',
+        type: 'BUY_X_GET_Y',
+        buyQty: 2,
+        getQty: 1,
+        value: 0,
+        target: 'DRINK',
+        allDay: false,
+        startTime: '18:00',
+        endTime: '23:59',
+        active: true
+      },
+      {
+        id: 'prm-member-10',
+        name: 'Diskon Member Toko (10%)',
+        type: 'PERCENT',
+        buyQty: 0,
+        getQty: 0,
+        value: 10,
+        target: 'ALL',
+        allDay: true,
+        startTime: '00:00',
+        endTime: '23:59',
+        active: true
+      },
+      {
+        id: 'prm-v5k',
+        name: 'Potongan Voucher Rp 5.000',
+        type: 'NOMINAL',
+        buyQty: 0,
+        getQty: 0,
+        value: 5000,
+        target: 'ALL',
+        allDay: true,
+        startTime: '00:00',
+        endTime: '23:59',
+        active: true
+      },
+      {
+        id: 'prm-v10k',
+        name: 'Potongan Voucher Rp 10.000',
+        type: 'NOMINAL',
+        buyQty: 0,
+        getQty: 0,
+        value: 10000,
+        target: 'ALL',
+        allDay: true,
+        startTime: '00:00',
+        endTime: '23:59',
+        active: true
+      }
+    ];
+
+    function getMasterPromos() {
+      try {
+        const raw = localStorage.getItem('wkl_master_promos_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return DEFAULT_PROMOS.map(p => ({ ...p }));
+    }
+
+    function saveMasterPromos(promos) {
+      try { localStorage.setItem('wkl_master_promos_v1', JSON.stringify(promos)); } catch (e) {}
+    }
+
+    function isPromoInTimeWindow(promo) {
+      if (!promo || promo.allDay) return true;
+      const now = new Date();
+      const curMin = now.getHours() * 60 + now.getMinutes();
+      const [sh, sm] = String(promo.startTime || '00:00').split(':').map(Number);
+      const [eh, em] = String(promo.endTime || '23:59').split(':').map(Number);
+      const startMin = (sh || 0) * 60 + (sm || 0);
+      const endMin = (eh || 23) * 60 + (em || 59);
+      if (startMin <= endMin) return curMin >= startMin && curMin <= endMin;
+      return curMin >= startMin || curMin <= endMin;
+    }
+
+    function getEligibleCartItemsForPromo(promo) {
+      const tgt = promo?.target || 'ALL';
+      return cart.filter(it => {
+        if (tgt === 'DRINK') return it.type === 'drink';
+        if (tgt === 'FOOD') return it.type === 'food' || it.type === 'addon_food';
+        return true;
+      });
+    }
+
+    function calculateMasterPromoDiscount(promo) {
+      if (!promo || !promo.active) return 0;
+      const eligible = getEligibleCartItemsForPromo(promo);
+      const eligibleSubtotal = eligible.reduce((s, it) => s + it.unitPrice * it.qty, 0);
+      if (eligibleSubtotal <= 0) return 0;
+
+      if (promo.type === 'BUY_X_GET_Y') {
+        const buyQ = Math.max(1, Number(promo.buyQty) || 2);
+        const getQ = Math.max(1, Number(promo.getQty) || 1);
+        const unitPrices = [];
+        eligible.forEach(it => {
+          for (let i = 0; i < it.qty; i++) unitPrices.push(it.unitPrice);
+        });
+        const groupSize = buyQ + getQ;
+        const freeCount = Math.floor(unitPrices.length / groupSize) * getQ;
+        if (freeCount <= 0) return 0;
+        unitPrices.sort((a, b) => a - b);
+        return unitPrices.slice(0, freeCount).reduce((s, p) => s + p, 0);
+      }
+      if (promo.type === 'PERCENT') {
+        const pct = Math.min(100, Math.max(0, Number(promo.value) || 0));
+        return Math.round(eligibleSubtotal * (pct / 100));
+      }
+      if (promo.type === 'NOMINAL') {
+        return Math.min(Number(promo.value) || 0, eligibleSubtotal);
+      }
+      return 0;
+    }
+
+    function syncCartDiscountOptions() {
+      const sel = document.getElementById('cartDiscountSelect');
+      if (!sel) return;
+      const prevVal = sel.value;
+      const promos = getMasterPromos().filter(p => p.active);
+      const opts = [
+        `<option value="NONE">Tanpa Diskon (0%)</option>`,
+        ...promos.map(p => {
+          const timeTag = p.allDay ? '' : ` [${p.startTime}-${p.endTime}]`;
+          return `<option value="MASTER:${p.id}">${p.name}${timeTag}</option>`;
+        }),
+        `<option value="STAMP_FREE">Reward Buy 7 (Free 1 Kopi)</option>`,
+        `<option value="CUSTOM">Custom Nominal...</option>`
+      ];
+      sel.innerHTML = opts.join('');
+      if (Array.from(sel.options).some(o => o.value === prevVal)) {
+        sel.value = prevVal;
+      } else {
+        sel.value = 'NONE';
+      }
+    }
+
+    function renderPromoManagement() {
+      if (!currentUser || !hasAnyRole(currentUser, ['MANAGER', 'OWNER', 'SUPERADMIN'])) {
+        showToast('⛔ Akses Ditolak: Master Promo hanya untuk Supervisor, Owner & Superadmin!');
+        if (currentUser) switchView(getMergedRoleConfig(currentUser).defaultView);
+        else openLoginPortal();
+        return;
+      }
+      const promos = getMasterPromos();
+      document.getElementById('promoStatTotal').textContent = promos.length;
+      document.getElementById('promoStatActive').textContent = promos.filter(p => p.active).length;
+      document.getElementById('promoStatBxgy').textContent = promos.filter(p => p.type === 'BUY_X_GET_Y').length;
+      document.getElementById('promoStatDisc').textContent = promos.filter(p => p.type === 'PERCENT' || p.type === 'NOMINAL').length;
+
+      const tbody = document.getElementById('promoMgmtTableBody');
+      if (!tbody) return;
+      const targetLabel = { ALL: 'Semua Menu', DRINK: '☕ Minuman', FOOD: '🍲 Makanan / Cuanki' };
+      tbody.innerHTML = promos.map(p => {
+        let ruleText = '';
+        if (p.type === 'BUY_X_GET_Y') ruleText = `<span class="badge-sky">Beli ${p.buyQty} Gratis ${p.getQty}</span>`;
+        else if (p.type === 'PERCENT') ruleText = `<span class="badge-sky">Diskon ${p.value}%</span>`;
+        else ruleText = `<span class="badge-sky">Potongan ${rp(p.value)}</span>`;
+        const timeText = p.allDay ? 'Sepanjang Hari' : `${p.startTime} – ${p.endTime}`;
+        const statusBtn = p.active
+          ? `<button type="button" onclick="togglePromoActive('${p.id}')" style="background:#DCFCE7;color:#166534;border:1px solid #86EFAC;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">● Aktif</button>`
+          : `<button type="button" onclick="togglePromoActive('${p.id}')" style="background:#F3F4F6;color:#6B7280;border:1px solid #D1D5DB;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">○ Nonaktif</button>`;
+        return `
+          <tr>
+            <td><strong>${p.name}</strong></td>
+            <td>${ruleText}</td>
+            <td>${targetLabel[p.target] || 'Semua Menu'}</td>
+            <td style="font-family:monospace;font-size:11px;">${timeText}</td>
+            <td>${statusBtn}</td>
+            <td style="text-align:center;">
+              <div style="display:flex;gap:4px;justify-content:center;">
+                <button type="button" onclick="openPromoModal('${p.id}')" style="background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;font-weight:700;">✏️ Edit</button>
+                <button type="button" onclick="deleteMasterPromo('${p.id}')" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;font-weight:700;">Hapus</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function togglePromoTypeFields() {
+      const t = document.getElementById('promoTypeSelect')?.value;
+      const bxgy = document.getElementById('promoBxgyFields');
+      const valBox = document.getElementById('promoValueField');
+      const valLabel = document.getElementById('promoValueLabel');
+      if (t === 'BUY_X_GET_Y') {
+        if (bxgy) bxgy.style.display = 'grid';
+        if (valBox) valBox.style.display = 'none';
+      } else {
+        if (bxgy) bxgy.style.display = 'none';
+        if (valBox) valBox.style.display = 'block';
+        if (valLabel) valLabel.textContent = t === 'PERCENT' ? 'Persentase Diskon (%):' : 'Nominal Potongan (Rp):';
+      }
+    }
+
+    function togglePromoTimeInputs() {
+      const allDay = document.getElementById('promoAllDayCheck')?.checked;
+      const box = document.getElementById('promoTimeInputs');
+      if (box) box.style.display = allDay ? 'none' : 'grid';
+    }
+
+    function openPromoModal(promoId) {
+      if (!currentUser || !hasAnyRole(currentUser, ['MANAGER', 'OWNER', 'SUPERADMIN'])) {
+        return showToast('⛔ Hanya Supervisor, Owner & Superadmin yang dapat mengelola Master Promo!');
+      }
+      const promos = getMasterPromos();
+      const existing = promoId ? promos.find(p => p.id === promoId) : null;
+      document.getElementById('promoModalTitle').textContent = existing ? '✏️ Edit Master Promo' : '🎁 Buat Master Promo Baru';
+      document.getElementById('promoEditId').value = existing ? existing.id : '';
+      document.getElementById('promoNameInput').value = existing ? existing.name : '';
+      document.getElementById('promoTypeSelect').value = existing ? existing.type : 'BUY_X_GET_Y';
+      document.getElementById('promoTargetSelect').value = existing ? existing.target : 'DRINK';
+      document.getElementById('promoBuyQtyInput').value = existing ? (existing.buyQty || 2) : 2;
+      document.getElementById('promoGetQtyInput').value = existing ? (existing.getQty || 1) : 1;
+      document.getElementById('promoValueInput').value = existing ? (existing.value || 10) : 10;
+      document.getElementById('promoAllDayCheck').checked = existing ? !!existing.allDay : false;
+      document.getElementById('promoStartTime').value = existing ? (existing.startTime || '18:00') : '18:00';
+      document.getElementById('promoEndTime').value = existing ? (existing.endTime || '23:59') : '23:59';
+      togglePromoTypeFields();
+      togglePromoTimeInputs();
+      openModal('promoModal');
+    }
+
+    function saveMasterPromo() {
+      if (!currentUser || !hasAnyRole(currentUser, ['MANAGER', 'OWNER', 'SUPERADMIN'])) {
+        return showToast('⛔ Akses Ditolak!');
+      }
+      const editId = document.getElementById('promoEditId').value.trim();
+      const name = document.getElementById('promoNameInput').value.trim();
+      const type = document.getElementById('promoTypeSelect').value;
+      const target = document.getElementById('promoTargetSelect').value;
+      const buyQty = Math.max(1, Number(document.getElementById('promoBuyQtyInput').value) || 2);
+      const getQty = Math.max(1, Number(document.getElementById('promoGetQtyInput').value) || 1);
+      const value = Math.max(0, Number(document.getElementById('promoValueInput').value) || 0);
+      const allDay = document.getElementById('promoAllDayCheck').checked;
+      const startTime = document.getElementById('promoStartTime').value || '18:00';
+      const endTime = document.getElementById('promoEndTime').value || '23:59';
+
+      if (!name) return showToast('Nama promo tidak boleh kosong!');
+      if (type !== 'BUY_X_GET_Y' && value <= 0) return showToast('Nilai potongan harus lebih dari 0!');
+
+      const promos = getMasterPromos();
+      if (editId) {
+        const idx = promos.findIndex(p => p.id === editId);
+        if (idx !== -1) {
+          promos[idx] = { ...promos[idx], name, type, target, buyQty, getQty, value, allDay, startTime, endTime };
+        }
+      } else {
+        promos.unshift({
+          id: 'prm-' + Date.now(),
+          name, type, target, buyQty, getQty, value, allDay, startTime, endTime, active: true
+        });
+      }
+      saveMasterPromos(promos);
+      syncCartDiscountOptions();
+      renderPromoManagement();
+      closeModal('promoModal');
+      showToast(`✅ Master Promo "${name}" berhasil disimpan!`);
+    }
+
+    function togglePromoActive(promoId) {
+      if (!currentUser || !hasAnyRole(currentUser, ['MANAGER', 'OWNER', 'SUPERADMIN'])) {
+        return showToast('⛔ Akses Ditolak!');
+      }
+      const promos = getMasterPromos();
+      const p = promos.find(x => x.id === promoId);
+      if (!p) return;
+      p.active = !p.active;
+      saveMasterPromos(promos);
+      syncCartDiscountOptions();
+      renderPromoManagement();
+      showToast(`Promo "${p.name}" ${p.active ? 'diaktifkan' : 'dinonaktifkan'}.`);
+    }
+
+    function deleteMasterPromo(promoId) {
+      if (!currentUser || !hasAnyRole(currentUser, ['MANAGER', 'OWNER', 'SUPERADMIN'])) {
+        return showToast('⛔ Akses Ditolak!');
+      }
+      let promos = getMasterPromos();
+      const target = promos.find(x => x.id === promoId);
+      if (!target) return;
+      if (!confirm(`Hapus Master Promo "${target.name}"?`)) return;
+      promos = promos.filter(x => x.id !== promoId);
+      saveMasterPromos(promos);
+      syncCartDiscountOptions();
+      renderPromoManagement();
+      showToast(`Promo "${target.name}" dihapus.`);
+    }
+
     function getCartBillingSummary() {
       const rawSubtotal = cart.reduce((s, it) => s + it.unitPrice * it.qty, 0);
       const totalCogs = cart.reduce((s, it) => s + (it.cogs || 0) * it.qty, 0);
 
-      // 1. Diskon
+      // 1. Diskon & Master Promo
       let discountAmt = 0;
-      if (currentDiscount.type === 'MEMBER_10') discountAmt = Math.round(rawSubtotal * 0.10);
+      if (currentDiscount.type === 'MASTER_PROMO' && currentDiscount.promoId) {
+        const promo = getMasterPromos().find(p => p.id === currentDiscount.promoId);
+        if (promo) discountAmt = calculateMasterPromoDiscount(promo);
+      }
+      else if (currentDiscount.type === 'MEMBER_10') discountAmt = Math.round(rawSubtotal * 0.10);
       else if (currentDiscount.type === 'STAMP_FREE') {
         const cheapestDrink = cart.filter(it => it.type === 'drink').sort((a,b) => a.unitPrice - b.unitPrice)[0];
         discountAmt = cheapestDrink ? cheapestDrink.unitPrice : 0;
@@ -4483,7 +4948,20 @@
     }
 
     function onCartDiscountChange(val) {
-      if (val === 'NONE') currentDiscount = { type: 'NONE', value: 0, label: 'Tanpa Diskon' };
+      if (val === 'NONE') {
+        currentDiscount = { type: 'NONE', value: 0, label: 'Tanpa Diskon' };
+      } else if (val.startsWith('MASTER:')) {
+        const promoId = val.replace('MASTER:', '');
+        const promo = getMasterPromos().find(p => p.id === promoId);
+        if (!promo) {
+          currentDiscount = { type: 'NONE', value: 0, label: 'Tanpa Diskon' };
+        } else {
+          if (!isPromoInTimeWindow(promo)) {
+            showToast(`⏰ Info: Promo "${promo.name}" dijadwalkan pukul ${promo.startTime}–${promo.endTime}.`);
+          }
+          currentDiscount = { type: 'MASTER_PROMO', promoId: promo.id, value: promo.value, label: promo.name };
+        }
+      }
       else if (val === 'MEMBER_10') currentDiscount = { type: 'MEMBER_10', value: 0.1, label: 'Member Toko (10%)' };
       else if (val === 'STAMP_FREE') currentDiscount = { type: 'STAMP_FREE', value: 0, label: 'Reward Buy 7 (Free 1)' };
       else if (val === 'VOUCHER_5K') currentDiscount = { type: 'VOUCHER_5K', value: 5000, label: 'Voucher Rp 5.000' };
@@ -6723,20 +7201,20 @@
         }
       });
 
-      // Shift Button display for Cashier/Manager/Superadmin
+      // Shift Button display for Cashier/Manager/Owner/Superadmin
       const shiftBtn = document.getElementById('shiftHeaderBtn');
       if (shiftBtn) {
-        if (hasAnyRole(user, ['CASHIER', 'MANAGER', 'SUPERADMIN'])) {
+        if (hasAnyRole(user, ['CASHIER', 'MANAGER', 'OWNER', 'SUPERADMIN'])) {
           shiftBtn.style.display = 'inline-flex';
         } else {
           shiftBtn.style.display = 'none';
         }
       }
 
-      // Cashier Create Menu button display for Supervisor/Superadmin
+      // Cashier Create Menu button display for Supervisor/Owner/Superadmin
       const cashierCreateBtn = document.getElementById('cashierCreateMenuBtn');
       if (cashierCreateBtn) {
-        if (hasAnyRole(user, ['MANAGER', 'SUPERADMIN'])) {
+        if (hasAnyRole(user, ['MANAGER', 'OWNER', 'SUPERADMIN'])) {
           cashierCreateBtn.style.display = 'inline-flex';
         } else {
           cashierCreateBtn.style.display = 'none';
@@ -8311,6 +8789,7 @@
     // INITIALIZATION
     // ==========================================
     loadProductsState();
+    syncCartDiscountOptions();
     renderMenu();
     renderCart();
     renderModifierBar();
