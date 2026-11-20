@@ -1801,6 +1801,33 @@
               </div>
             </div>
 
+            <!-- GRAFIK REPORTING: PRODUK TERLARIS & KINERJA KEUANGAN -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;margin-bottom:20px;">
+              <!-- Chart 1: Produk Terlaris -->
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
+                  <div>
+                    <h3 class="serif" style="font-size:16px;margin:0;">🏆 Grafik Produk Terlaris</h3>
+                    <div style="font-size:11px;color:var(--ink-muted);">Peringkat penjualan menu &amp; kontribusi keuntungan</div>
+                  </div>
+                  <span class="badge-sky" id="ownerTopProdBadge">Top 6</span>
+                </div>
+                <div id="ownerTopProductsChart" style="display:flex;flex-direction:column;gap:10px;"></div>
+              </div>
+
+              <!-- Chart 2: Omzet, Gross Profit, Pengeluaran & Net Profit -->
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
+                  <div>
+                    <h3 class="serif" style="font-size:16px;margin:0;">📊 Grafik Keuntungan &amp; Arus Kas</h3>
+                    <div style="font-size:11px;color:var(--ink-muted);">Perbandingan Omzet, Gross Profit, Pengeluaran &amp; Net Profit</div>
+                  </div>
+                  <span class="badge-sky" id="ownerChartPeriodBadge">Harian</span>
+                </div>
+                <div id="ownerFinanceChart" style="display:flex;flex-direction:column;gap:12px;"></div>
+              </div>
+            </div>
+
             <!-- LAPORAN LABA RUGI KOMPREHENSIF -->
             <div class="pnl-container" style="margin-bottom:20px;">
               <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;flex-wrap:wrap;gap:8px;">
@@ -6611,6 +6638,96 @@
       renderOwnerHub();
     }
 
+    function renderOwnerCharts({ allOrders, totalRev, totalCogs, grossProfit, totalExpenses, netProfit, grossMarginPct, netMarginPct }) {
+      // 1. Grafik Produk Terlaris
+      const prodBox = document.getElementById('ownerTopProductsChart');
+      if (prodBox) {
+        const map = {};
+        allOrders.forEach(o => {
+          (o.items || []).forEach(it => {
+            const key = it.name || it.id || 'Item';
+            if (!map[key]) {
+              map[key] = { name: key, type: it.type, qty: 0, rev: 0, profit: 0 };
+            }
+            const qty = Number(it.qty) || 1;
+            const rev = (Number(it.unitPrice) || 0) * qty;
+            const cogs = (Number(it.cogs) || 0) * qty;
+            map[key].qty += qty;
+            map[key].rev += rev;
+            map[key].profit += (rev - cogs);
+          });
+        });
+        const sorted = Object.values(map).sort((a, b) => b.qty - a.qty || b.rev - a.rev).slice(0, 6);
+        const topBadge = document.getElementById('ownerTopProdBadge');
+        if (topBadge) topBadge.textContent = sorted.length > 0 ? `Top ${sorted.length}` : '0 Item';
+
+        if (sorted.length === 0) {
+          prodBox.innerHTML = `<div style="text-align:center;color:var(--ink-muted);padding:24px;font-size:12px;">Belum ada data penjualan produk.</div>`;
+        } else {
+          const maxQty = Math.max(1, sorted[0].qty);
+          const barColors = ['#BC012E', '#D97706', '#15803D', '#0284C7', '#7C3AED', '#4B5563'];
+          prodBox.innerHTML = sorted.map((p, idx) => {
+            const pct = Math.max(8, Math.round((p.qty / maxQty) * 100));
+            const color = barColors[idx % barColors.length];
+            const icon = (p.type === 'food' || p.type === 'addon_food') ? '🍲' : '☕';
+            return `
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;gap:8px;">
+                  <span style="font-weight:700;color:var(--ink-espresso);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    <span style="display:inline-block;min-width:20px;color:${color};font-weight:800;">#${idx + 1}</span> ${icon} ${p.name}
+                  </span>
+                  <span style="font-weight:800;color:${color};white-space:nowrap;">${p.qty} terjual</span>
+                </div>
+                <div style="width:100%;height:10px;background:var(--bg-oat-dark);border-radius:999px;overflow:hidden;">
+                  <div style="width:${pct}%;height:100%;background:${color};border-radius:999px;transition:width 0.3s ease;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-muted);">
+                  <span>Omzet: <strong>${rp(p.rev)}</strong></span>
+                  <span style="color:#15803D;">Laba Kotor: <strong>${rp(p.profit)}</strong></span>
+                </div>
+              </div>`;
+          }).join('');
+        }
+      }
+
+      // 2. Grafik Keuangan (Omzet, Gross Profit, Total Pengeluaran, Net Profit)
+      const finBox = document.getElementById('ownerFinanceChart');
+      if (finBox) {
+        const periodBadge = document.getElementById('ownerChartPeriodBadge');
+        if (periodBadge) {
+          periodBadge.textContent = pnlPeriod === 'MONTHLY' ? 'Bulanan' : (pnlPeriod === 'WEEKLY' ? 'Mingguan' : 'Harian');
+        }
+        const metrics = [
+          { label: 'Omzet', sub: 'Total Penjualan', val: totalRev, color: '#BC012E', bg: '#FDF2F4' },
+          { label: 'Gross Profit', sub: `Margin ${grossMarginPct}%`, val: grossProfit, color: '#15803D', bg: '#DCFCE7' },
+          { label: 'Pengeluaran', sub: 'Beban OPEX', val: totalExpenses, color: '#C2410C', bg: '#FFEDD5' },
+          { label: 'Net Profit', sub: `Net ${netMarginPct}%`, val: netProfit, color: netProfit >= 0 ? '#111827' : '#B91C1C', bg: netProfit >= 0 ? '#F3F4F6' : '#FEE2E2' }
+        ];
+        const maxVal = Math.max(1, ...metrics.map(m => Math.abs(m.val)));
+
+        finBox.innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;align-items:end;height:185px;padding:14px 8px 6px;background:var(--bg-oat);border-radius:14px;border:1px solid var(--border-hairline);">
+            ${metrics.map(m => {
+              const barH = Math.max(8, Math.round((Math.abs(m.val) / maxVal) * 115));
+              return `
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;">
+                  <div style="font-size:10px;font-weight:800;color:${m.color};text-align:center;line-height:1.15;">${rp(m.val)}</div>
+                  <div style="width:100%;max-width:44px;height:${barH}px;background:${m.color};border-radius:8px 8px 4px 4px;box-shadow:0 3px 8px rgba(0,0,0,0.1);transition:height 0.3s ease;"></div>
+                  <div style="text-align:center;">
+                    <div style="font-size:10.5px;font-weight:800;color:var(--ink-espresso);line-height:1.15;">${m.label}</div>
+                    <div style="font-size:9px;color:var(--ink-muted);">${m.sub}</div>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 12px;background:var(--bg-oat);border-radius:10px;border:1px solid var(--border-hairline);font-size:11px;">
+            <span>Total HPP (COGS): <strong style="color:#BC012E;">${rp(totalCogs)}</strong></span>
+            <span>Gross Margin: <strong style="color:#15803D;">${grossMarginPct}%</strong></span>
+            <span>Net Margin: <strong style="color:${netProfit >= 0 ? '#15803D' : '#B91C1C'};">${netMarginPct}%</strong></span>
+          </div>`;
+      }
+    }
+
     function renderOwnerHub() {
       const allOrders = [...orders];
       const revDrinks = allOrders.reduce((s, o) => s + (o.revMinuman || 0), 0);
@@ -6658,6 +6775,8 @@
         netMarginPctEl.textContent = `Net Margin: ${netMarginPct}%`;
         netMarginPctEl.style.color = netProfit >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
       }
+
+      renderOwnerCharts({ allOrders, totalRev, totalCogs, grossProfit, totalExpenses, netProfit, grossMarginPct, netMarginPct });
 
       // Update PnL Table Elements
       const pnlRevDrinksEl = document.getElementById('pnlRevDrinks');
