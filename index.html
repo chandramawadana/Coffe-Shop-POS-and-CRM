@@ -3649,6 +3649,18 @@
         pin: '8888',
         createdAt: '2026-11-03',
         isProtected: false
+      },
+      {
+        id: 'usr-kasir-barista-1',
+        name: 'Raka Pratama (Kasir & Barista)',
+        username: 'kasirbarista',
+        email: 'kasirbarista@kopiluhur.id',
+        password: 'Luhur123',
+        role: 'CASHIER',
+        roles: ['CASHIER', 'BARISTA'],
+        pin: '4567',
+        createdAt: '2026-11-20',
+        isProtected: false
       }
     ];
 
@@ -3769,8 +3781,14 @@
           users = DEFAULT_USERS;
         }
       }
-      // Ensure all users have username attached
+      // Ensure all users have username attached and new built-in defaults exist
       let modified = false;
+      DEFAULT_USERS.forEach(def => {
+        if (!users.some(u => u.id === def.id || (u.email && def.email && u.email.toLowerCase() === def.email.toLowerCase()))) {
+          users.push({ ...def });
+          modified = true;
+        }
+      });
       users = users.map(u => {
         const def = DEFAULT_USERS.find(d => 
           (d.email && u.email && d.email.toLowerCase() === u.email.toLowerCase()) || 
