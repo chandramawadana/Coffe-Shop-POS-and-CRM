@@ -2229,6 +2229,7 @@
                 <button class="btn-pay" style="padding:10px;font-size:12px;margin-top:6px;border-radius:10px;" onclick="registerNewUser()">
                   💾 Simpan &amp; Daftarkan Pengguna
                 </button>
+                <div id="userCreateFeedback" style="display:none;font-size:11px;font-weight:700;padding:8px 10px;border-radius:8px;"></div>
               </div>
             </div>
 
@@ -7463,43 +7464,59 @@
       showToast(`✅ Role ${users[idx].name} diperbarui menjadi: ${merged.badge}`);
     }
 
+    function setUserCreateFeedback(msg, isError) {
+      const fb = document.getElementById('userCreateFeedback');
+      if (fb) {
+        fb.style.display = 'block';
+        fb.style.background = isError ? '#FEE2E2' : '#DCFCE7';
+        fb.style.color = isError ? '#991B1B' : '#166534';
+        fb.style.border = isError ? '1px solid #FCA5A5' : '1px solid #86EFAC';
+        fb.textContent = msg;
+      }
+      showToast(msg);
+    }
+
     function registerNewUser() {
       if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
-        showToast('⛔ Hanya Superadmin yang berhak mendaftarkan user baru!');
+        setUserCreateFeedback('⛔ Hanya Superadmin yang berhak mendaftarkan user baru!', true);
         return;
       }
 
       const name = document.getElementById('newUserName').value.trim();
-      const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+      const rawLogin = document.getElementById('newUserEmail').value.trim().toLowerCase().replace(/\s+/g, '');
       const password = document.getElementById('newUserPassword').value.trim();
       const selectedRoles = Array.from(document.querySelectorAll('input[name="newUserRoleCheck"]:checked')).map(el => el.value);
 
       if (!name) {
-        showToast('Nama lengkap staf tidak boleh kosong!');
+        setUserCreateFeedback('⚠️ Nama lengkap staf tidak boleh kosong!', true);
         return;
       }
-      if (!email || !email.includes('@')) {
-        showToast('Format email tidak valid (harus mengandung @)!');
+      if (!rawLogin || rawLogin.length < 3) {
+        setUserCreateFeedback('⚠️ Username / Email minimal 3 karakter!', true);
         return;
       }
       if (!password || password.length < 4) {
-        showToast('Password minimal 4 karakter!');
+        setUserCreateFeedback('⚠️ Password minimal 4 karakter!', true);
         return;
       }
       if (selectedRoles.length === 0) {
-        showToast('Pilih minimal 1 role penugasan!');
+        setUserCreateFeedback('⚠️ Pilih minimal 1 role penugasan!', true);
         return;
       }
 
+      const username = rawLogin.includes('@') ? rawLogin.split('@')[0] : rawLogin;
+      const email = rawLogin.includes('@') ? rawLogin : `${rawLogin}@kopiluhur.id`;
+
       const users = getUsers();
-      if (users.some(u => u.email.toLowerCase() === email)) {
-        showToast(`Email ${email} sudah terdaftar di sistem!`);
+      if (users.some(u => (u.email && u.email.toLowerCase() === email) || (u.username && u.username.toLowerCase() === username))) {
+        setUserCreateFeedback(`⚠️ Username "${username}" atau Email "${email}" sudah terdaftar!`, true);
         return;
       }
 
       const newUser = {
         id: 'usr-' + Date.now(),
         name: name,
+        username: username,
         email: email,
         password: password,
         role: selectedRoles[0],
@@ -7518,7 +7535,7 @@
 
       renderUserManagement();
       const merged = getMergedRoleConfig(newUser);
-      showToast(`✅ Pengguna ${name} (${merged.badge}) berhasil didaftarkan!`);
+      setUserCreateFeedback(`✅ Pengguna ${name} (${username} • ${merged.badge}) berhasil didaftarkan!`, false);
     }
 
     function deleteUser(id) {
