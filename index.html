@@ -2026,16 +2026,31 @@
                   <input type="text" id="newUserPassword" class="field" placeholder="contoh: Luhur2026" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border-radius:10px;" />
                 </div>
                 <div>
-                  <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Pilih Role Penugasan:</label>
-                  <select id="newUserRole" class="field" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border-radius:10px;background:var(--surface-card);" onchange="updateRoleHint(this.value)">
-                    <option value="CASHIER">☕ Kasir POS (Hanya Halaman Kasir POS &amp; QRIS)</option>
-                    <option value="BARISTA">👨‍🍳 Barista KDS (Hanya Halaman Barista KDS)</option>
-                    <option value="KITCHEN">🍳 Kitchen KDS (Hanya Halaman Kitchen KDS)</option>
-                    <option value="MANAGER">📊 Supervisor / Manager (Kasir, KDS, Stok, P&amp;L)</option>
-                    <option value="SUPERADMIN">👑 Superadmin (Akses Penuh Semua Halaman &amp; Kelola User)</option>
-                  </select>
+                  <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:6px;">Pilih Role Penugasan (Bisa Gabung &gt; 1 Role):</label>
+                  <div id="newUserRolesGroup" style="display:flex;flex-direction:column;gap:6px;background:var(--bg-oat);padding:10px;border-radius:10px;border:1px solid var(--border-hairline);">
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
+                      <input type="checkbox" name="newUserRoleCheck" value="CASHIER" checked onchange="updateRoleHint()" />
+                      <span>☕ Kasir POS <span style="color:var(--ink-muted);font-weight:400;">(Kasir POS &amp; Layar QRIS)</span></span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
+                      <input type="checkbox" name="newUserRoleCheck" value="BARISTA" onchange="updateRoleHint()" />
+                      <span>👨‍🍳 Barista KDS <span style="color:var(--ink-muted);font-weight:400;">(Antrean Minuman)</span></span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
+                      <input type="checkbox" name="newUserRoleCheck" value="KITCHEN" onchange="updateRoleHint()" />
+                      <span>🍳 Kitchen KDS <span style="color:var(--ink-muted);font-weight:400;">(Antrean Makanan Dapur)</span></span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
+                      <input type="checkbox" name="newUserRoleCheck" value="MANAGER" onchange="updateRoleHint()" />
+                      <span>📊 Supervisor / Manager <span style="color:var(--ink-muted);font-weight:400;">(Stok, Kelola Menu &amp; P&amp;L)</span></span>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;cursor:pointer;">
+                      <input type="checkbox" name="newUserRoleCheck" value="SUPERADMIN" onchange="updateRoleHint()" />
+                      <span>👑 Superadmin <span style="color:var(--ink-muted);font-weight:400;">(Akses Penuh Semua Halaman)</span></span>
+                    </label>
+                  </div>
                   <div id="roleHintText" style="font-size:10.5px;color:var(--ink-muted);margin-top:6px;background:var(--bg-oat-dark);padding:7px 10px;border-radius:8px;line-height:1.4;">
-                    ℹ️ <strong>Kasir POS</strong>: Hanya dapat mengakses transaksi kasir, cetak struk, dan layar QRIS.
+                    ℹ️ <strong>Kasir POS</strong>: Kasir POS, Layar QRIS.
                   </div>
                 </div>
                 <button class="btn-pay" style="padding:10px;font-size:12px;margin-top:6px;border-radius:10px;" onclick="registerNewUser()">
@@ -2657,6 +2672,46 @@
         <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('pendingQrisModal')">✕</button>
       </div>
       <div id="pendingQrisList" style="max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT KOMBINASI ROLE USER -->
+  <div class="modal-backdrop" id="editUserRolesModal">
+    <div class="modal-box" style="max-width:440px;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:14px;">
+        <div>
+          <div class="serif" style="font-size:17px;font-weight:700;">✏️ Atur Gabungan Role Pengguna</div>
+          <div style="font-size:11px;color:var(--ink-muted);" id="editRoleUserLabel">-</div>
+        </div>
+        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('editUserRolesModal')">✕</button>
+      </div>
+      <input type="hidden" id="editRoleUserId" />
+      <div id="editUserRolesGroup" style="display:flex;flex-direction:column;gap:8px;background:var(--bg-oat);padding:12px;border-radius:12px;border:1px solid var(--border-hairline);margin-bottom:14px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" name="editUserRoleCheck" value="CASHIER" />
+          <span>☕ Kasir POS <span style="color:var(--ink-muted);font-weight:400;">(Kasir POS &amp; Layar QRIS)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" name="editUserRoleCheck" value="BARISTA" />
+          <span>👨‍🍳 Barista KDS <span style="color:var(--ink-muted);font-weight:400;">(Antrean Minuman)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" name="editUserRoleCheck" value="KITCHEN" />
+          <span>🍳 Kitchen KDS <span style="color:var(--ink-muted);font-weight:400;">(Antrean Makanan Dapur)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" name="editUserRoleCheck" value="MANAGER" />
+          <span>📊 Supervisor / Manager <span style="color:var(--ink-muted);font-weight:400;">(Stok, Kelola Menu &amp; P&amp;L)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;cursor:pointer;">
+          <input type="checkbox" name="editUserRoleCheck" value="SUPERADMIN" />
+          <span>👑 Superadmin <span style="color:var(--ink-muted);font-weight:400;">(Akses Penuh)</span></span>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button type="button" class="btn-dark" style="background:var(--bg-oat-dark);color:var(--ink-espresso);" onclick="closeModal('editUserRolesModal')">Batal</button>
+        <button type="button" class="btn-pay" style="width:auto;padding:10px 18px;font-size:12px;border-radius:10px;" onclick="saveEditedUserRoles()">💾 Simpan Role</button>
+      </div>
     </div>
   </div>
 
@@ -3640,6 +3695,67 @@
       }
     };
 
+    const NAV_VIEW_ORDER = ['cashier', 'kds-barista', 'kds-kitchen', 'customer', 'inventory', 'whatsapp', 'menu-mgmt', 'owner', 'users'];
+    const VIEW_LABELS = {
+      'cashier': 'Kasir POS',
+      'kds-barista': 'Barista KDS',
+      'kds-kitchen': 'Kitchen KDS',
+      'customer': 'Layar QRIS',
+      'inventory': 'Stok & BOM',
+      'whatsapp': 'WhatsApp CRM',
+      'menu-mgmt': 'Kelola Menu',
+      'owner': 'Owner Hub',
+      'users': 'Kelola User'
+    };
+
+    function getUserRoles(user) {
+      if (!user) return ['CASHIER'];
+      if (Array.isArray(user.roles) && user.roles.length > 0) {
+        const valid = user.roles.filter(r => ROLE_PERMISSIONS[r]);
+        if (valid.length > 0) return valid;
+      }
+      if (typeof user.role === 'string') {
+        const parts = user.role.split(',').map(s => s.trim()).filter(r => ROLE_PERMISSIONS[r]);
+        if (parts.length > 0) return parts;
+      }
+      return ['CASHIER'];
+    }
+
+    function hasRole(user, roleKey) {
+      return getUserRoles(user).includes(roleKey);
+    }
+
+    function hasAnyRole(user, roleList) {
+      const roles = getUserRoles(user);
+      return roleList.some(r => roles.includes(r));
+    }
+
+    function getMergedRoleConfig(user) {
+      const roles = getUserRoles(user);
+      if (roles.length === 1) {
+        return { ...ROLE_PERMISSIONS[roles[0]], roles };
+      }
+      const viewSet = new Set();
+      roles.forEach(r => {
+        (ROLE_PERMISSIONS[r]?.allowedViews || []).forEach(v => viewSet.add(v));
+      });
+      const allowedViews = NAV_VIEW_ORDER.filter(v => viewSet.has(v));
+      const primary = ROLE_PERMISSIONS[roles[0]] || ROLE_PERMISSIONS.CASHIER;
+      const badge = roles.map(r => ROLE_PERMISSIONS[r].badge).join(' + ');
+      let badgeStyle = 'background:#BC012E;color:#FFF;';
+      if (roles.includes('SUPERADMIN')) badgeStyle = ROLE_PERMISSIONS.SUPERADMIN.badgeStyle;
+      else if (roles.includes('MANAGER')) badgeStyle = ROLE_PERMISSIONS.MANAGER.badgeStyle;
+      return {
+        roles,
+        label: roles.map(r => ROLE_PERMISSIONS[r].label).join(' + '),
+        allowedViews,
+        defaultView: primary.defaultView,
+        badge,
+        badgeStyle,
+        description: allowedViews.map(v => VIEW_LABELS[v] || v).join(', ')
+      };
+    }
+
     function getUsers() {
       const stored = localStorage.getItem('wkl_registered_users_v2');
       let users = DEFAULT_USERS;
@@ -3953,7 +4069,7 @@
         openLoginPortal();
         return;
       }
-      const roleCfg = ROLE_PERMISSIONS[currentUser.role] || ROLE_PERMISSIONS.CASHIER;
+      const roleCfg = getMergedRoleConfig(currentUser);
       switchView(roleCfg.defaultView);
     }
 
@@ -3963,7 +4079,7 @@
         return;
       }
 
-      const roleCfg = ROLE_PERMISSIONS[currentUser.role] || ROLE_PERMISSIONS.CASHIER;
+      const roleCfg = getMergedRoleConfig(currentUser);
       if (!roleCfg.allowedViews.includes(viewId)) {
         showToast(`⛔ Akses Ditolak: Role Anda (${roleCfg.badge}) hanya diizinkan membuka task khusus Anda.`);
         switchView(roleCfg.defaultView);
@@ -5569,7 +5685,7 @@
     }
 
     function openAddMenuModal() {
-      if (!currentUser || !['SUPERADMIN', 'MANAGER'].includes(currentUser.role)) {
+      if (!currentUser || !hasAnyRole(currentUser, ['SUPERADMIN', 'MANAGER'])) {
         showToast('⛔ Hanya Supervisor atau Superadmin yang berhak menambah menu baru!');
         return;
       }
@@ -5640,7 +5756,7 @@
     }
 
     function openEditMenuModal(productId) {
-      if (!currentUser || !['SUPERADMIN', 'MANAGER'].includes(currentUser.role)) {
+      if (!currentUser || !hasAnyRole(currentUser, ['SUPERADMIN', 'MANAGER'])) {
         showToast('⛔ Hanya Supervisor atau Superadmin yang berhak mengubah HPP dan Harga!');
         return;
       }
@@ -6443,13 +6559,13 @@
 
     function applyUserSession(user) {
       currentUser = user;
-      activeStaff = { name: user.name, role: user.role, email: user.email };
+      const roleCfg = getMergedRoleConfig(user);
+      activeStaff = { name: user.name, role: roleCfg.badge, roles: roleCfg.roles, email: user.email };
       localStorage.setItem('wkl_active_user', JSON.stringify(user));
 
       // Update Topbar
       document.getElementById('activeStaffName').textContent = user.name;
       const roleBadge = document.getElementById('activeStaffRole');
-      const roleCfg = ROLE_PERMISSIONS[user.role] || ROLE_PERMISSIONS.CASHIER;
       roleBadge.textContent = roleCfg.badge;
       roleBadge.style.cssText = roleCfg.badgeStyle;
 
@@ -6467,7 +6583,7 @@
       // Shift Button display for Cashier/Manager/Superadmin
       const shiftBtn = document.getElementById('shiftHeaderBtn');
       if (shiftBtn) {
-        if (['CASHIER', 'MANAGER', 'SUPERADMIN'].includes(user.role)) {
+        if (hasAnyRole(user, ['CASHIER', 'MANAGER', 'SUPERADMIN'])) {
           shiftBtn.style.display = 'inline-flex';
         } else {
           shiftBtn.style.display = 'none';
@@ -6477,7 +6593,7 @@
       // Cashier Create Menu button display for Supervisor/Superadmin
       const cashierCreateBtn = document.getElementById('cashierCreateMenuBtn');
       if (cashierCreateBtn) {
-        if (['MANAGER', 'SUPERADMIN'].includes(user.role)) {
+        if (hasAnyRole(user, ['MANAGER', 'SUPERADMIN'])) {
           cashierCreateBtn.style.display = 'inline-flex';
         } else {
           cashierCreateBtn.style.display = 'none';
@@ -6503,27 +6619,24 @@
     // ==========================================
     // SUPERADMIN USER MANAGEMENT
     // ==========================================
-    function updateRoleHint(role) {
+    function updateRoleHint() {
       const hintEl = document.getElementById('roleHintText');
       if (!hintEl) return;
-      if (role === 'CASHIER') {
-        hintEl.innerHTML = 'ℹ️ <strong>Kasir POS</strong>: Hanya dapat melihat transaksi kasir POS, cetak struk, dan layar QRIS.';
-      } else if (role === 'BARISTA') {
-        hintEl.innerHTML = 'ℹ️ <strong>Barista KDS</strong>: Hanya dapat melihat antrean pesanan minuman kopi &amp; non-kopi.';
-      } else if (role === 'KITCHEN') {
-        hintEl.innerHTML = 'ℹ️ <strong>Kitchen KDS</strong>: Hanya dapat melihat antrean makanan hangat &amp; snack dapur.';
-      } else if (role === 'MANAGER') {
-        hintEl.innerHTML = 'ℹ️ <strong>Supervisor / Manager</strong>: Dapat mengelola menu (Create Menu, HPP &amp; Harga Jual), kasir, KDS, stok bahan, dan laporan keuangan.';
-      } else if (role === 'SUPERADMIN') {
-        hintEl.innerHTML = 'ℹ️ <strong>Superadmin</strong>: Memiliki hak akses penuh ke seluruh modul sistem dan dapat mendaftarkan user baru.';
+      const checked = Array.from(document.querySelectorAll('input[name="newUserRoleCheck"]:checked')).map(el => el.value);
+      if (checked.length === 0) {
+        hintEl.innerHTML = '⚠️ Pilih minimal <strong>1 role</strong> untuk pengguna ini.';
+        return;
       }
+      const merged = getMergedRoleConfig({ roles: checked });
+      const pagesText = merged.allowedViews.map(v => VIEW_LABELS[v] || v).join(', ');
+      hintEl.innerHTML = `ℹ️ <strong>${merged.badge}</strong>: Dapat mengakses <strong>${pagesText}</strong>.`;
     }
 
     function renderUserManagement() {
-      if (!currentUser || currentUser.role !== 'SUPERADMIN') {
+      if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
         showToast('⛔ Akses Ditolak: Halaman ini khusus untuk Superadmin!');
         if (currentUser) {
-          switchView(ROLE_PERMISSIONS[currentUser.role].defaultView);
+          switchView(getMergedRoleConfig(currentUser).defaultView);
         } else {
           openLoginPortal();
         }
@@ -6534,22 +6647,23 @@
       
       // Update Stats
       document.getElementById('uStatTotal').textContent = users.length;
-      document.getElementById('uStatSuper').textContent = users.filter(u => u.role === 'SUPERADMIN').length;
-      document.getElementById('uStatCashier').textContent = users.filter(u => u.role === 'CASHIER').length;
-      document.getElementById('uStatProd').textContent = users.filter(u => ['BARISTA', 'KITCHEN'].includes(u.role)).length;
+      document.getElementById('uStatSuper').textContent = users.filter(u => hasRole(u, 'SUPERADMIN')).length;
+      document.getElementById('uStatCashier').textContent = users.filter(u => hasRole(u, 'CASHIER')).length;
+      document.getElementById('uStatProd').textContent = users.filter(u => hasAnyRole(u, ['BARISTA', 'KITCHEN'])).length;
 
       // Populate Table
       const tbody = document.getElementById('userTableBody');
       tbody.innerHTML = users.map((u, idx) => {
-        const roleCfg = ROLE_PERMISSIONS[u.role] || ROLE_PERMISSIONS.CASHIER;
+        const roleCfg = getMergedRoleConfig(u);
+        const userRoles = roleCfg.roles;
         const isCurrent = currentUser && currentUser.email.toLowerCase() === u.email.toLowerCase();
-        
-        let scopeText = '';
-        if (u.role === 'SUPERADMIN') scopeText = '<span style="color:#B91C1C;font-weight:700;">Akses Penuh Semua Modul</span>';
-        else if (u.role === 'CASHIER') scopeText = 'Khusus Kasir POS &amp; Layar QRIS';
-        else if (u.role === 'BARISTA') scopeText = 'Khusus Barista KDS (Minuman)';
-        else if (u.role === 'KITCHEN') scopeText = 'Khusus Kitchen KDS (Makanan)';
-        else if (u.role === 'MANAGER') scopeText = 'Kasir, KDS, Stok, Kelola Menu &amp; Laba Rugi';
+        const roleBadgesHtml = userRoles.map(r => {
+          const cfg = ROLE_PERMISSIONS[r] || ROLE_PERMISSIONS.CASHIER;
+          return `<span class="role-tag" style="${cfg.badgeStyle}display:inline-block;margin:1px 2px;">${cfg.badge}</span>`;
+        }).join('');
+        const scopeText = userRoles.includes('SUPERADMIN')
+          ? '<span style="color:#B91C1C;font-weight:700;">Akses Penuh Semua Modul</span>'
+          : roleCfg.allowedViews.map(v => VIEW_LABELS[v] || v).join(', ');
 
         return `
           <tr style="border-bottom:1px solid var(--border-hairline);${isCurrent ? 'background:#F0FDF4;' : ''}">
@@ -6563,25 +6677,72 @@
               <div style="font-size:10.5px;color:var(--ink-muted);">Password: <code>${u.password || '••••••••'}</code></div>
             </td>
             <td style="padding:10px;">
-              <span class="role-tag" style="${roleCfg.badgeStyle}">${roleCfg.badge}</span>
+              <div style="display:flex;flex-wrap:wrap;gap:2px;">${roleBadgesHtml}</div>
             </td>
             <td style="padding:10px;font-size:11px;color:var(--ink-muted);">
               ${scopeText}
             </td>
             <td style="padding:10px;font-size:10.5px;color:var(--ink-muted);">${u.createdAt || '-'}</td>
             <td style="padding:10px;text-align:center;">
-              ${u.isProtected ? 
-                '<span style="font-size:10px;color:var(--ink-muted);background:var(--bg-oat-dark);padding:3px 6px;border-radius:4px;">🔒 Utama</span>' :
-                `<button onclick="deleteUser('${u.id}')" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;font-weight:700;">Hapus</button>`
-              }
+              <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;">
+                <button onclick="openEditUserRolesModal('${u.id}')" style="background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;font-weight:700;">✏️ Role</button>
+                ${u.isProtected ? 
+                  '<span style="font-size:10px;color:var(--ink-muted);background:var(--bg-oat-dark);padding:3px 6px;border-radius:4px;">🔒 Utama</span>' :
+                  `<button onclick="deleteUser('${u.id}')" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;font-weight:700;">Hapus</button>`
+                }
+              </div>
             </td>
           </tr>
         `;
       }).join('');
     }
 
+    function openEditUserRolesModal(userId) {
+      if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
+        return showToast('⛔ Hanya Superadmin yang berhak mengubah role pengguna!');
+      }
+      const users = getUsers();
+      const target = users.find(u => u.id === userId);
+      if (!target) return;
+      const currentRoles = getUserRoles(target);
+      document.getElementById('editRoleUserId').value = target.id;
+      document.getElementById('editRoleUserLabel').textContent = `${target.name} (${target.email})`;
+      document.querySelectorAll('input[name="editUserRoleCheck"]').forEach(cb => {
+        cb.checked = currentRoles.includes(cb.value);
+      });
+      openModal('editUserRolesModal');
+    }
+
+    function saveEditedUserRoles() {
+      if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
+        return showToast('⛔ Hanya Superadmin yang berhak mengubah role pengguna!');
+      }
+      const userId = document.getElementById('editRoleUserId').value;
+      const selectedRoles = Array.from(document.querySelectorAll('input[name="editUserRoleCheck"]:checked')).map(el => el.value);
+      if (selectedRoles.length === 0) {
+        return showToast('Pilih minimal 1 role untuk pengguna!');
+      }
+      const users = getUsers();
+      const idx = users.findIndex(u => u.id === userId);
+      if (idx === -1) return;
+      if (users[idx].isProtected && !selectedRoles.includes('SUPERADMIN')) {
+        selectedRoles.push('SUPERADMIN');
+      }
+      users[idx].roles = selectedRoles;
+      users[idx].role = selectedRoles[0];
+      saveUsers(users);
+
+      if (currentUser && currentUser.id === users[idx].id) {
+        applyUserSession(users[idx]);
+      }
+      closeModal('editUserRolesModal');
+      renderUserManagement();
+      const merged = getMergedRoleConfig(users[idx]);
+      showToast(`✅ Role ${users[idx].name} diperbarui menjadi: ${merged.badge}`);
+    }
+
     function registerNewUser() {
-      if (!currentUser || currentUser.role !== 'SUPERADMIN') {
+      if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
         showToast('⛔ Hanya Superadmin yang berhak mendaftarkan user baru!');
         return;
       }
@@ -6589,7 +6750,7 @@
       const name = document.getElementById('newUserName').value.trim();
       const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
       const password = document.getElementById('newUserPassword').value.trim();
-      const role = document.getElementById('newUserRole').value;
+      const selectedRoles = Array.from(document.querySelectorAll('input[name="newUserRoleCheck"]:checked')).map(el => el.value);
 
       if (!name) {
         showToast('Nama lengkap staf tidak boleh kosong!');
@@ -6601,6 +6762,10 @@
       }
       if (!password || password.length < 4) {
         showToast('Password minimal 4 karakter!');
+        return;
+      }
+      if (selectedRoles.length === 0) {
+        showToast('Pilih minimal 1 role penugasan!');
         return;
       }
 
@@ -6615,7 +6780,8 @@
         name: name,
         email: email,
         password: password,
-        role: role,
+        role: selectedRoles[0],
+        roles: selectedRoles,
         pin: String(Math.floor(1000 + Math.random() * 9000)),
         createdAt: new Date().toISOString().split('T')[0],
         isProtected: false
@@ -6629,11 +6795,12 @@
       document.getElementById('newUserPassword').value = '';
 
       renderUserManagement();
-      showToast(`✅ Pengguna ${name} (${role}) berhasil didaftarkan!`);
+      const merged = getMergedRoleConfig(newUser);
+      showToast(`✅ Pengguna ${name} (${merged.badge}) berhasil didaftarkan!`);
     }
 
     function deleteUser(id) {
-      if (!currentUser || currentUser.role !== 'SUPERADMIN') {
+      if (!currentUser || !hasRole(currentUser, 'SUPERADMIN')) {
         showToast('⛔ Hanya Superadmin yang berhak menghapus user!');
         return;
       }
@@ -7559,7 +7726,7 @@
     let editMatId = null;
 
     function openMasterHppModal() {
-      if (!currentUser || !['SUPERADMIN', 'MANAGER'].includes(currentUser.role)) {
+      if (!currentUser || !hasAnyRole(currentUser, ['SUPERADMIN', 'MANAGER'])) {
         showToast('⛔ Akses Terbatas: Hanya Supervisor atau Superadmin yang berhak mengakses Master Data HPP!');
         return;
       }
