@@ -1004,7 +1004,30 @@
       font-weight: 600;
       z-index: 200;
       display: none;
+      pointer-events: none;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .mobile-cart-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--ink-espresso);
+      color: #FFFFFF;
+      padding: 10px 14px;
+      border-top: 2px solid #BC012E;
+      flex-shrink: 0;
+      z-index: 25;
+    }
+    .mobile-cart-head {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #BC012E 0%, #8C0020 100%);
+      color: #FFFFFF;
+      flex-shrink: 0;
     }
 
     @media (max-width: 1280px) {
@@ -1053,30 +1076,88 @@
       .page-body { padding: 14px; }
     }
 
-    @media (max-width: 860px) {
+    @media (max-width: 900px) {
       .cashier-layout { flex-direction: column; }
-      .catalog-pane { flex: 1; min-height: 0; border-right: none; }
+      .catalog-pane { flex: 1 1 56%; min-height: 0; border-right: none; }
+      .sub-header { padding: 8px 12px; gap: 6px; }
+      .modifier-bar { padding: 6px 12px; }
+      .menu-scroll { padding: 10px 12px; }
       .cart-pane {
         width: 100%;
-        height: 40dvh;
-        min-height: 250px;
-        max-height: 380px;
+        flex: 0 0 44%;
+        height: auto;
+        min-height: 230px;
+        max-height: 46dvh;
         border-left: none;
         border-top: 1px solid var(--border-hairline);
+        overflow: hidden;
+      }
+      .cart-crm {
+        padding: 8px 12px;
+        gap: 5px;
+        max-height: 135px;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+      .loyalty-card-box { padding: 6px 10px; }
+      .cart-items {
+        flex: 1;
+        min-height: 50px;
+        overflow-y: auto;
+        padding: 8px 12px;
+      }
+      .cart-footer {
+        flex-shrink: 0;
+        padding: 8px 12px;
+        gap: 6px;
       }
       .kds-board { padding: 12px 14px; gap: 12px; }
       .kds-ticket { width: 275px; }
     }
 
     @media (max-width: 640px) {
+      .topbar { padding: 6px 10px; gap: 6px; }
       .brand .badge-sky { display: none; }
-      .header-actions .pill-status { display: none; }
+      .header-actions {
+        width: 100%;
+        flex: 0 0 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .header-actions .pill-status {
+        display: inline-flex;
+        padding: 4px 8px;
+        font-size: 10.5px;
+      }
+      .user-pill { margin-left: auto; max-width: 165px; }
       .nav-tabs {
         flex-wrap: nowrap;
         justify-content: flex-start;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
       }
+      .catalog-pane { flex: 1 1 100%; min-height: 0; }
+      .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .menu-card { padding: 12px 10px 10px; min-height: 104px; }
+      .menu-tag-wrap { padding-right: 0; margin-top: 14px; }
+      .menu-name { font-size: 12.5px; }
+      #menuSearch { width: 100% !important; min-width: 120px; flex: 1; }
+      .mobile-cart-bar { display: flex; }
+      .cart-pane { display: none; }
+      .cart-pane.mobile-open {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        width: 100%;
+        height: 100dvh;
+        max-height: 100dvh;
+        flex: none;
+      }
+      .cart-pane.mobile-open .mobile-cart-head { display: flex; }
+      .cart-pane.mobile-open .cart-crm { max-height: 36dvh; }
+      .modal-box { border-radius: 16px; max-height: 94dvh; }
     }
   </style>
 </head>
@@ -1119,7 +1200,7 @@
           ⏱️ Absensi
         </button>
         <!-- Tombol Manajemen Meja & QR Self-Order -->
-        <button class="pill-status" style="cursor:pointer;background:#FDF2F4;color:#BC012E;border-color:#F7CCD3;font-weight:700;display:inline-flex;align-items:center;gap:4px;" onclick="openTableMgmtModal()" title="Manajemen Meja Kedai & Download/Print QR Code">
+        <button class="pill-status" style="cursor:pointer;background:#FDF2F4;color:#BC012E;border-color:#F7CCD3;font-weight:700;align-items:center;gap:4px;" onclick="openTableMgmtModal()" title="Manajemen Meja Kedai & Download/Print QR Code">
           🪑 Meja &amp; QR (<span id="headerTableCount">12</span>)
         </button>
         <button class="pill-status" style="cursor:pointer;background:var(--accent-sky);color:var(--ink-espresso);border-color:var(--accent-sky);font-weight:700;" onclick="openShiftModal()" id="shiftHeaderBtn">
@@ -1225,10 +1306,23 @@
             <div class="menu-scroll">
               <div class="menu-grid" id="menuGrid"></div>
             </div>
+
+            <!-- Mobile Bottom Cart Summary Bar (<= 640px) -->
+            <div class="mobile-cart-bar" id="mobileCartBar" onclick="toggleMobileCart(true)">
+              <div>
+                <div style="font-size:10.5px;color:#FCA5A5;font-weight:700;">🛒 Keranjang (<span id="mobileCartCount">0 item</span>)</div>
+                <div style="font-size:15px;font-weight:800;" id="mobileCartTotal">Rp 0</div>
+              </div>
+              <button type="button" class="btn-pay" style="width:auto;padding:8px 14px;font-size:12px;border-radius:999px;">Lihat &amp; Bayar ▲</button>
+            </div>
           </div>
 
           <!-- Cart Sidebar with Visual Loyalty Card -->
-          <aside class="cart-pane">
+          <aside class="cart-pane" id="cartPane">
+            <div class="mobile-cart-head">
+              <strong class="serif" style="font-size:15px;">🛒 Keranjang &amp; Pembayaran</strong>
+              <button type="button" class="btn-dark" style="background:rgba(0,0,0,0.25);padding:5px 12px;font-size:11px;border-radius:999px;" onclick="toggleMobileCart(false)">✕ Tambah Menu</button>
+            </div>
             <div class="cart-crm">
               <div class="input-row">
                 <input type="tel" class="field" id="custPhone" placeholder="No. WhatsApp Pelanggan..." value="081234567890" />
@@ -4517,6 +4611,17 @@
       }).join('');
 
       renderCustomerDisplay();
+      const mobCount = document.getElementById('mobileCartCount');
+      const mobTotal = document.getElementById('mobileCartTotal');
+      if (mobCount) mobCount.textContent = `${totalQty} item`;
+      if (mobTotal) mobTotal.textContent = rp(bill.finalTotal);
+    }
+
+    function toggleMobileCart(open) {
+      const pane = document.getElementById('cartPane');
+      if (!pane) return;
+      if (open === undefined) pane.classList.toggle('mobile-open');
+      else pane.classList.toggle('mobile-open', !!open);
     }
 
     // ==========================================
