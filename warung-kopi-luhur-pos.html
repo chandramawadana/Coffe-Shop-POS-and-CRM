@@ -52,10 +52,11 @@
 
     /* Layout Shell */
     .app-shell {
+      position: fixed;
+      inset: 0;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      height: 100dvh;
+      height: 100%;
       width: 100%;
       overflow: hidden;
     }
@@ -288,7 +289,8 @@
 
     /* Main Viewport Panels */
     .main-view {
-      flex: 1;
+      flex: 1 1 0;
+      min-height: 0;
       overflow: hidden;
       position: relative;
       background: var(--bg-oat);
@@ -1065,14 +1067,15 @@
     }
 
     @media (max-width: 1280px), (max-height: 860px) {
-      .cart-pane { overflow-y: auto; }
-      .cart-crm { padding: 6px 10px; gap: 4px; }
+      .cart-pane { height: 100%; min-height: 0; overflow: hidden; }
+      .cart-crm { padding: 6px 10px; gap: 4px; flex-shrink: 0; }
       .cart-crm .field { padding: 6px 8px; font-size: 11px; }
       .loyalty-card-box { padding: 5px 8px; margin-top: 2px; }
-      .cart-items { min-height: 130px; padding: 6px 10px; gap: 5px; }
-      .cart-footer { padding: 6px 10px; gap: 4px; }
+      .cart-items { flex: 1 1 0; min-height: 80px; overflow-y: auto; padding: 6px 10px; gap: 5px; }
+      .cart-footer { flex-shrink: 0; padding: 6px 10px; gap: 4px; }
       .cart-footer #cartTotal { font-size: 18px !important; }
       .cart-footer #btnSaveOpenBill, .cart-footer #btnPayNow { padding: 9px 10px !important; font-size: 11.5px !important; }
+      footer.app-footer { padding: 3px 12px !important; font-size: 9.5px !important; }
     }
 
     @media (max-width: 980px) {
