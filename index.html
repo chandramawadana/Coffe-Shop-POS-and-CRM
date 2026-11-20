@@ -1033,20 +1033,18 @@
       flex-shrink: 0;
     }
 
-    @media (max-width: 1280px) {
+    @media (max-width: 1680px) {
       .topbar {
         height: auto;
-        padding: 8px 14px;
+        padding: 8px 16px;
         flex-wrap: wrap;
         gap: 8px;
       }
-      .brand-sub { display: none; }
       .header-actions {
         flex-wrap: wrap;
         justify-content: flex-end;
         gap: 6px;
       }
-      .header-actions .status-lan { display: none; }
       .nav-tabs {
         order: 3;
         width: 100%;
@@ -1058,6 +1056,12 @@
         padding: 4px;
       }
       .nav-tab { padding: 5px 10px; font-size: 11px; }
+    }
+
+    @media (max-width: 1280px) {
+      .topbar { padding: 8px 14px; }
+      .brand-sub { display: none; }
+      .header-actions .status-lan { display: none; }
       .cart-pane { width: 315px; }
       .menu-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
     }
