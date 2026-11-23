@@ -6381,7 +6381,11 @@
         </td>
       `;
 
-      tbody.appendChild(tr);
+      if (!data) {
+        tbody.prepend(tr);
+      } else {
+        tbody.appendChild(tr);
+      }
 
       // Check if custom
       const selectEl = tr.querySelector('.recipe-mat-select');
