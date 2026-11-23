@@ -31,7 +31,8 @@ $allowedKeys = [
     'tables',
     'products',
     'expenses',
-    'customers'
+    'customers',
+    'categories'
 ];
 
 $action = $_GET['action'] ?? '';

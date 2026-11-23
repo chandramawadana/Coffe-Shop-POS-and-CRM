@@ -3208,7 +3208,12 @@
                   <option value="penyempurna">Penyempurna Kopi</option>
                   <option value="penyempurna_cuanki">Topping Cuanki</option>
                 </optgroup>
+                <optgroup label="📌 Kategori Tambahan" id="newMenuCustomCatGroup"></optgroup>
+                <option value="__CUSTOM__">➕ Input Kategori Baru Manual...</option>
               </select>
+              <div id="newMenuCustomCatBox" style="display:none;margin-top:6px;">
+                <input type="text" id="newMenuCustomCatInput" class="field" placeholder="Ketik nama kategori baru (cth: Snack &amp; Pastry)" style="width:100%;" />
+              </div>
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Stasiun Order KDS:</label>
@@ -3414,7 +3419,7 @@
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Kategori Menu:</label>
-              <select class="field" id="editMenuCat" style="width:100%;margin-top:4px;">
+              <select class="field" id="editMenuCat" style="width:100%;margin-top:4px;" onchange="toggleEditCustomCatInput()">
                 <optgroup label="☕ Kategori Minuman">
                   <option value="racikan_master">Racikan Master</option>
                   <option value="klasik_kopi">Klasik Kopi</option>
@@ -3429,7 +3434,12 @@
                   <option value="penyempurna">Penyempurna Kopi</option>
                   <option value="penyempurna_cuanki">Topping Cuanki</option>
                 </optgroup>
+                <optgroup label="📌 Kategori Tambahan" id="editMenuCustomCatGroup"></optgroup>
+                <option value="__CUSTOM__">➕ Input Kategori Baru Manual...</option>
               </select>
+              <div id="editMenuCustomCatBox" style="display:none;margin-top:6px;">
+                <input type="text" id="editMenuCustomCatInput" class="field" placeholder="Ketik nama kategori baru (cth: Snack &amp; Pastry)" style="width:100%;" />
+              </div>
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Stasiun Order KDS:</label>
@@ -4354,6 +4364,12 @@
             renderLoyaltyCard();
           }
         }
+        if (Array.isArray(d.categories)) {
+          customCategories = d.categories;
+          localStorage.setItem('wkl_custom_categories_v1', JSON.stringify(customCategories));
+          syncCategoryDropdowns();
+          renderCategoryBar();
+        }
 
         if (document.getElementById('view-users')?.classList.contains('active')) renderUserManagement();
         if (document.getElementById('view-promo-mgmt')?.classList.contains('active')) renderPromoManagement();
@@ -4621,6 +4637,98 @@
       renderMenu();
     }
 
+    const BUILTIN_CATEGORIES = [
+      { id: 'cuanki', label: '🍲 Menu Cuanki', style: 'background:#FEF3C7;color:#92400E;border-color:#F59E0B;font-weight:700;' },
+      { id: 'racikan_master', label: 'Racikan Master' },
+      { id: 'klasik_kopi', label: 'Klasik Kopi' },
+      { id: 'kopi_buah', label: 'Kopi Buah' },
+      { id: 'racikan_manual', label: 'Racikan Manual' },
+      { id: 'bukan_kopi', label: 'Bukan Kopi' },
+      { id: 'penyempurna_cuanki', label: '✨ Topping Cuanki' },
+      { id: 'penyempurna', label: '✨ Penyempurna Kopi' }
+    ];
+
+    let customCategories = (() => {
+      try {
+        const raw = localStorage.getItem('wkl_custom_categories_v1');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    })();
+
+    function saveCustomCategoriesState() {
+      try { localStorage.setItem('wkl_custom_categories_v1', JSON.stringify(customCategories)); } catch (e) {}
+      syncToServer('categories', customCategories);
+    }
+
+    function getCategoryLabel(catId) {
+      const b = BUILTIN_CATEGORIES.find(x => x.id === catId);
+      if (b) return b.label.replace(/^[^\w\s]+\s*/, '');
+      const c = customCategories.find(x => x.id === catId);
+      if (c) return c.label;
+      return String(catId || '').replace(/_/g, ' ');
+    }
+
+    function registerCustomCategory(label, station) {
+      const clean = String(label || '').trim();
+      if (!clean) return '';
+      const existing = [...BUILTIN_CATEGORIES, ...customCategories].find(
+        x => x.label.replace(/^[^\w\s]+\s*/, '').toLowerCase() === clean.toLowerCase()
+      );
+      if (existing) return existing.id;
+      let slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+      if (!slug) slug = 'cat_' + Date.now();
+      if ([...BUILTIN_CATEGORIES, ...customCategories].some(x => x.id === slug)) {
+        slug = slug + '_' + String(Date.now()).slice(-4);
+      }
+      customCategories.push({ id: slug, label: clean, station: station || 'BARISTA' });
+      saveCustomCategoriesState();
+      syncCategoryDropdowns();
+      renderCategoryBar();
+      return slug;
+    }
+
+    function syncCategoryDropdowns() {
+      const optsHtml = customCategories.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+      const g1 = document.getElementById('newMenuCustomCatGroup');
+      const g2 = document.getElementById('editMenuCustomCatGroup');
+      if (g1) g1.innerHTML = optsHtml;
+      if (g2) g2.innerHTML = optsHtml;
+    }
+
+    function renderCategoryBar() {
+      const bar = document.getElementById('catBar');
+      if (!bar) return;
+      const nonAddonCount = PRODUCTS.filter(p => p.cat !== 'penyempurna' && p.cat !== 'penyempurna_cuanki').length;
+      const allCats = [...BUILTIN_CATEGORIES, ...customCategories.map(c => ({ id: c.id, label: `📌 ${c.label}` }))];
+
+      // Include any orphan categories present on PRODUCTS
+      PRODUCTS.forEach(p => {
+        if (p.cat && !allCats.some(c => c.id === p.cat)) {
+          allCats.push({ id: p.cat, label: `📌 ${getCategoryLabel(p.cat)}` });
+        }
+      });
+
+      const pills = [
+        `<button class="cat-pill ${activeCategory === 'all' ? 'active' : ''}" onclick="selectCategory('all', this)">Semua Menu (${nonAddonCount})</button>`,
+        ...allCats.map(c => {
+          const cnt = PRODUCTS.filter(p => p.cat === c.id).length;
+          if (cnt === 0 && !BUILTIN_CATEGORIES.some(b => b.id === c.id)) return '';
+          const extraStyle = c.style ? `style="${c.style}"` : '';
+          return `<button class="cat-pill ${activeCategory === c.id ? 'active' : ''}" ${extraStyle} onclick="selectCategory('${c.id}', this)">${c.label} (${cnt})</button>`;
+        })
+      ];
+      bar.innerHTML = pills.join('');
+    }
+
+    function toggleEditCustomCatInput() {
+      const sel = document.getElementById('editMenuCat');
+      const box = document.getElementById('editMenuCustomCatBox');
+      if (box && sel) {
+        box.style.display = sel.value === '__CUSTOM__' ? 'block' : 'none';
+        if (sel.value === '__CUSTOM__') document.getElementById('editMenuCustomCatInput')?.focus();
+      }
+    }
+
     function renderMenu() {
       const grid = document.getElementById('menuGrid');
       const q = (document.getElementById('menuSearch')?.value || '').toLowerCase();
@@ -4635,7 +4743,7 @@
         let cardType = 'drink';
         let ribbonIcon = '☕';
         let ribbonLabel = 'Minuman';
-        let subTag = p.cat.replace('_', ' ').toUpperCase();
+        let subTag = getCategoryLabel(p.cat).toUpperCase();
 
         if (p.cat === 'cuanki' || p.type === 'food') {
           cardType = 'food';
@@ -6214,8 +6322,14 @@
     function syncNewMenuTypeStation() {
       const catEl = document.getElementById('newMenuCat');
       const stationSel = document.getElementById('newMenuStation');
+      const customBox = document.getElementById('newMenuCustomCatBox');
       if (!catEl || !stationSel) return;
       const cat = catEl.value;
+      if (customBox) {
+        customBox.style.display = cat === '__CUSTOM__' ? 'block' : 'none';
+        if (cat === '__CUSTOM__') document.getElementById('newMenuCustomCatInput')?.focus();
+      }
+      if (cat === '__CUSTOM__') return;
       if (cat === 'cuanki' || cat === 'penyempurna_cuanki') {
         stationSel.value = 'KITCHEN';
         if (document.getElementById('newPkgCuankiCup')) document.getElementById('newPkgCuankiCup').checked = true;
@@ -6240,6 +6354,7 @@
       if (!confirm('Apakah Anda yakin ingin menghapus menu ini dari katalog?')) return;
       PRODUCTS = PRODUCTS.filter(p => p.id !== productId);
       saveProductsState();
+      renderCategoryBar();
       renderMenu();
       renderHppTable();
       renderMenuMgmtTable();
@@ -6634,17 +6749,22 @@
 
     function saveNewMenu() {
       const name = document.getElementById('newMenuName').value.trim();
-      const cat = document.getElementById('newMenuCat').value;
+      let cat = document.getElementById('newMenuCat').value;
       const station = document.getElementById('newMenuStation').value;
       const price = Number(document.getElementById('newMenuPrice').value || 0);
       const cogs = Number(document.getElementById('newMenuCogs').value || 0);
       const desc = document.getElementById('newMenuDesc').value.trim() || 'Menu racikan spesial Warung Kopi Luhur.';
 
       if (!name) return showToast('Nama menu tidak boleh kosong!');
+      if (cat === '__CUSTOM__') {
+        const customLabel = (document.getElementById('newMenuCustomCatInput')?.value || '').trim();
+        if (!customLabel) return showToast('Ketik nama kategori baru terlebih dahulu!');
+        cat = registerCustomCategory(customLabel, station);
+      }
       if (price <= 0) return showToast('Harga jual harus lebih dari Rp 0!');
       if (cogs <= 0) return showToast('HPP modal bahan baku harus lebih dari Rp 0!');
 
-      let type = 'drink';
+      let type = station === 'KITCHEN' ? 'food' : 'drink';
       if (cat === 'cuanki') type = 'food';
       else if (cat === 'penyempurna') type = 'addon';
       else if (cat === 'penyempurna_cuanki') type = 'addon_food';
@@ -6669,6 +6789,7 @@
       saveProductsState();
       closeModal('addMenuModal');
 
+      renderCategoryBar();
       renderMenu();
       renderHppTable();
       renderMenuMgmtTable();
@@ -6763,6 +6884,7 @@
       saveProductsState();
       closeModal('editMenuModal');
 
+      renderCategoryBar();
       renderMenu();
       renderHppTable();
       renderMenuMgmtTable();
@@ -9475,6 +9597,8 @@
     // INITIALIZATION
     // ==========================================
     loadProductsState();
+    syncCategoryDropdowns();
+    renderCategoryBar();
     syncCartDiscountOptions();
     renderMenu();
     renderCart();
