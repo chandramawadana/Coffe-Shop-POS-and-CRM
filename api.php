@@ -30,7 +30,8 @@ $allowedKeys = [
     'attendance',
     'tables',
     'products',
-    'expenses'
+    'expenses',
+    'customers'
 ];
 
 $action = $_GET['action'] ?? '';

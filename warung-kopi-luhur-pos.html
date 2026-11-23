@@ -625,7 +625,7 @@
     }
     .stamp-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 5px;
       margin: 8px 0;
     }
@@ -1313,7 +1313,7 @@
             </div>
             <div class="cart-crm">
               <div class="input-row">
-                <input type="tel" class="field" id="custPhone" placeholder="No. WhatsApp Pelanggan..." value="081234567890" />
+                <input type="tel" class="field" id="custPhone" placeholder="No. HP / WhatsApp Pelanggan..." value="" oninput="onCustPhoneInput(this.value)" />
                 <button class="btn-dark" onclick="lookupCustomer()">Cek</button>
               </div>
 
@@ -1321,11 +1321,11 @@
               <div id="loyaltyCardWidget" class="loyalty-card-box is-collapsed">
                 <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleLoyaltyWidget()" title="Klik untuk tampilkan / sembunyikan kartu stamp">
                   <div>
-                    <div style="font-size:9px;letter-spacing:0.8px;font-weight:800;color:var(--ink-muted);">LOYALTY • <span id="loyaltyCustName" style="color:var(--ink-espresso);">Budi Santoso</span></div>
-                    <div id="loyaltyProgressText" style="font-size:10px;font-weight:700;color:#BC012E;">5 / 7 Stamp (2 cup lagi gratis!)</div>
+                    <div style="font-size:9px;letter-spacing:0.8px;font-weight:800;color:var(--ink-muted);">LOYALTY • <span id="loyaltyCustName" style="color:var(--ink-espresso);">Belum Ada Member</span></div>
+                    <div id="loyaltyProgressText" style="font-size:10px;font-weight:700;color:#BC012E;">Input No. HP lalu klik Cek (0 / 10 Stamp)</div>
                   </div>
                   <div style="display:flex;align-items:center;gap:4px;">
-                    <span class="badge-sky" id="loyaltyCustVisits" style="font-size:9.5px;">5x</span>
+                    <span class="badge-sky" id="loyaltyCustVisits" style="font-size:9.5px;">0x</span>
                     <span id="loyaltyToggleIcon" style="font-size:10px;color:var(--ink-muted);font-weight:800;">▼</span>
                   </div>
                 </div>
@@ -1366,7 +1366,7 @@
                   <select class="field" id="cartDiscountSelect" style="font-size:11px;padding:3px 6px;width:150px;border-radius:6px;" onchange="onCartDiscountChange(this.value)">
                     <option value="NONE">Tanpa Diskon (0%)</option>
                     <option value="MEMBER_10">Member Toko (10%)</option>
-                    <option value="STAMP_FREE">Reward Buy 7 (Free 1 Kopi)</option>
+                    <option value="STAMP_FREE">Reward Buy 10 (Free 1 Kopi)</option>
                     <option value="VOUCHER_5K">Voucher Rp 5.000</option>
                     <option value="VOUCHER_10K">Voucher Rp 10.000</option>
                     <option value="CUSTOM">Custom Nominal...</option>
@@ -1486,10 +1486,10 @@
             <div id="custDisplayLoyaltyCard" style="background:#3A2E25;border:1px solid #524337;border-radius:16px;padding:12px 16px;max-width:440px;width:100%;font-size:12px;text-align:left;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                 <strong style="color:var(--accent-sky);">Loyalty Stamp Pelanggan:</strong>
-                <span id="custLoyaltyPhone" style="color:#C8BEB0;font-size:11px;">081234567890</span>
+                <span id="custLoyaltyPhone" style="color:#C8BEB0;font-size:11px;">-</span>
               </div>
               <div class="stamp-grid" id="custStampGrid" style="margin:6px 0;"></div>
-              <div style="font-size:11px;color:#E5DECE;" id="custLoyaltyMsg">Kumpulkan 7 Stamp untuk mendapatkan 1 Minuman Gratis!</div>
+              <div style="font-size:11px;color:#E5DECE;" id="custLoyaltyMsg">Kumpulkan 10 Stamp untuk mendapatkan 1 Minuman Gratis!</div>
             </div>
           </div>
 
@@ -3103,6 +3103,33 @@
     </div>
   </div>
 
+  <!-- MODAL: DAFTAR MEMBER STAMP BARU (BELI 10 GRATIS 1) -->
+  <div class="modal-backdrop" id="registerMemberModal" style="z-index:1025;">
+    <div class="modal-box" style="max-width:420px;padding:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;">
+        <div>
+          <div class="serif" style="font-size:17px;font-weight:700;">🎁 Daftar Member Stamp (10+1)</div>
+          <div style="font-size:11px;color:var(--ink-muted);">Nomor HP belum terdaftar. Lengkapi nama &amp; nomor HP untuk mulai kumpulkan stamp.</div>
+        </div>
+        <button class="btn-dark" style="padding:4px 10px;" onclick="closeModal('registerMemberModal')">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Nama Pelanggan:</label>
+          <input type="text" id="regMemberName" class="field" placeholder="Contoh: Andi Wijaya" style="width:100%;" />
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--ink-muted);display:block;margin-bottom:4px;">Nomor HP / WhatsApp:</label>
+          <input type="tel" id="regMemberPhone" class="field" placeholder="Contoh: 081234567890" style="width:100%;" />
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+          <button type="button" class="btn-dark" style="background:var(--bg-oat-dark);color:var(--ink-espresso);" onclick="closeModal('registerMemberModal')">Batal</button>
+          <button type="button" class="btn-pay" style="width:auto;padding:10px 18px;font-size:12px;border-radius:10px;" onclick="saveNewMemberStamp()">✅ Daftarkan Member</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: OPEN TABS (OPEN BILL DINE-IN) -->
   <div class="modal-backdrop" id="openTabsModal">
     <div class="modal-box" style="max-width:640px;padding:24px;">
@@ -4319,6 +4346,14 @@
         if (Array.isArray(d.expenses)) {
           dailyExpenses = d.expenses;
         }
+        if (d.customers && typeof d.customers === 'object' && !Array.isArray(d.customers)) {
+          customers = d.customers;
+          localStorage.setItem('wkl_customers_v1', JSON.stringify(customers));
+          if (currentCustomer && customers[currentCustomer.phone]) {
+            currentCustomer = customers[currentCustomer.phone];
+            renderLoyaltyCard();
+          }
+        }
 
         if (document.getElementById('view-users')?.classList.contains('active')) renderUserManagement();
         if (document.getElementById('view-promo-mgmt')?.classList.contains('active')) renderPromoManagement();
@@ -4436,11 +4471,18 @@
     let activeHppFilter = 'all';
     let activeIngFilter = 'all';
 
-    // Demonstrasi Pelanggan CRM & Loyalty
-    let customers = {
-      '6281234567890': { phone: '6281234567890', name: 'Budi Santoso', visits: 5, stamps: 5 }
-    };
-    let currentCustomer = customers['6281234567890'];
+    // Pelanggan CRM & Loyalty (Default kosong, daftar saat nomor belum terdaftar)
+    let customers = (() => {
+      try {
+        const raw = localStorage.getItem('wkl_customers_v1');
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) { return {}; }
+    })();
+    function saveCustomersState() {
+      try { localStorage.setItem('wkl_customers_v1', JSON.stringify(customers)); } catch (e) {}
+      syncToServer('customers', customers);
+    }
+    let currentCustomer = null;
 
     // 4. Riwayat Transaksi Penjualan Awal (Demo Realistis)
     let orders = [
@@ -4958,7 +5000,7 @@
           const timeTag = p.allDay ? '' : ` [${p.startTime}-${p.endTime}]`;
           return `<option value="MASTER:${p.id}">${p.name}${timeTag}</option>`;
         }),
-        `<option value="STAMP_FREE">Reward Buy 7 (Free 1 Kopi)</option>`,
+        `<option value="STAMP_FREE">Reward Buy 10 (Free 1 Kopi)</option>`,
         `<option value="CUSTOM">Custom Nominal...</option>`
       ];
       sel.innerHTML = opts.join('');
@@ -5217,7 +5259,7 @@
         }
       }
       else if (val === 'MEMBER_10') currentDiscount = { type: 'MEMBER_10', value: 0.1, label: 'Member Toko (10%)' };
-      else if (val === 'STAMP_FREE') currentDiscount = { type: 'STAMP_FREE', value: 0, label: 'Reward Buy 7 (Free 1)' };
+      else if (val === 'STAMP_FREE') currentDiscount = { type: 'STAMP_FREE', value: 0, label: 'Reward Buy 10 (Free 1)' };
       else if (val === 'VOUCHER_5K') currentDiscount = { type: 'VOUCHER_5K', value: 5000, label: 'Voucher Rp 5.000' };
       else if (val === 'VOUCHER_10K') currentDiscount = { type: 'VOUCHER_10K', value: 10000, label: 'Voucher Rp 10.000' };
       else if (val === 'CUSTOM') {
@@ -5381,28 +5423,43 @@
     }
 
     // ==========================================
-    // 6. VISUAL DIGITAL LOYALTY CARD
+    // 6. VISUAL DIGITAL LOYALTY CARD (BELI 10 GRATIS 1)
     // ==========================================
+    function normalizeIndoPhone(rawVal) {
+      const raw = String(rawVal || '').replace(/\D/g, '');
+      if (raw.length < 8) return '';
+      return raw.startsWith('0') ? '62' + raw.slice(1) : raw;
+    }
+
+    function onCustPhoneInput(val) {
+      if (!String(val || '').trim()) {
+        currentCustomer = null;
+        renderLoyaltyCard();
+      }
+    }
+
     function renderLoyaltyCard() {
       const container = document.getElementById('stampSlotsContainer');
       const custGrid = document.getElementById('custStampGrid');
-      const stamps = currentCustomer ? currentCustomer.stamps : 0;
+      const stamps = currentCustomer ? (currentCustomer.stamps || 0) : 0;
 
-      document.getElementById('loyaltyCustName').textContent = currentCustomer ? currentCustomer.name : 'Pelanggan Baru';
-      document.getElementById('loyaltyCustVisits').textContent = currentCustomer ? `${currentCustomer.visits}x Kunjungan` : '1x Kunjungan';
-      document.getElementById('loyaltyProgressText').textContent = `${stamps} / 7 Stamp (${7 - stamps} cup lagi gratis!)`;
-      
+      document.getElementById('loyaltyCustName').textContent = currentCustomer ? currentCustomer.name : 'Belum Ada Member';
+      document.getElementById('loyaltyCustVisits').textContent = currentCustomer ? `${currentCustomer.visits || 0}x` : '0x';
+      document.getElementById('loyaltyProgressText').textContent = currentCustomer
+        ? (stamps >= 10 ? `🎉 ${stamps} / 10 Stamp (Siap Klaim Gratis!)` : `${stamps} / 10 Stamp (${10 - stamps} cup lagi gratis!)`)
+        : 'Input No. HP lalu klik Cek (0 / 10 Stamp)';
+
       const claimBtn = document.getElementById('btnClaimReward');
       if (claimBtn) {
-        claimBtn.disabled = stamps < 7;
-        claimBtn.style.opacity = stamps >= 7 ? '1' : '0.5';
+        claimBtn.disabled = !currentCustomer || stamps < 10;
+        claimBtn.style.opacity = (currentCustomer && stamps >= 10) ? '1' : '0.5';
       }
 
-      // 7 Visual Slots: 6 Coffee Cups + 1 Golden Gift Reward
+      // 10 Visual Slots: 9 Coffee Cups + 1 Golden Gift Reward
       let slotsHtml = '';
-      for (let i = 1; i <= 7; i++) {
-        const isReward = i === 7;
-        const isFilled = i <= stamps;
+      for (let i = 1; i <= 10; i++) {
+        const isReward = i === 10;
+        const isFilled = currentCustomer && i <= stamps;
         const icon = isReward ? '🎁' : '☕';
         slotsHtml += `
           <div class="stamp-slot ${isReward ? 'reward' : ''} ${isFilled ? 'filled' : ''}" title="Stamp #${i}">
@@ -5414,38 +5471,87 @@
       if (container) container.innerHTML = slotsHtml;
       if (custGrid) custGrid.innerHTML = slotsHtml;
 
+      const custPhoneEl = document.getElementById('custLoyaltyPhone');
+      const custMsgEl = document.getElementById('custLoyaltyMsg');
       if (currentCustomer) {
-        document.getElementById('custLoyaltyPhone').textContent = currentCustomer.phone;
-        document.getElementById('custLoyaltyMsg').textContent = stamps >= 7
-          ? '🎉 Selamat! Anda memiliki 7 stamp. Klaim 1 Kopi Gratis sekarang!'
-          : `Kumpulkan ${7 - stamps} stamp lagi untuk mendapatkan 1 Minuman Gratis!`;
+        if (custPhoneEl) custPhoneEl.textContent = currentCustomer.phone;
+        if (custMsgEl) {
+          custMsgEl.textContent = stamps >= 10
+            ? '🎉 Selamat! Anda memiliki 10 stamp. Klaim 1 Minuman Gratis sekarang!'
+            : `Kumpulkan ${10 - stamps} stamp lagi untuk mendapatkan 1 Minuman Gratis!`;
+        }
+      } else {
+        if (custPhoneEl) custPhoneEl.textContent = '-';
+        if (custMsgEl) custMsgEl.textContent = 'Kumpulkan 10 Stamp untuk mendapatkan 1 Minuman Gratis!';
       }
     }
 
     function lookupCustomer() {
-      const raw = document.getElementById('custPhone').value.replace(/\D/g, '');
-      if (raw.length < 8) return showToast('Masukkan minimal 8 digit nomor WhatsApp.');
-      const phone = raw.startsWith('0') ? '62' + raw.slice(1) : raw;
-      if (!customers[phone]) {
-        customers[phone] = { phone, name: 'Pelanggan ' + phone.slice(-4), visits: 1, stamps: 0 };
+      const rawInput = (document.getElementById('custPhone')?.value || '').trim();
+      if (!rawInput) {
+        currentCustomer = null;
+        renderLoyaltyCard();
+        return showToast('Nomor HP dikosongkan — stamp tidak berjalan untuk transaksi ini.');
       }
+      const phone = normalizeIndoPhone(rawInput);
+      if (!phone) return showToast('Masukkan minimal 8 digit nomor HP / WhatsApp.');
+
+      if (!customers[phone]) {
+        document.getElementById('regMemberName').value = '';
+        document.getElementById('regMemberPhone').value = rawInput;
+        openModal('registerMemberModal');
+        setTimeout(() => document.getElementById('regMemberName')?.focus(), 100);
+        return showToast('Nomor belum terdaftar. Silakan isi Nama & Nomor HP untuk daftar member stamp.');
+      }
+
       currentCustomer = customers[phone];
+      document.getElementById('loyaltyCardWidget')?.classList.remove('is-collapsed');
+      const icon = document.getElementById('loyaltyToggleIcon');
+      if (icon) icon.textContent = '▲';
       renderLoyaltyCard();
-      showToast(`Kartu Loyalitas ${currentCustomer.name} (${currentCustomer.stamps}/7 Stamp) dimuat!`);
+      showToast(`✅ Member ${currentCustomer.name} (${currentCustomer.stamps}/10 Stamp) dimuat!`);
+    }
+
+    function saveNewMemberStamp() {
+      const name = (document.getElementById('regMemberName')?.value || '').trim();
+      const rawPhone = (document.getElementById('regMemberPhone')?.value || '').trim();
+      if (!name) return showToast('Nama pelanggan wajib diisi!');
+      const phone = normalizeIndoPhone(rawPhone);
+      if (!phone) return showToast('Nomor HP minimal 8 digit!');
+
+      customers[phone] = {
+        phone,
+        name,
+        visits: 0,
+        stamps: 0,
+        createdAt: new Date().toISOString()
+      };
+      saveCustomersState();
+      currentCustomer = customers[phone];
+      const cp = document.getElementById('custPhone');
+      if (cp) cp.value = rawPhone;
+
+      closeModal('registerMemberModal');
+      document.getElementById('loyaltyCardWidget')?.classList.remove('is-collapsed');
+      const icon = document.getElementById('loyaltyToggleIcon');
+      if (icon) icon.textContent = '▲';
+      renderLoyaltyCard();
+      showToast(`✅ Member ${name} (${phone}) berhasil didaftarkan (0/10 Stamp)!`);
     }
 
     function claimFreeDrinkReward() {
-      if (!currentCustomer || currentCustomer.stamps < 7) {
-        return showToast('Stamp belum mencapai 7 untuk klaim minuman gratis.');
+      if (!currentCustomer || currentCustomer.stamps < 10) {
+        return showToast('Stamp belum mencapai 10 untuk klaim minuman gratis.');
       }
       // Diskon 1 item minuman termurah di keranjang
       const drinkIdx = cart.findIndex(it => it.type === 'drink');
       if (drinkIdx >= 0) {
         cart[drinkIdx].unitPrice = 0;
-        currentCustomer.stamps -= 7;
+        currentCustomer.stamps -= 10;
+        saveCustomersState();
         renderCart();
         renderLoyaltyCard();
-        showToast(`🎁 Selamat! 1 Kopi Gratis berhasil diklaim untuk ${currentCustomer.name}!`);
+        showToast(`🎁 Selamat! 1 Minuman Gratis berhasil diklaim untuk ${currentCustomer.name}!`);
       } else {
         showToast('Tambahkan minuman ke keranjang terlebih dahulu untuk klaim gratis!');
       }
@@ -6406,10 +6512,21 @@
       } else {
         orders.push(order);
         saveOrdersState();
+        if (currentCustomer && customers[currentCustomer.phone]) {
+          const drinkStamps = order.items.filter(it => it.type === 'drink').reduce((s, it) => s + (it.qty || 1), 0);
+          const addStamps = drinkStamps > 0 ? drinkStamps : 1;
+          customers[currentCustomer.phone].stamps = (customers[currentCustomer.phone].stamps || 0) + addStamps;
+          customers[currentCustomer.phone].visits = (customers[currentCustomer.phone].visits || 0) + 1;
+          saveCustomersState();
+        }
         showToast(`✅ Pembayaran #${num} lunas (${rp(bill.finalTotal)})! Struk otomatis tercetak.`);
       }
 
       cart = [];
+      currentCustomer = null;
+      const cpReset = document.getElementById('custPhone');
+      if (cpReset) cpReset.value = '';
+      renderLoyaltyCard();
       document.getElementById('tableNameInput').value = '';
       currentDiscount = { type: 'NONE', value: 0, label: 'Tanpa Diskon' };
       const dSel = document.getElementById('cartDiscountSelect');
