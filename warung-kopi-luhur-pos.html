@@ -4484,94 +4484,17 @@
     }
     let currentCustomer = null;
 
-    // 4. Riwayat Transaksi Penjualan Awal (Demo Realistis)
-    let orders = [
-      {
-        id: 'ord-demo-1',
-        number: '001',
-        type: 'DINE_IN',
-        table: 'Meja 03',
-        customer: 'Budi Santoso',
-        items: [
-          { id: 'wkl-rm-02', name: 'Kopi Susu Luhur', cat: 'racikan_master', type: 'drink', station: 'BARISTA', unitPrice: 18000, qty: 2, cogs: 6800, mods: { temp: 'ICE', sweet: '100%', shot: 'SINGLE', milk: 'FRESH' }, kdsStatus: 'COOKING' },
-          { id: 'wkl-rm-03', name: 'Butterscotch Coffee', cat: 'racikan_master', type: 'drink', station: 'BARISTA', unitPrice: 23000, qty: 1, cogs: 6500, mods: { temp: 'ICE', sweet: '50%' }, kdsStatus: 'QUEUED' }
-        ],
-        total: 59000,
-        cogs: 21500,
-        revMinuman: 59000,
-        revMakanan: 0,
-        cogsMinuman: 21500,
-        cogsMakanan: 0,
-        discount: 0,
-        method: 'CASH',
-        shift: 'PAGI',
-        createdAt: new Date(Date.now() - 4 * 60000).toISOString()
-      },
-      {
-        id: 'ord-demo-2',
-        number: '002',
-        type: 'DINE_IN',
-        table: 'Meja 05',
-        customer: 'Siti Rahma',
-        items: [
-          { id: 'wkl-kk-06', name: 'Spanish Latte', cat: 'klasik_kopi', type: 'drink', station: 'BARISTA', unitPrice: 20000, qty: 1, cogs: 6800, mods: { temp: 'HOT', sweet: 'Normal' }, kdsStatus: 'COOKING' },
-          { id: 'wkl-bk-03', name: 'Lychee Tea Mutiara', cat: 'bukan_kopi', type: 'drink', station: 'BARISTA', unitPrice: 15000, qty: 2, cogs: 4700, mods: { temp: 'ICE' }, kdsStatus: 'QUEUED' }
-        ],
-        total: 50000,
-        cogs: 16400,
-        revMinuman: 50000,
-        revMakanan: 0,
-        cogsMinuman: 16400,
-        cogsMakanan: 0,
-        discount: 0,
-        method: 'QRIS',
-        shift: 'PAGI',
-        createdAt: new Date(Date.now() - 2 * 60000).toISOString()
-      },
-      {
-        id: 'ord-demo-3',
-        number: '003',
-        type: 'TAKEAWAY',
-        table: '',
-        customer: 'Ahmad Fauzi',
-        items: [
-          { id: 'wkl-rm-04', name: 'Dirty Latte', cat: 'racikan_master', type: 'drink', station: 'BARISTA', unitPrice: 25000, qty: 1, cogs: 8500, mods: { temp: 'ICE', shot: 'DOUBLE' }, kdsStatus: 'QUEUED' },
-          { id: 'wkl-rmn-01', name: 'Tetes Luhur (V60)', cat: 'racikan_manual', type: 'drink', station: 'BARISTA', unitPrice: 24000, qty: 1, cogs: 8600, mods: { beans: 'Gayo Wine' }, kdsStatus: 'QUEUED' }
-        ],
-        total: 49000,
-        cogs: 16000,
-        revMinuman: 49000,
-        revMakanan: 0,
-        cogsMinuman: 16000,
-        cogsMakanan: 0,
-        discount: 0,
-        method: 'EDC',
-        shift: 'PAGI',
-        createdAt: new Date(Date.now() - 1 * 60000).toISOString()
-      },
-      {
-        id: 'ord-demo-4',
-        number: '004',
-        type: 'DINE_IN',
-        table: 'Meja 03',
-        customer: 'Dimas Prasetyo',
-        items: [
-          { id: 'wkl-ck-03', name: 'Cuanki Luhur (Lengkap) 👍', cat: 'cuanki', type: 'food', station: 'KITCHEN', unitPrice: 28000, basePrice: 22000, qty: 1, cogs: 18400, mods: { kuah: 'TOMYAM', pedas: 'LV2' }, kdsStatus: 'COOKING' },
-          { id: 'top-ck-ceker', name: 'Topping Ceker 👍', cat: 'penyempurna_cuanki', type: 'addon_food', station: 'KITCHEN', unitPrice: 2500, basePrice: 2500, qty: 1, cogs: 1200, mods: {}, kdsStatus: 'COOKING' },
-          { id: 'wkl-rm-02', name: 'Kopi Susu Luhur', cat: 'racikan_master', type: 'drink', station: 'BARISTA', unitPrice: 18000, basePrice: 18000, qty: 1, cogs: 6700, mods: { temp: 'ICE', sweet: '100%', shot: 'SINGLE' }, kdsStatus: 'QUEUED' }
-        ],
-        total: 48500,
-        cogs: 17500,
-        revMinuman: 18000,
-        revMakanan: 30500,
-        cogsMinuman: 6800,
-        cogsMakanan: 10700,
-        discount: 0,
-        method: 'QRIS',
-        shift: 'PAGI',
-        createdAt: new Date(Date.now() - 3 * 60000).toISOString()
-      }
-    ];
+    // 4. Riwayat Transaksi Penjualan (Kosong secara default, terisi dari transaksi nyata / server)
+    let orders = (() => {
+      try {
+        const raw = localStorage.getItem('wkl_orders_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed.filter(o => !String(o.id || '').startsWith('ord-demo-'));
+        }
+      } catch (e) {}
+      return [];
+    })();
 
     // 5. Data Pengeluaran Operasional & Harian (Termasuk Gaji, Sewa, Utilitas & Petty Cash)
     let pnlPeriod = 'LIVE'; // 'LIVE' or 'MONTHLY'
