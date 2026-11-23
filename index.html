@@ -1617,7 +1617,10 @@
               </div>
               <p style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Kelola seluruh varian menu kedai, daftarkan menu baru lengkap dengan HPP &amp; Harga Jual, tentukan stasiun KDS (Barista/Kitchen), serta pantau margin keuntungan.</p>
             </div>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <button class="btn-dark" style="background:var(--bg-oat);color:var(--ink-espresso);border:1px solid var(--border-hairline);padding:10px 18px;font-size:13px;border-radius:999px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="openManageCategoriesModal()">
+                🏷️ Kelola &amp; Edit Kategori
+              </button>
               <button class="btn-pay" style="background:var(--ink-espresso);color:var(--surface-card);padding:10px 22px;font-size:13px;border-radius:999px;font-weight:700;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-sm);cursor:pointer;border:none;" onclick="openAddMenuModal()">
                 ➕ Create Menu Baru
               </button>
@@ -1831,6 +1834,100 @@
                   <span class="badge-sky" id="ownerChartPeriodBadge">Harian</span>
                 </div>
                 <div id="ownerFinanceChart" style="display:flex;flex-direction:column;gap:12px;"></div>
+              </div>
+            </div>
+
+            <!-- REKAP PENJUALAN PER KATEGORI & MENU (FILTER TANGGAL, SORT, TOTAL HPP KESELURUHAN) -->
+            <div class="panel-card" style="margin-bottom:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;">
+                <div>
+                  <h3 class="serif" style="font-size:18px;margin:0;">🧾 Rekap Penjualan per Kategori &amp; Menu <span class="italic">(Filter Tanggal &amp; Total HPP)</span></h3>
+                  <p style="font-size:11.5px;color:var(--ink-muted);margin:3px 0 0;">Pantau jumlah porsi terjual per kategori &amp; per menu dalam rentang tanggal tertentu beserta Total HPP Keseluruhan.</p>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <button type="button" class="cat-pill" onclick="setSalesBreakdownPreset('TODAY')">Hari Ini</button>
+                  <button type="button" class="cat-pill" onclick="setSalesBreakdownPreset('7D')">7 Hari</button>
+                  <button type="button" class="cat-pill" onclick="setSalesBreakdownPreset('MONTH')">Bulan Ini</button>
+                  <button type="button" class="cat-pill" onclick="setSalesBreakdownPreset('ALL')">Semua</button>
+                </div>
+              </div>
+
+              <!-- Filter & Sort Bar -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:10px;margin-bottom:14px;background:var(--bg-oat);padding:12px;border-radius:12px;border:1px solid var(--border-hairline);">
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">DARI TANGGAL</label>
+                  <input type="date" id="salesBreakdownStart" class="field" style="width:100%;padding:7px 10px;font-size:12px;" onchange="renderSalesBreakdown()" />
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">SAMPAI TANGGAL</label>
+                  <input type="date" id="salesBreakdownEnd" class="field" style="width:100%;padding:7px 10px;font-size:12px;" onchange="renderSalesBreakdown()" />
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">FILTER KATEGORI</label>
+                  <select id="salesBreakdownCat" class="field" style="width:100%;padding:7px 10px;font-size:12px;" onchange="renderSalesBreakdown()">
+                    <option value="ALL">Semua Kategori</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">URUTKAN (SORT)</label>
+                  <select id="salesBreakdownSort" class="field" style="width:100%;padding:7px 10px;font-size:12px;" onchange="renderSalesBreakdown()">
+                    <option value="qty_desc">Terlaris (Qty Terbanyak)</option>
+                    <option value="qty_asc">Qty Terendah</option>
+                    <option value="rev_desc">Omzet Tertinggi</option>
+                    <option value="cogs_desc">Total HPP Tertinggi</option>
+                    <option value="profit_desc">Laba Kotor Tertinggi</option>
+                    <option value="name_asc">Nama Menu (A - Z)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Summary KPI Strip -->
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:10px;margin-bottom:14px;">
+                <div style="background:var(--bg-oat);padding:10px 14px;border-radius:10px;border:1px solid var(--border-hairline);">
+                  <div style="font-size:10px;font-weight:700;color:var(--ink-muted);">TRANSAKSI TERFILTER</div>
+                  <div style="font-size:18px;font-weight:800;color:var(--ink-espresso);" id="sbTotalOrders">0 Transaksi</div>
+                </div>
+                <div style="background:var(--bg-oat);padding:10px 14px;border-radius:10px;border:1px solid var(--border-hairline);">
+                  <div style="font-size:10px;font-weight:700;color:var(--ink-muted);">TOTAL ITEM TERJUAL</div>
+                  <div style="font-size:18px;font-weight:800;color:#0284C7;" id="sbTotalQty">0 Porsi</div>
+                </div>
+                <div style="background:var(--bg-oat);padding:10px 14px;border-radius:10px;border:1px solid var(--border-hairline);">
+                  <div style="font-size:10px;font-weight:700;color:var(--ink-muted);">TOTAL OMZET</div>
+                  <div style="font-size:18px;font-weight:800;color:var(--ink-espresso);" id="sbTotalRev">Rp 0</div>
+                </div>
+                <div style="background:#FEF2F2;padding:10px 14px;border-radius:10px;border:1.5px solid #FCA5A5;">
+                  <div style="font-size:10px;font-weight:800;color:#991B1B;">TOTAL HPP KESELURUHAN</div>
+                  <div style="font-size:18px;font-weight:800;color:#BC012E;" id="sbTotalCogs">Rp 0</div>
+                </div>
+                <div style="background:#F0FDF4;padding:10px 14px;border-radius:10px;border:1px solid #86EFAC;">
+                  <div style="font-size:10px;font-weight:700;color:#166534;">LABA KOTOR</div>
+                  <div style="font-size:18px;font-weight:800;color:#15803D;" id="sbTotalProfit">Rp 0</div>
+                </div>
+              </div>
+
+              <!-- Ringkasan per Kategori -->
+              <div style="margin-bottom:14px;">
+                <div style="font-size:11px;font-weight:800;color:var(--ink-muted);margin-bottom:6px;text-transform:uppercase;">Ringkasan per Kategori</div>
+                <div id="salesBreakdownCatChips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+              </div>
+
+              <!-- Tabel Rincian per Menu -->
+              <div style="overflow-x:auto;border:1px solid var(--border-hairline);border-radius:12px;">
+                <table class="pnl-table" style="margin:0;">
+                  <thead>
+                    <tr>
+                      <th style="width:40px;">No</th>
+                      <th>Nama Menu</th>
+                      <th>Kategori</th>
+                      <th style="text-align:center;">Qty Terjual</th>
+                      <th style="text-align:right;">HPP / Porsi</th>
+                      <th style="text-align:right;">Total HPP</th>
+                      <th style="text-align:right;">Total Omzet</th>
+                      <th style="text-align:right;">Laba Kotor</th>
+                    </tr>
+                  </thead>
+                  <tbody id="salesBreakdownTableBody"></tbody>
+                </table>
               </div>
             </div>
 
@@ -2609,6 +2706,35 @@
         <button type="button" class="btn-pay" id="btnSoConfirmPaid" style="display:none;width:100%;padding:12px;font-size:13px;border-radius:10px;background:#15803D;" onclick="completeCustomerSelfOrderPayment()">
           ✅ SAYA SUDAH BAYAR DI APLIKASI
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: KELOLA & EDIT KATEGORI MENU -->
+  <div class="modal-backdrop" id="manageCategoriesModal">
+    <div class="modal-box" style="max-width:640px;padding:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;">
+        <div>
+          <h3 class="serif" style="font-size:20px;margin:0;">🏷️ Kelola &amp; Edit Kategori Menu</h3>
+          <p style="font-size:11.5px;color:var(--ink-muted);margin:3px 0 0;">Ubah nama kategori yang sudah ada atau tambahkan kategori baru. Perubahan langsung tersimpan &amp; sinkron ke Kasir POS.</p>
+        </div>
+        <button type="button" onclick="closeModal('manageCategoriesModal')" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="background:var(--bg-oat);padding:12px;border-radius:12px;border:1px solid var(--border-hairline);margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="newCategoryManagerInput" class="field" placeholder="Tambah kategori baru (cth: Signature Toast)..." style="flex:1;min-width:180px;" />
+        <select id="newCategoryManagerStation" class="field" style="width:auto;min-width:130px;">
+          <option value="BARISTA">☕ Barista</option>
+          <option value="KITCHEN">🍳 Kitchen</option>
+        </select>
+        <button type="button" class="btn-dark" style="background:var(--ink-espresso);color:#FFF;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;" onclick="addCategoryFromManager()">➕ Tambah</button>
+      </div>
+
+      <div id="manageCategoriesList" style="display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;padding-right:4px;"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border-hairline);">
+        <button type="button" class="btn-dark" style="background:var(--bg-oat);color:var(--ink-espresso);border:1px solid var(--border-hairline);padding:9px 18px;border-radius:10px;font-weight:700;cursor:pointer;" onclick="closeModal('manageCategoriesModal')">Batal</button>
+        <button type="button" class="btn-pay" style="padding:9px 22px;border-radius:10px;font-weight:700;border:none;cursor:pointer;" onclick="saveAllCategoryEdits()">💾 Simpan Perubahan Kategori</button>
       </div>
     </div>
   </div>
@@ -3650,7 +3776,7 @@
     // MASTER BAHAN BAKU & HARGA PEMBELIAN (BOM)
     // Sesuai Formula Resmi Excel Warung Kopi Luhur
     // ==========================================
-    const MASTER_RAW_MATERIALS = [
+    let MASTER_RAW_MATERIALS = [
       // 1. BIJI KOPI
       { name: 'HB Lokadjaya 20:80', unit: 'g', packQty: 1000, packPrice: 220000, unitCost: 220 },
       { name: 'Arabika Luhur', unit: 'g', packQty: 500, packPrice: 150000, unitCost: 300 },
@@ -3705,6 +3831,16 @@
       { name: 'Cup + Sendok Cuanki', unit: 'pcs', packQty: 1, packPrice: 1600, unitCost: 1600 },
       { name: 'Plastik + Kresek Cuanki', unit: 'pcs', packQty: 1, packPrice: 700, unitCost: 700 }
     ];
+
+    try {
+      const savedMaterialsRaw = localStorage.getItem('wkl_master_raw_materials');
+      if (savedMaterialsRaw) {
+        const parsedMaterials = JSON.parse(savedMaterialsRaw);
+        if (Array.isArray(parsedMaterials) && parsedMaterials.length > 0) {
+          MASTER_RAW_MATERIALS = parsedMaterials;
+        }
+      }
+    } catch (e) {}
 
     // TEMPLATE RESEP RESMI DARI BUKU RESEP EXCEL
     const HPP_RECIPE_TEMPLATES = {
@@ -4370,10 +4506,23 @@
           syncCategoryDropdowns();
           renderCategoryBar();
         }
+        if (d.categoryLabels && typeof d.categoryLabels === 'object' && !Array.isArray(d.categoryLabels)) {
+          categoryLabelOverrides = d.categoryLabels;
+          localStorage.setItem('wkl_category_labels_v1', JSON.stringify(categoryLabelOverrides));
+          syncCategoryDropdowns();
+          renderCategoryBar();
+          renderMenu();
+        }
+        if (Array.isArray(d.materials) && d.materials.length > 0) {
+          MASTER_RAW_MATERIALS = d.materials;
+          localStorage.setItem('wkl_master_raw_materials', JSON.stringify(MASTER_RAW_MATERIALS));
+          renderMasterMaterialsTable();
+        }
 
         if (document.getElementById('view-users')?.classList.contains('active')) renderUserManagement();
         if (document.getElementById('view-promo-mgmt')?.classList.contains('active')) renderPromoManagement();
         if (document.getElementById('view-owner')?.classList.contains('active')) renderOwnerHub();
+        if (document.getElementById('view-menu-mgmt')?.classList.contains('active')) renderMenuMgmtTable();
         if (document.getElementById('view-kds-barista')?.classList.contains('active')) renderKds('BARISTA');
         if (document.getElementById('view-kds-kitchen')?.classList.contains('active')) renderKds('KITCHEN');
         return true;
@@ -4655,12 +4804,27 @@
       } catch (e) { return []; }
     })();
 
+    let categoryLabelOverrides = (() => {
+      try {
+        const raw = localStorage.getItem('wkl_category_labels_v1');
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) { return {}; }
+    })();
+
     function saveCustomCategoriesState() {
       try { localStorage.setItem('wkl_custom_categories_v1', JSON.stringify(customCategories)); } catch (e) {}
       syncToServer('categories', customCategories);
     }
 
+    function saveCategoryLabelOverridesState() {
+      try { localStorage.setItem('wkl_category_labels_v1', JSON.stringify(categoryLabelOverrides)); } catch (e) {}
+      syncToServer('categoryLabels', categoryLabelOverrides);
+    }
+
     function getCategoryLabel(catId) {
+      if (categoryLabelOverrides && categoryLabelOverrides[catId]) {
+        return categoryLabelOverrides[catId];
+      }
       const b = BUILTIN_CATEGORIES.find(x => x.id === catId);
       if (b) return b.label.replace(/^[^\w\s]+\s*/, '');
       const c = customCategories.find(x => x.id === catId);
@@ -4668,11 +4832,18 @@
       return String(catId || '').replace(/_/g, ' ');
     }
 
+    function getCategoryDisplayLabel(catObj) {
+      if (categoryLabelOverrides && categoryLabelOverrides[catObj.id]) {
+        return categoryLabelOverrides[catObj.id];
+      }
+      return catObj.label;
+    }
+
     function registerCustomCategory(label, station) {
       const clean = String(label || '').trim();
       if (!clean) return '';
       const existing = [...BUILTIN_CATEGORIES, ...customCategories].find(
-        x => x.label.replace(/^[^\w\s]+\s*/, '').toLowerCase() === clean.toLowerCase()
+        x => getCategoryLabel(x.id).toLowerCase() === clean.toLowerCase()
       );
       if (existing) return existing.id;
       let slug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
@@ -4688,31 +4859,129 @@
     }
 
     function syncCategoryDropdowns() {
-      const optsHtml = customCategories.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+      const optsHtml = customCategories.map(c => `<option value="${c.id}">${getCategoryLabel(c.id)}</option>`).join('');
       const g1 = document.getElementById('newMenuCustomCatGroup');
       const g2 = document.getElementById('editMenuCustomCatGroup');
       if (g1) g1.innerHTML = optsHtml;
       if (g2) g2.innerHTML = optsHtml;
+
+      ['newMenuCat', 'editMenuCat'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        Array.from(sel.options).forEach(opt => {
+          if (opt.value && opt.value !== '__CUSTOM__' && BUILTIN_CATEGORIES.some(b => b.id === opt.value)) {
+            opt.textContent = getCategoryLabel(opt.value);
+          }
+        });
+      });
+
+      const sbCat = document.getElementById('salesBreakdownCat');
+      if (sbCat) {
+        const curVal = sbCat.value || 'ALL';
+        const allCats = getAllCategoriesList();
+        sbCat.innerHTML = `<option value="ALL">Semua Kategori</option>` +
+          allCats.map(c => `<option value="${c.id}">${getCategoryLabel(c.id)}</option>`).join('');
+        if ([...sbCat.options].some(o => o.value === curVal)) sbCat.value = curVal;
+      }
+    }
+
+    function getAllCategoriesList() {
+      const list = [
+        ...BUILTIN_CATEGORIES.map(c => ({ id: c.id, label: getCategoryDisplayLabel(c), style: c.style || '', isBuiltin: true })),
+        ...customCategories.map(c => ({ id: c.id, label: `📌 ${getCategoryLabel(c.id)}`, isBuiltin: false }))
+      ];
+      PRODUCTS.forEach(p => {
+        if (p.cat && !list.some(c => c.id === p.cat)) {
+          list.push({ id: p.cat, label: `📌 ${getCategoryLabel(p.cat)}`, isBuiltin: false });
+        }
+      });
+      return list;
+    }
+
+    function openManageCategoriesModal() {
+      if (!currentUser || !hasAnyRole(currentUser, ['SUPERADMIN', 'MANAGER', 'OWNER'])) {
+        showToast('⛔ Hanya Supervisor, Owner, atau Superadmin yang berhak mengubah kategori!');
+        return;
+      }
+      renderManageCategoriesList();
+      openModal('manageCategoriesModal');
+    }
+
+    function renderManageCategoriesList() {
+      const container = document.getElementById('manageCategoriesList');
+      if (!container) return;
+      const cats = getAllCategoriesList();
+      container.innerHTML = cats.map(c => {
+        const cnt = PRODUCTS.filter(p => p.cat === c.id).length;
+        const currentLabel = getCategoryLabel(c.id);
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border-hairline);border-radius:10px;background:var(--surface-card);">
+            <div style="min-width:120px;">
+              <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">${c.isBuiltin ? 'Bawaan' : 'Tambahan'} • ${cnt} menu</div>
+              <div style="font-size:11px;font-family:monospace;color:var(--ink-muted);">${c.id}</div>
+            </div>
+            <input type="text" class="field cat-rename-input" data-cat-id="${c.id}" value="${currentLabel.replace(/"/g, '&quot;')}" style="flex:1;padding:7px 10px;font-size:12.5px;font-weight:700;" />
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveAllCategoryEdits() {
+      const inputs = document.querySelectorAll('#manageCategoriesList .cat-rename-input');
+      let updated = 0;
+      inputs.forEach(inp => {
+        const catId = inp.dataset.catId;
+        const newLabel = inp.value.trim();
+        if (!catId || !newLabel) return;
+        const prev = getCategoryLabel(catId);
+        if (newLabel === prev) return;
+        const customObj = customCategories.find(c => c.id === catId);
+        if (customObj) {
+          customObj.label = newLabel;
+        } else {
+          categoryLabelOverrides[catId] = newLabel;
+        }
+        updated++;
+      });
+      if (updated > 0) {
+        saveCustomCategoriesState();
+        saveCategoryLabelOverridesState();
+        syncCategoryDropdowns();
+        renderCategoryBar();
+        renderMenu();
+        renderMenuMgmtTable();
+        renderHppTable();
+        renderOwnerHub();
+        showToast(`✅ ${updated} kategori menu berhasil diperbarui!`);
+      } else {
+        showToast('Tidak ada perubahan nama kategori.');
+      }
+      closeModal('manageCategoriesModal');
+    }
+
+    function addCategoryFromManager() {
+      const inp = document.getElementById('newCategoryManagerInput');
+      const station = document.getElementById('newCategoryManagerStation')?.value || 'BARISTA';
+      const label = (inp?.value || '').trim();
+      if (!label) return showToast('Ketik nama kategori baru terlebih dahulu!');
+      registerCustomCategory(label, station);
+      if (inp) inp.value = '';
+      renderManageCategoriesList();
+      renderMenuMgmtTable();
+      showToast(`✅ Kategori "${label}" ditambahkan!`);
     }
 
     function renderCategoryBar() {
       const bar = document.getElementById('catBar');
       if (!bar) return;
       const nonAddonCount = PRODUCTS.filter(p => p.cat !== 'penyempurna' && p.cat !== 'penyempurna_cuanki').length;
-      const allCats = [...BUILTIN_CATEGORIES, ...customCategories.map(c => ({ id: c.id, label: `📌 ${c.label}` }))];
-
-      // Include any orphan categories present on PRODUCTS
-      PRODUCTS.forEach(p => {
-        if (p.cat && !allCats.some(c => c.id === p.cat)) {
-          allCats.push({ id: p.cat, label: `📌 ${getCategoryLabel(p.cat)}` });
-        }
-      });
+      const allCats = getAllCategoriesList();
 
       const pills = [
         `<button class="cat-pill ${activeCategory === 'all' ? 'active' : ''}" onclick="selectCategory('all', this)">Semua Menu (${nonAddonCount})</button>`,
         ...allCats.map(c => {
           const cnt = PRODUCTS.filter(p => p.cat === c.id).length;
-          if (cnt === 0 && !BUILTIN_CATEGORIES.some(b => b.id === c.id)) return '';
+          if (cnt === 0 && !c.isBuiltin) return '';
           const extraStyle = c.style ? `style="${c.style}"` : '';
           return `<button class="cat-pill ${activeCategory === c.id ? 'active' : ''}" ${extraStyle} onclick="selectCategory('${c.id}', this)">${c.label} (${cnt})</button>`;
         })
@@ -6770,6 +7039,7 @@
       else if (cat === 'penyempurna_cuanki') type = 'addon_food';
 
       const recipeData = collectRecipeData(false);
+      const addedMasterMats = ensureIngredientsInMaster(recipeData.ingredients);
       const newId = 'wkl-custom-' + Date.now();
       const newProduct = {
         id: newId,
@@ -6794,7 +7064,8 @@
       renderHppTable();
       renderMenuMgmtTable();
       renderOwnerHub();
-      showToast(`✅ Menu "${name}" berhasil didaftarkan! Harga: ${rp(price)}, HPP: ${rp(cogs)}`);
+      const extraNote = addedMasterMats > 0 ? ` (+${addedMasterMats} bahan baru masuk Master)` : '';
+      showToast(`✅ Menu "${name}" berhasil didaftarkan! Harga: ${rp(price)}, HPP: ${rp(cogs)}${extraNote}`);
     }
 
     function openEditMenuModal(productId) {
@@ -6807,12 +7078,17 @@
 
       document.getElementById('editMenuId').value = p.id;
       document.getElementById('editMenuName').value = p.name;
+      syncCategoryDropdowns();
       document.getElementById('editMenuCat').value = p.cat;
+      const editCustomBox = document.getElementById('editMenuCustomCatBox');
+      const editCustomInp = document.getElementById('editMenuCustomCatInput');
+      if (editCustomBox) editCustomBox.style.display = 'none';
+      if (editCustomInp) editCustomInp.value = '';
       document.getElementById('editMenuStation').value = p.station;
       document.getElementById('editMenuPrice').value = p.price;
       document.getElementById('editMenuCogs').value = p.cogs;
       document.getElementById('editMenuDesc').value = p.desc;
-      document.getElementById('editMenuSub').textContent = `Kategori: ${p.cat} • Stasiun: ${p.station}`;
+      document.getElementById('editMenuSub').textContent = `Kategori: ${getCategoryLabel(p.cat)} • Stasiun: ${p.station}`;
       delete document.getElementById('editMenuCogs').dataset.manual;
 
       // Populate Recipe Table
@@ -6860,20 +7136,32 @@
       if (!p) return;
 
       const name = document.getElementById('editMenuName').value.trim();
-      const cat = document.getElementById('editMenuCat').value;
+      let cat = document.getElementById('editMenuCat').value;
       const station = document.getElementById('editMenuStation').value;
       const price = Number(document.getElementById('editMenuPrice').value || 0);
       const cogs = Number(document.getElementById('editMenuCogs').value || 0);
       const desc = document.getElementById('editMenuDesc').value.trim();
 
       if (!name) return showToast('Nama menu tidak boleh kosong!');
+      if (cat === '__CUSTOM__') {
+        const customLabel = (document.getElementById('editMenuCustomCatInput')?.value || '').trim();
+        if (!customLabel) return showToast('Ketik nama kategori baru terlebih dahulu!');
+        cat = registerCustomCategory(customLabel, station);
+      }
       if (price <= 0) return showToast('Harga jual harus lebih dari Rp 0!');
       if (cogs <= 0) return showToast('HPP modal harus lebih dari Rp 0!');
 
+      let type = station === 'KITCHEN' ? 'food' : 'drink';
+      if (cat === 'cuanki') type = 'food';
+      else if (cat === 'penyempurna') type = 'addon';
+      else if (cat === 'penyempurna_cuanki') type = 'addon_food';
+
       const recipeData = collectRecipeData(true);
+      const addedMasterMats = ensureIngredientsInMaster(recipeData.ingredients);
 
       p.name = name;
       p.cat = cat;
+      p.type = type;
       p.station = station;
       p.price = price;
       p.cogs = cogs;
@@ -6889,7 +7177,8 @@
       renderHppTable();
       renderMenuMgmtTable();
       renderOwnerHub();
-      showToast(`✅ Perubahan disimpan: ${name} -> Harga: ${rp(price)}, HPP: ${rp(cogs)}`);
+      const extraNote = addedMasterMats > 0 ? ` (+${addedMasterMats} bahan baru masuk Master)` : '';
+      showToast(`✅ Perubahan disimpan: ${name} -> Harga: ${rp(price)}, HPP: ${rp(cogs)}${extraNote}`);
     }
 
     // Modal Trigger: View Recipe Detail Modal
@@ -7572,6 +7861,7 @@
 
       // Render Category Breakdown (Point 4)
       renderOwnerCategoryBreakdown(allOrders);
+      renderSalesBreakdown();
 
       // Render Attendance Log in Owner Hub (Point 7)
       const ownerAttTbody = document.getElementById('ownerAttendanceTableBody');
@@ -9203,13 +9493,46 @@
         showToast(`✅ Bahan baku master baru "${name}" ditambahkan!`);
       }
 
-      localStorage.setItem('wkl_master_raw_materials', JSON.stringify(MASTER_RAW_MATERIALS));
+      saveMasterMaterialsState();
       editMatId = null;
       document.getElementById('masterMatFormTitle').textContent = 'Tambah Bahan Baku Baru';
       document.getElementById('matFormName').value = '';
       recalcMatFormUnitCost();
       renderMasterMaterialsTable();
       renderHppTable();
+    }
+
+    function saveMasterMaterialsState() {
+      try { localStorage.setItem('wkl_master_raw_materials', JSON.stringify(MASTER_RAW_MATERIALS)); } catch (e) {}
+      syncToServer('materials', MASTER_RAW_MATERIALS);
+    }
+
+    function ensureIngredientsInMaster(ingredients) {
+      if (!Array.isArray(ingredients) || ingredients.length === 0) return 0;
+      let addedCount = 0;
+      ingredients.forEach(ing => {
+        const cleanName = String(ing.name || '').trim();
+        if (!cleanName) return;
+        const exists = MASTER_RAW_MATERIALS.some(m => String(m.name || '').trim().toLowerCase() === cleanName.toLowerCase());
+        if (!exists) {
+          const unitCost = Number(ing.unitCost || 0);
+          MASTER_RAW_MATERIALS.push({
+            id: 'mat-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+            name: cleanName,
+            cat: 'Custom',
+            packQty: 1,
+            unit: ing.unit || 'g',
+            packPrice: Math.round(unitCost),
+            unitCost: unitCost
+          });
+          addedCount++;
+        }
+      });
+      if (addedCount > 0) {
+        saveMasterMaterialsState();
+        renderMasterMaterialsTable();
+      }
+      return addedCount;
     }
 
     function editMasterRawMaterial(id) {
@@ -9229,7 +9552,7 @@
       if (!mat) return;
       if (!confirm(`Hapus bahan baku master "${mat.name}"?`)) return;
       MASTER_RAW_MATERIALS = MASTER_RAW_MATERIALS.filter(m => (m.id !== id && m.name !== id));
-      localStorage.setItem('wkl_master_raw_materials', JSON.stringify(MASTER_RAW_MATERIALS));
+      saveMasterMaterialsState();
       renderMasterMaterialsTable();
       showToast('Bahan baku master telah dihapus.');
     }
@@ -9356,6 +9679,183 @@
       `;
 
       tbody.innerHTML = rows + totalFooterRow;
+    }
+
+    function toLocalYmd(dateObj) {
+      const d = dateObj instanceof Date ? dateObj : new Date(dateObj);
+      if (isNaN(d.getTime())) return '';
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function setSalesBreakdownPreset(preset) {
+      const startEl = document.getElementById('salesBreakdownStart');
+      const endEl = document.getElementById('salesBreakdownEnd');
+      if (!startEl || !endEl) return;
+      const now = new Date();
+      const todayStr = toLocalYmd(now);
+      if (preset === 'TODAY') {
+        startEl.value = todayStr;
+        endEl.value = todayStr;
+      } else if (preset === '7D') {
+        const past = new Date(now.getTime() - 6 * 86400000);
+        startEl.value = toLocalYmd(past);
+        endEl.value = todayStr;
+      } else if (preset === 'MONTH') {
+        startEl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+        endEl.value = todayStr;
+      } else if (preset === 'ALL') {
+        startEl.value = '';
+        endEl.value = '';
+      }
+      renderSalesBreakdown();
+    }
+
+    function renderSalesBreakdown() {
+      const tbody = document.getElementById('salesBreakdownTableBody');
+      if (!tbody) return;
+
+      syncCategoryDropdowns();
+
+      const startEl = document.getElementById('salesBreakdownStart');
+      const endEl = document.getElementById('salesBreakdownEnd');
+      if (startEl && endEl && !startEl.dataset.initialized) {
+        const now = new Date();
+        startEl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+        endEl.value = toLocalYmd(now);
+        startEl.dataset.initialized = '1';
+      }
+
+      const startVal = startEl?.value || '';
+      const endVal = endEl?.value || '';
+      const catFilter = document.getElementById('salesBreakdownCat')?.value || 'ALL';
+      const sortBy = document.getElementById('salesBreakdownSort')?.value || 'qty_desc';
+
+      const filteredOrders = orders.filter(o => {
+        const dStr = toLocalYmd(o.createdAt || Date.now());
+        if (!dStr) return true;
+        if (startVal && dStr < startVal) return false;
+        if (endVal && dStr > endVal) return false;
+        return true;
+      });
+
+      const menuMap = new Map();
+      const catMap = new Map();
+
+      filteredOrders.forEach(ord => {
+        (ord.items || []).forEach(it => {
+          const prod = PRODUCTS.find(p => p.id === it.id || p.name === it.name);
+          const catId = (prod && prod.cat) || it.cat || 'lainnya';
+          const qty = Number(it.qty || 1);
+          const unitPrice = Number(it.unitPrice ?? it.price ?? (prod && prod.price) ?? 0);
+          const unitCogs = Number(it.cogs ?? (prod && prod.cogs) ?? 0);
+          const rev = unitPrice * qty;
+          const cogs = unitCogs * qty;
+
+          // Aggregate per category (always across all categories in date range)
+          const cEntry = catMap.get(catId) || { catId, label: getCategoryLabel(catId), qty: 0, rev: 0, cogs: 0 };
+          cEntry.qty += qty;
+          cEntry.rev += rev;
+          cEntry.cogs += cogs;
+          catMap.set(catId, cEntry);
+
+          if (catFilter !== 'ALL' && catId !== catFilter) return;
+
+          const menuKey = (prod && prod.id) || it.id || it.name;
+          const mEntry = menuMap.get(menuKey) || {
+            name: (prod && prod.name) || it.name || 'Menu',
+            catId,
+            catLabel: getCategoryLabel(catId),
+            qty: 0,
+            unitCogs,
+            cogs: 0,
+            rev: 0
+          };
+          mEntry.qty += qty;
+          mEntry.cogs += cogs;
+          mEntry.rev += rev;
+          if (mEntry.qty > 0) mEntry.unitCogs = Math.round(mEntry.cogs / mEntry.qty);
+          menuMap.set(menuKey, mEntry);
+        });
+      });
+
+      const items = Array.from(menuMap.values());
+      items.sort((a, b) => {
+        if (sortBy === 'qty_desc') return b.qty - a.qty || b.rev - a.rev;
+        if (sortBy === 'qty_asc') return a.qty - b.qty || a.rev - b.rev;
+        if (sortBy === 'rev_desc') return b.rev - a.rev;
+        if (sortBy === 'cogs_desc') return b.cogs - a.cogs;
+        if (sortBy === 'profit_desc') return (b.rev - b.cogs) - (a.rev - a.cogs);
+        if (sortBy === 'name_asc') return a.name.localeCompare(b.name);
+        return b.qty - a.qty;
+      });
+
+      const totalQty = items.reduce((s, x) => s + x.qty, 0);
+      const totalRev = items.reduce((s, x) => s + x.rev, 0);
+      const totalCogs = items.reduce((s, x) => s + x.cogs, 0);
+      const totalProfit = totalRev - totalCogs;
+
+      const elOrders = document.getElementById('sbTotalOrders');
+      const elQty = document.getElementById('sbTotalQty');
+      const elRev = document.getElementById('sbTotalRev');
+      const elCogs = document.getElementById('sbTotalCogs');
+      const elProfit = document.getElementById('sbTotalProfit');
+      if (elOrders) elOrders.textContent = `${filteredOrders.length} Transaksi`;
+      if (elQty) elQty.textContent = `${totalQty} Porsi`;
+      if (elRev) elRev.textContent = rp(totalRev);
+      if (elCogs) elCogs.textContent = rp(totalCogs);
+      if (elProfit) elProfit.textContent = rp(totalProfit);
+
+      const chipsEl = document.getElementById('salesBreakdownCatChips');
+      if (chipsEl) {
+        const catRows = Array.from(catMap.values()).sort((a, b) => b.qty - a.qty);
+        if (catRows.length === 0) {
+          chipsEl.innerHTML = `<span style="font-size:11.5px;color:var(--ink-muted);">Belum ada penjualan pada rentang tanggal ini.</span>`;
+        } else {
+          chipsEl.innerHTML = catRows.map(c => {
+            const active = catFilter === c.catId;
+            return `
+              <button type="button" onclick="document.getElementById('salesBreakdownCat').value='${active ? 'ALL' : c.catId}';renderSalesBreakdown();" style="display:flex;flex-direction:column;align-items:flex-start;padding:8px 12px;border-radius:10px;border:1.5px solid ${active ? '#BC012E' : 'var(--border-hairline)'};background:${active ? '#FEF2F2' : 'var(--surface-card)'};cursor:pointer;text-align:left;">
+                <div style="font-size:11.5px;font-weight:800;color:var(--ink-espresso);">${c.label} <span style="color:#BC012E;">(${c.qty}x)</span></div>
+                <div style="font-size:10.5px;color:var(--ink-muted);margin-top:2px;">Omzet: <strong>${rp(c.rev)}</strong> • HPP: <strong style="color:#991B1B;">${rp(c.cogs)}</strong></div>
+              </button>
+            `;
+          }).join('');
+        }
+      }
+
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:22px;color:var(--ink-muted);font-size:12px;">Tidak ada data penjualan menu pada filter tanggal/kategori yang dipilih.</td></tr>`;
+        return;
+      }
+
+      const bodyHtml = items.map((m, idx) => {
+        const profit = m.rev - m.cogs;
+        return `
+          <tr style="border-bottom:1px solid var(--border-hairline);font-size:12px;">
+            <td style="padding:9px 10px;color:var(--ink-muted);">${idx + 1}</td>
+            <td style="padding:9px 10px;font-weight:700;color:var(--ink-espresso);">${m.name}</td>
+            <td style="padding:9px 10px;"><span class="badge-sky" style="font-size:10px;">${m.catLabel}</span></td>
+            <td style="padding:9px 10px;text-align:center;font-family:monospace;font-weight:800;color:#0284C7;">${m.qty}</td>
+            <td style="padding:9px 10px;text-align:right;font-family:monospace;color:var(--ink-muted);">${rp(m.unitCogs)}</td>
+            <td style="padding:9px 10px;text-align:right;font-family:monospace;font-weight:700;color:#BC012E;">${rp(m.cogs)}</td>
+            <td style="padding:9px 10px;text-align:right;font-family:monospace;font-weight:700;">${rp(m.rev)}</td>
+            <td style="padding:9px 10px;text-align:right;font-family:monospace;font-weight:800;color:#15803D;">${rp(profit)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const footerHtml = `
+        <tr style="background:var(--bg-oat);font-weight:800;font-size:12.5px;border-top:2px solid var(--border-hairline);">
+          <td colspan="3" style="padding:10px;">TOTAL KESELURUHAN (${items.length} Menu)</td>
+          <td style="padding:10px;text-align:center;font-family:monospace;color:#0284C7;">${totalQty}</td>
+          <td style="padding:10px;text-align:right;color:var(--ink-muted);">-</td>
+          <td style="padding:10px;text-align:right;font-family:monospace;color:#BC012E;">${rp(totalCogs)}</td>
+          <td style="padding:10px;text-align:right;font-family:monospace;">${rp(totalRev)}</td>
+          <td style="padding:10px;text-align:right;font-family:monospace;color:#15803D;">${rp(totalProfit)}</td>
+        </tr>
+      `;
+
+      tbody.innerHTML = bodyHtml + footerHtml;
     }
 
     // ==========================================
