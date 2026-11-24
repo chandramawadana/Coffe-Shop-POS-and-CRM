@@ -1534,9 +1534,9 @@
                   </select>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px dashed var(--border-hairline);">
-                  <label style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                    <input type="checkbox" id="cartServiceFeeToggle" onchange="toggleServiceFee(this.checked)" />
-                    Biaya Layanan (5%)
+                  <label style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;color:var(--ink-muted);cursor:not-allowed;" title="Biaya layanan otomatis Rp 1.000 per transaksi dan tidak dapat diubah">
+                    <input type="checkbox" id="cartServiceFeeToggle" checked disabled style="accent-color:#0F2442;cursor:not-allowed;" />
+                    Biaya Layanan (Tetap Rp 1.000)
                   </label>
                   <label style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;cursor:pointer;">
                     <input type="checkbox" id="cartPpnToggle" onchange="togglePpn(this.checked)" />
@@ -1556,8 +1556,8 @@
                   <span id="cartDiscountAmt" style="font-family:monospace;font-weight:700;">-Rp 0</span>
                 </div>
                 <div id="cartServiceRow" style="display:none;justify-content:space-between;color:var(--ink-espresso);">
-                  <span>Biaya Layanan (5%):</span>
-                  <span id="cartServiceAmt" style="font-family:monospace;font-weight:700;">+Rp 0</span>
+                  <span>Biaya Layanan (Otomatis):</span>
+                  <span id="cartServiceAmt" style="font-family:monospace;font-weight:700;">+Rp 1.000</span>
                 </div>
                 <div id="cartPlatformRow" style="display:none;justify-content:space-between;color:#D97706;">
                   <span id="cartPlatformLabel">Platform Fee (20%):</span>
@@ -2131,6 +2131,12 @@
                     <td style="text-align:right;" id="pnlRevFoods">Rp 33.000</td>
                     <td></td>
                     <td style="text-align:right;" id="pnlPctFoods">35.9%</td>
+                  </tr>
+                  <tr class="pnl-sub-row">
+                    <td>Pendapatan Biaya Layanan (Otomatis Rp 1.000 / Transaksi)</td>
+                    <td style="text-align:right;color:#0284C7;font-weight:700;" id="pnlRevServiceFee">Rp 0</td>
+                    <td></td>
+                    <td style="text-align:right;" id="pnlPctServiceFee">0.0%</td>
                   </tr>
                   <tr class="pnl-sub-row">
                     <td>Diskon / Potongan Promo Stamp Digital</td>
@@ -4818,7 +4824,8 @@
     // Surcharges & Pricing Engine
     let currentChannel = 'DINE_IN'; // 'DINE_IN', 'TAKEAWAY', 'GOFOOD', 'GRABFOOD', 'SHOPEEFOOD'
     let currentDiscount = { type: 'NONE', value: 0, label: 'Tanpa Diskon' };
-    let serviceFeeEnabled = false;
+    let serviceFeeEnabled = true;
+    const FIXED_SERVICE_FEE = 1000;
     let ppnEnabled = false;
 
     // Absensi Records Storage
@@ -5676,8 +5683,8 @@
 
       const afterDiscount = Math.max(0, rawSubtotal - discountAmt);
 
-      // 2. Service Fee (5% Dine-In toggle)
-      const serviceAmt = serviceFeeEnabled ? Math.round(afterDiscount * 0.05) : 0;
+      // 2. Service Fee (Otomatis Rp 1.000 per transaksi, tidak dapat diedit)
+      const serviceAmt = cart.length > 0 ? FIXED_SERVICE_FEE : 0;
 
       // 3. Platform Fee (GoFood, Grab, Shopee +20%)
       let platformAmt = 0;
@@ -5767,8 +5774,10 @@
       renderCart();
     }
 
-    function toggleServiceFee(checked) {
-      serviceFeeEnabled = checked;
+    function toggleServiceFee() {
+      serviceFeeEnabled = true;
+      const el = document.getElementById('cartServiceFeeToggle');
+      if (el) { el.checked = true; el.disabled = true; }
       renderCart();
     }
 
@@ -7887,6 +7896,7 @@
       const allOrders = [...orders];
       const revDrinks = allOrders.reduce((s, o) => s + (o.revMinuman || 0), 0);
       const revFoods = allOrders.reduce((s, o) => s + (o.revMakanan || 0), 0);
+      const totalServiceFee = allOrders.reduce((s, o) => s + (o.serviceFee || 0), 0);
       const totalRev = allOrders.reduce((s, o) => s + (o.total || 0), 0);
 
       const cogsDrinks = allOrders.reduce((s, o) => s + (o.cogsMinuman || 0), 0);
@@ -7906,7 +7916,7 @@
       const revEl = document.getElementById('ownerRevenue');
       if (revEl) revEl.textContent = rp(totalRev);
       const orderCountEl = document.getElementById('ownerOrderCount');
-      if (orderCountEl) orderCountEl.textContent = `${allOrders.length} Transaksi Selesai`;
+      if (orderCountEl) orderCountEl.textContent = `${allOrders.length} Transaksi • Biaya Layanan: ${rp(totalServiceFee)}`;
 
       const cogsEl = document.getElementById('ownerCogs');
       if (cogsEl) cogsEl.textContent = rp(totalCogs);
@@ -7944,6 +7954,11 @@
       if (pnlRevFoodsEl) pnlRevFoodsEl.textContent = rp(revFoods);
       const pnlPctFoodsEl = document.getElementById('pnlPctFoods');
       if (pnlPctFoodsEl) pnlPctFoodsEl.textContent = totalRev > 0 ? `${((revFoods/totalRev)*100).toFixed(1)}%` : '0%';
+
+      const pnlRevSvcEl = document.getElementById('pnlRevServiceFee');
+      if (pnlRevSvcEl) pnlRevSvcEl.textContent = rp(totalServiceFee);
+      const pnlPctSvcEl = document.getElementById('pnlPctServiceFee');
+      if (pnlPctSvcEl) pnlPctSvcEl.textContent = totalRev > 0 ? `${((totalServiceFee/totalRev)*100).toFixed(1)}%` : '0%';
 
       const pnlTotalRevEl = document.getElementById('pnlTotalRev');
       if (pnlTotalRevEl) pnlTotalRevEl.innerHTML = `<strong>${rp(totalRev)}</strong>`;
@@ -9545,10 +9560,10 @@
         rawSubtotal: totalAmt,
         discount: 0,
         discountType: 'Tanpa Diskon',
-        serviceFee: 0,
+        serviceFee: selfOrderCart.length > 0 ? FIXED_SERVICE_FEE : 0,
         platformFee: 0,
         ppn: 0,
-        total: totalAmt,
+        total: totalAmt + (selfOrderCart.length > 0 ? FIXED_SERVICE_FEE : 0),
         cogs: totalCogs,
         revMinuman: revDrinks,
         revMakanan: revFoods,
