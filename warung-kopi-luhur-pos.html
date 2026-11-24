@@ -2716,8 +2716,8 @@
 
   <!-- MODAL: PANDUAN LENGKAP & FAQ CARA PAKAI POS CRM -->
   <div class="modal-backdrop" id="faqGuideModal">
-    <div class="modal-box" style="max-width:860px;padding:24px;max-height:90vh;display:flex;flex-direction:column;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;gap:12px;">
+    <div class="modal-box" style="max-width:860px;padding:24px;height:88vh;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;gap:12px;">
         <div>
           <h3 class="serif" style="font-size:21px;margin:0;">📖 Panduan Lengkap &amp; FAQ Cara Pakai POS CRM</h3>
           <p style="font-size:12px;color:var(--ink-muted);margin:4px 0 0;">Pelajari alur kerja Kasir POS, Pembayaran QRIS, Stamp CRM 10+1, Barista/Kitchen KDS, Kelola Menu &amp; HPP, hingga Laporan Owner Hub.</p>
@@ -2725,11 +2725,11 @@
         <button type="button" onclick="closeModal('faqGuideModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
       </div>
 
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <div style="flex-shrink:0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
         <input type="text" id="faqSearchInput" class="field" placeholder="🔍 Cari topik atau pertanyaan (cth: QRIS, Stamp, Open Tab, HPP, Kategori, KDS)..." style="flex:1;min-width:220px;padding:9px 12px;font-size:12.5px;" oninput="renderFaqGuide()" />
       </div>
 
-      <div id="faqFilterPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+      <div id="faqFilterPills" style="flex-shrink:0;display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
         <button type="button" class="cat-pill active" onclick="setFaqCategoryFilter('ALL', this)">Semua Topik</button>
         <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('KASIR', this)">☕ Kasir &amp; Bayar</button>
         <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('CRM', this)">🎁 CRM &amp; Stamp 10+1</button>
@@ -2739,9 +2739,9 @@
         <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('ADMIN', this)">👥 User &amp; Sinkronisasi</button>
       </div>
 
-      <div id="faqGuideList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px;"></div>
+      <div id="faqGuideList" style="flex:1;min-height:0;overflow-y:auto;display:block;padding-right:6px;"></div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-hairline);font-size:11.5px;color:var(--ink-muted);">
+      <div style="flex-shrink:0;display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-hairline);font-size:11.5px;color:var(--ink-muted);">
         <span>💡 Tips: Klik setiap judul panduan untuk membuka/menutup langkah detail.</span>
         <button type="button" class="btn-dark" style="background:var(--ink-espresso);color:#FFF;padding:8px 18px;border-radius:10px;font-weight:700;border:none;cursor:pointer;" onclick="closeModal('faqGuideModal')">Tutup Panduan</button>
       </div>
@@ -10046,12 +10046,12 @@
       }
 
       box.innerHTML = filtered.map((item, idx) => `
-        <details ${idx === 0 || q ? 'open' : ''} style="border:1px solid var(--border-hairline);border-radius:12px;background:var(--surface-card);overflow:hidden;">
-          <summary style="padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg-oat);font-weight:700;font-size:13px;color:var(--ink-espresso);list-style:none;">
-            <span>${item.q}</span>
-            <span class="badge-sky" style="font-size:10px;white-space:nowrap;">${item.badge}</span>
+        <details ${idx === 0 || q ? 'open' : ''} style="display:block;margin-bottom:10px;border:1px solid var(--border-hairline);border-radius:12px;background:var(--surface-card);overflow:hidden;">
+          <summary style="padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--bg-oat);font-weight:700;font-size:13px;line-height:1.45;color:var(--ink-espresso);list-style:none;">
+            <span style="flex:1;">${item.q}</span>
+            <span class="badge-sky" style="font-size:10px;white-space:nowrap;flex-shrink:0;">${item.badge}</span>
           </summary>
-          <div style="padding:12px 16px;font-size:12.5px;color:var(--ink-espresso);border-top:1px solid var(--border-hairline);background:#FFF;">
+          <div style="padding:12px 16px 14px;font-size:12.5px;line-height:1.6;color:var(--ink-espresso);border-top:1px solid var(--border-hairline);background:#FFF;">
             ${item.a}
           </div>
         </details>
