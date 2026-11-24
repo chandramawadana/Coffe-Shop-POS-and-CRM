@@ -1182,6 +1182,10 @@
           <span class="dot-live"></span>
           <span>LAN Ready</span>
         </div>
+        <!-- Tombol Panduan & FAQ Cara Pakai POS CRM -->
+        <button class="pill-status" style="cursor:pointer;background:#EFF6FF;color:#1D4ED8;border-color:#93C5FD;font-weight:700;" onclick="openFaqGuideModal()" title="Panduan Lengkap &amp; FAQ Cara Pakai POS CRM">
+          📖 Panduan &amp; FAQ
+        </button>
         <!-- Tombol Absensi Karyawan -->
         <button class="pill-status" style="cursor:pointer;background:#FEF3C7;color:#92400E;border-color:#F59E0B;font-weight:700;" onclick="openAbsensiModal()" title="Absensi Masuk / Pulang Shift Karyawan">
           ⏱️ Absensi
@@ -2706,6 +2710,40 @@
         <button type="button" class="btn-pay" id="btnSoConfirmPaid" style="display:none;width:100%;padding:12px;font-size:13px;border-radius:10px;background:#15803D;" onclick="completeCustomerSelfOrderPayment()">
           ✅ SAYA SUDAH BAYAR DI APLIKASI
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PANDUAN LENGKAP & FAQ CARA PAKAI POS CRM -->
+  <div class="modal-backdrop" id="faqGuideModal">
+    <div class="modal-box" style="max-width:860px;padding:24px;max-height:90vh;display:flex;flex-direction:column;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;gap:12px;">
+        <div>
+          <h3 class="serif" style="font-size:21px;margin:0;">📖 Panduan Lengkap &amp; FAQ Cara Pakai POS CRM</h3>
+          <p style="font-size:12px;color:var(--ink-muted);margin:4px 0 0;">Pelajari alur kerja Kasir POS, Pembayaran QRIS, Stamp CRM 10+1, Barista/Kitchen KDS, Kelola Menu &amp; HPP, hingga Laporan Owner Hub.</p>
+        </div>
+        <button type="button" onclick="closeModal('faqGuideModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+        <input type="text" id="faqSearchInput" class="field" placeholder="🔍 Cari topik atau pertanyaan (cth: QRIS, Stamp, Open Tab, HPP, Kategori, KDS)..." style="flex:1;min-width:220px;padding:9px 12px;font-size:12.5px;" oninput="renderFaqGuide()" />
+      </div>
+
+      <div id="faqFilterPills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <button type="button" class="cat-pill active" onclick="setFaqCategoryFilter('ALL', this)">Semua Topik</button>
+        <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('KASIR', this)">☕ Kasir &amp; Bayar</button>
+        <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('CRM', this)">🎁 CRM &amp; Stamp 10+1</button>
+        <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('KDS', this)">👨‍🍳 Barista &amp; Kitchen KDS</button>
+        <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('MENU', this)">🍽️ Menu, Kategori &amp; HPP</button>
+        <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('OWNER', this)">📊 Owner Hub &amp; Laporan</button>
+        <button type="button" class="cat-pill" onclick="setFaqCategoryFilter('ADMIN', this)">👥 User &amp; Sinkronisasi</button>
+      </div>
+
+      <div id="faqGuideList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px;"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-hairline);font-size:11.5px;color:var(--ink-muted);">
+        <span>💡 Tips: Klik setiap judul panduan untuk membuka/menutup langkah detail.</span>
+        <button type="button" class="btn-dark" style="background:var(--ink-espresso);color:#FFF;padding:8px 18px;border-radius:10px;font-weight:700;border:none;cursor:pointer;" onclick="closeModal('faqGuideModal')">Tutup Panduan</button>
       </div>
     </div>
   </div>
@@ -9860,6 +9898,164 @@
       `;
 
       tbody.innerHTML = bodyHtml + footerHtml;
+    }
+
+    // ==========================================
+    // PANDUAN & FAQ CARA PAKAI POS CRM
+    // ==========================================
+    let faqActiveFilter = 'ALL';
+    const FAQ_GUIDE_ITEMS = [
+      {
+        cat: 'ADMIN',
+        badge: '🔐 Login, Shift & Absensi',
+        q: '1. Bagaimana cara login, ganti akun staf, pilih shift, dan absensi karyawan?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Login Akun:</strong> Saat membuka POS, masukkan <em>Username/Email &amp; Password</em> atau gunakan <em>PIN 4-digit</em>. Untuk berganti staf di tengah shift, klik badge nama staf di pojok kanan atas (<code>👤 Nama Staf</code>).</li>
+              <li><strong>Pilih Shift Aktif:</strong> Klik tombol <code>☀️ Shift Pagi</code> di header kanan atas untuk mengganti Shift Pagi (07:00 - 15:00) atau Shift Sore/Malam (15:00 - 23:00).</li>
+              <li><strong>Absensi Masuk / Pulang:</strong> Klik tombol <code>⏱️ Absensi</code> di header, pilih status (Masuk/Pulang) dan catatan singkat, lalu simpan. Log absensi langsung tercatat dan dapat dipantau di <strong>Owner Hub</strong>.</li>
+            </ol>`
+      },
+      {
+        cat: 'KASIR',
+        badge: '☕ Kasir POS',
+        q: '2. Bagaimana alur membuat pesanan Dine In, Takeaway, pilih Meja, dan Add-on/Topping?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Pilih Menu:</strong> Gunakan bar kategori (<code>Semua Menu</code>, <code>Menu Cuanki</code>, <code>Racikan Master</code>, dll.) atau kolom <code>Cari menu...</code>, lalu klik kartu menu untuk menambah ke keranjang kanan.</li>
+              <li><strong>Tambah Add-on / Topping:</strong> Klik kategori <code>✨ Topping Cuanki</code> atau <code>✨ Penyempurna Kopi</code> untuk menambahkan ekstra shot, susu oat, pangsit, bakso, dll.</li>
+              <li><strong>Tipe Order &amp; Meja:</strong> Di panel keranjang kanan, pilih nomor meja (atau Walk-In/Takeaway) dan atur jumlah (<code>+</code> / <code>-</code>) atau hapus item.</li>
+              <li><strong>Diskon / Promo:</strong> Pilih promo aktif dari dropdown Diskon bila pelanggan berhak menerima potongan.</li>
+            </ol>`
+      },
+      {
+        cat: 'KASIR',
+        badge: '📑 Open Tab (Bayar Nanti)',
+        q: '3. Kapan memakai "Simpan Sebagai Open Tab" dan bagaimana cara melanjutkannya?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Simpan Open Tab:</strong> Jika pelanggan Dine In ingin pesan dulu dan bayar belakangan, klik <code>Proses Pembayaran</code> lalu pilih <strong><code>📑 Simpan Sebagai Open Tab</code></strong>. Pesanan langsung masuk ke antrean Barista/Kitchen KDS tanpa menunggu lunas.</li>
+              <li><strong>Tambah Menu ke Open Tab:</strong> Klik tombol <code>Open Tab (N)</code> di atas katalog kasir → pilih meja terkait → klik <code>✏️ Tambah Menu</code> untuk memuat kembali item ke keranjang, tambah menu baru, lalu simpan lagi atau bayar.</li>
+              <li><strong>Bayar Open Tab:</strong> Buka <code>Open Tab (N)</code> → klik <code>💳 Bayar Tab</code> → selesaikan pembayaran Tunai/QRIS/EDC/Split Bill.</li>
+            </ol>`
+      },
+      {
+        cat: 'KASIR',
+        badge: '💳 Pembayaran & QRIS',
+        q: '4. Bagaimana cara pembayaran Tunai, QRIS, EDC, Split Bill, dan Verifikasi QRIS Self-Order?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Tunai / EDC:</strong> Klik <code>Proses Pembayaran</code> → pilih metode <code>💵 Tunai</code> (masukkan nominal uang diterima untuk hitung kembalian) atau <code>💳 EDC</code> → klik <code>✅ Konfirmasi Lunas</code>.</li>
+              <li><strong>QRIS Statis / Layar QRIS:</strong> Pilih metode <code>📱 QRIS</code> di modal bayar untuk menampilkan kode QRIS besar agar mudah di-scan pelanggan, atau buka tab <code>📱 Layar QRIS</code> di layar kedua/tablet pelanggan.</li>
+              <li><strong>Split Bill:</strong> Pilih <code>✂️ Split Bill</code> untuk membagi pembayaran antara dua metode (mis. sebagian Tunai, sebagian QRIS).</li>
+              <li><strong>Verifikasi QRIS Self-Order:</strong> Jika pelanggan memesan via scan QR meja, pesanan masuk ke tombol kuning <code>📱 Verifikasi QRIS (N)</code> di kasir. Kasir wajib mengecek mutasi dana masuk lalu klik <strong>Konfirmasi Lunas</strong> agar pesanan otomatis terkirim ke Barista/Kitchen KDS.</li>
+            </ol>`
+      },
+      {
+        cat: 'CRM',
+        badge: '🎁 Stamp Beli 10 Gratis 1',
+        q: '5. Bagaimana aturan & cara menjalankan Stamp Loyalitas Beli 10 Gratis 1?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Default Kosong:</strong> Kolom Nomor HP pelanggan di keranjang kasir selalu kosong secara default. <strong>Jika dikosongkan, stamp tidak berjalan</strong> pada transaksi tersebut.</li>
+              <li><strong>Pelanggan Belum Terdaftar:</strong> Jika kasir memasukkan Nomor HP yang belum ada di database, sistem akan meminta kasir <strong>mendaftarkan Nama &amp; Nomor HP</strong> pelanggan terlebih dahulu sebelum stamp bisa diberikan.</li>
+              <li><strong>Tambah &amp; Klaim Stamp:</strong> Setiap transaksi selesai dengan pelanggan terdaftar akan menambah stamp. Setelah mencapai <strong>10 Stamp</strong>, pelanggan berhak klaim <strong>Gratis 1 Menu</strong> (tombol klaim/tukar tersedia di kartu loyalitas kasir).</li>
+              <li><strong>WhatsApp CRM:</strong> Buka tab <code>💬 WhatsApp CRM</code> untuk melihat daftar member, jumlah kunjungan/stamp, serta mengirim pesan promo atau sapaan langsung ke WhatsApp pelanggan.</li>
+            </ol>`
+      },
+      {
+        cat: 'KDS',
+        badge: '👨‍🍳 Barista & Kitchen KDS',
+        q: '6. Bagaimana cara kerja Barista KDS dan Kitchen KDS?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Pemisahan Otomatis:</strong> Setiap transaksi lunas atau Open Tab otomatis memisahkan item Minuman ke <code>👨‍🍳 Barista KDS</code> dan item Makanan/Cuanki ke <code>🍳 Kitchen KDS</code>.</li>
+              <li><strong>Update Status Pesanan:</strong> Staf Barista/Dapur cukup klik tombol status pada tiket (<code>⏳ Antre</code> → <code>🔥 Sedang Dibuat</code> → <code>✅ Selesai</code>) agar antrean tetap rapi dan tidak ada pesanan terlewat.</li>
+            </ol>`
+      },
+      {
+        cat: 'MENU',
+        badge: '🏷️ Menu & Edit Kategori',
+        q: '7. Bagaimana cara membuat menu baru, menambah kategori, dan mengedit nama kategori?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Buat Menu Baru:</strong> Buka tab <code>🍽️ Kelola Menu</code> (atau tombol <code>➕ Create Menu</code> di Kasir) → klik <code>➕ Create Menu Baru</code>. Isi Nama, Stasiun KDS (Barista/Kitchen), Harga Jual, dan Kategori.</li>
+              <li><strong>Tambah Kategori Manual:</strong> Di dropdown Kategori (baik saat Buat Menu maupun Edit Menu), pilih opsi <strong><code>+ Ketik Kategori Baru...</code></strong> lalu ketik nama kategori baru. Saat disimpan, kategori otomatis muncul di bar Kasir POS.</li>
+              <li><strong>Edit Nama Kategori yang Sudah Ada:</strong> Di tab <code>🍽️ Kelola Menu</code>, klik tombol <strong><code>🏷️ Kelola &amp; Edit Kategori</code></strong>. Anda bisa mengubah nama kategori bawaan maupun kategori tambahan, lalu klik <code>💾 Simpan Perubahan Kategori</code>.</li>
+            </ol>`
+      },
+      {
+        cat: 'MENU',
+        badge: '🧪 Formula HPP (BOM) & Master Bahan',
+        q: '8. Bagaimana cara menyusun skema HPP (BOM) & otomatis menyimpan bahan custom ke Master?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Tambah Bahan di Paling Atas:</strong> Saat membuat/mengedit menu, klik <code>+ Tambah Bahan</code>. Baris bahan baru langsung muncul di <strong>baris paling atas tabel BOM</strong> agar mudah langsung diisi.</li>
+              <li><strong>Pilih Master atau Bahan Custom Manual:</strong> Pilih bahan dari daftar Master Bahan Baku, atau pilih <strong><code>+ Bahan Custom Manual</code></strong> lalu ketik nama bahan, jumlah, satuan, dan harga beli satuan.</li>
+              <li><strong>Auto-Save ke Master:</strong> Ketika menu disimpan, bahan baru / custom manual tersebut <strong>otomatis masuk ke Master Bahan Baku</strong> sehingga bisa langsung dipilih ulang di menu lain.</li>
+              <li><strong>Kelola Master Bahan Baku:</strong> Buka tab <code>📦 Stok &amp; BOM</code> untuk memantau stok, menambah, mengedit harga kemasan, atau menghapus bahan baku master.</li>
+            </ol>`
+      },
+      {
+        cat: 'OWNER',
+        badge: '📊 Owner Hub & Filter Penjualan',
+        q: '9. Bagaimana cara melihat penjualan per kategori/menu berdasarkan tanggal & Total HPP Keseluruhan?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Buka Owner Hub:</strong> Klik tab <code>📊 Owner Hub</code>. Di bagian atas tersedia 5 KPI utama (Omzet, Total HPP, Laba Kotor, Pengeluaran, Laba Bersih).</li>
+              <li><strong>Filter Tanggal &amp; Sort Penjualan:</strong> Pada panel <strong><code>🧾 Rekap Penjualan per Kategori &amp; Menu</code></strong>, atur <em>Dari Tanggal</em> &amp; <em>Sampai Tanggal</em> (atau klik preset <code>Hari Ini</code> / <code>7 Hari</code> / <code>Bulan Ini</code> / <code>Semua</code>).</li>
+              <li><strong>Rincian per Kategori &amp; Menu:</strong> Anda dapat memfilter kategori tertentu (atau klik kartu ringkasan kategori) dan mengurutkan berdasarkan <em>Terlaris (Qty Terbanyak)</em>, <em>Omzet Tertinggi</em>, <em>Total HPP Tertinggi</em>, atau <em>Laba Kotor Tertinggi</em>. Di dalamnya langsung terlihat jumlah terjual tiap menu beserta <strong>Total HPP Keseluruhan</strong>.</li>
+              <li><strong>Riwayat Transaksi &amp; Export CSV:</strong> Scroll ke bawah untuk melihat riwayat struk per hari, filter metode bayar, dan tombol <code>⬇️ Export CSV</code>.</li>
+            </ol>`
+      },
+      {
+        cat: 'ADMIN',
+        badge: '👥 Kelola User & Sinkronisasi',
+        q: '10. Bagaimana cara menambah user baru, mengatur multi-role, dan sinkronisasi antar PC/Tablet?',
+        a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
+              <li><strong>Kelola User (Superadmin):</strong> Buka tab <code>👥 Kelola User</code> → isi Nama, Username/Email, Password, dan centang satu atau lebih Role (mis. Kasir + Barista). Klik <code>💾 Simpan &amp; Daftarkan Pengguna</code>.</li>
+              <li><strong>Sinkronisasi Multi-Perangkat:</strong> Pastikan indikator <code>🟢 LAN Ready</code> aktif di header. Semua data (User, Menu, Kategori, Master Bahan Baku, Promo, Transaksi, Open Tab, Pending QRIS, Meja, dan Pelanggan Stamp) otomatis tersinkronisasi ke server <code>api.php</code> agar tampil sama di semua PC/tablet.</li>
+            </ol>`
+      }
+    ];
+
+    function openFaqGuideModal() {
+      faqActiveFilter = 'ALL';
+      const inp = document.getElementById('faqSearchInput');
+      if (inp) inp.value = '';
+      document.querySelectorAll('#faqFilterPills .cat-pill').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === 0);
+      });
+      renderFaqGuide();
+      openModal('faqGuideModal');
+    }
+
+    function setFaqCategoryFilter(cat, btnEl) {
+      faqActiveFilter = cat;
+      document.querySelectorAll('#faqFilterPills .cat-pill').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      renderFaqGuide();
+    }
+
+    function renderFaqGuide() {
+      const box = document.getElementById('faqGuideList');
+      if (!box) return;
+      const q = (document.getElementById('faqSearchInput')?.value || '').trim().toLowerCase();
+
+      const filtered = FAQ_GUIDE_ITEMS.filter(item => {
+        const matchCat = faqActiveFilter === 'ALL' || item.cat === faqActiveFilter;
+        const plainText = (item.q + ' ' + item.badge + ' ' + item.a.replace(/<[^>]+>/g, ' ')).toLowerCase();
+        const matchQuery = !q || plainText.includes(q);
+        return matchCat && matchQuery;
+      });
+
+      if (filtered.length === 0) {
+        box.innerHTML = `<div style="text-align:center;padding:28px;color:var(--ink-muted);background:var(--bg-oat);border-radius:12px;border:1px dashed var(--border-hairline);font-size:12.5px;">Tidak ditemukan panduan yang cocok dengan kata kunci "<strong>${q}</strong>".</div>`;
+        return;
+      }
+
+      box.innerHTML = filtered.map((item, idx) => `
+        <details ${idx === 0 || q ? 'open' : ''} style="border:1px solid var(--border-hairline);border-radius:12px;background:var(--surface-card);overflow:hidden;">
+          <summary style="padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg-oat);font-weight:700;font-size:13px;color:var(--ink-espresso);list-style:none;">
+            <span>${item.q}</span>
+            <span class="badge-sky" style="font-size:10px;white-space:nowrap;">${item.badge}</span>
+          </summary>
+          <div style="padding:12px 16px;font-size:12.5px;color:var(--ink-espresso);border-top:1px solid var(--border-hairline);background:#FFF;">
+            ${item.a}
+          </div>
+        </details>
+      `).join('');
     }
 
     // ==========================================
