@@ -2087,6 +2087,11 @@
                 <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:#C2410C;" id="ownerTotalExpense">Rp 55.000</div>
                 <div style="font-size:11px;color:var(--ink-muted);" id="ownerExpenseCount">2 Catatan Petty Cash</div>
               </div>
+              <div class="panel-card" style="background:#EFF6FF;border:1px solid #BFDBFE;">
+                <div style="font-size:11px;font-weight:800;color:#1E40AF;">BIAYA LAYANAN (RP 1.000/TRX)</div>
+                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:#1D4ED8;" id="ownerServiceFee">Rp 0</div>
+                <div style="font-size:11px;font-weight:700;color:#1E40AF;" id="ownerServiceFeeCount">0 Transaksi × Rp 1.000</div>
+              </div>
               <div class="panel-card" style="background:#FFFFFF;border:1.5px solid #BC012E;box-shadow:0 3px 10px rgba(188,1,46,0.12);">
                 <div style="font-size:11px;font-weight:800;color:var(--ink-espresso);">LABA BERSIH (NET PROFIT)</div>
                 <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:var(--ink-espresso);" id="ownerNetProfit">Rp 4.200</div>
@@ -2182,6 +2187,10 @@
                 <div style="background:#FEF2F2;padding:10px 14px;border-radius:10px;border:1.5px solid #FCA5A5;">
                   <div style="font-size:10px;font-weight:800;color:#991B1B;">TOTAL HPP KESELURUHAN</div>
                   <div style="font-size:18px;font-weight:800;color:#BC012E;" id="sbTotalCogs">Rp 0</div>
+                </div>
+                <div style="background:#EFF6FF;padding:10px 14px;border-radius:10px;border:1px solid #BFDBFE;">
+                  <div style="font-size:10px;font-weight:800;color:#1E40AF;">BIAYA LAYANAN</div>
+                  <div style="font-size:18px;font-weight:800;color:#1D4ED8;" id="sbTotalServiceFee">Rp 0</div>
                 </div>
                 <div style="background:#F0FDF4;padding:10px 14px;border-radius:10px;border:1px solid #86EFAC;">
                   <div style="font-size:10px;font-weight:700;color:#166534;">LABA KOTOR</div>
@@ -8043,6 +8052,12 @@
       const orderCountEl = document.getElementById('ownerOrderCount');
       if (orderCountEl) orderCountEl.textContent = `${allOrders.length} Transaksi • Biaya Layanan: ${rp(totalServiceFee)}`;
 
+      const svcFeeEl = document.getElementById('ownerServiceFee');
+      if (svcFeeEl) svcFeeEl.textContent = rp(totalServiceFee);
+      const svcFeeCountEl = document.getElementById('ownerServiceFeeCount');
+      const svcTxCount = allOrders.filter(o => (o.serviceFee || 0) > 0).length;
+      if (svcFeeCountEl) svcFeeCountEl.textContent = `${svcTxCount} Transaksi × Rp 1.000`;
+
       const cogsEl = document.getElementById('ownerCogs');
       if (cogsEl) cogsEl.textContent = rp(totalCogs);
       const cogsBreakdownEl = document.getElementById('ownerCogsBreakdown');
@@ -10137,16 +10152,19 @@
       const totalRev = items.reduce((s, x) => s + x.rev, 0);
       const totalCogs = items.reduce((s, x) => s + x.cogs, 0);
       const totalProfit = totalRev - totalCogs;
+      const filteredServiceFee = filteredOrders.reduce((s, o) => s + (o.serviceFee || 0), 0);
 
       const elOrders = document.getElementById('sbTotalOrders');
       const elQty = document.getElementById('sbTotalQty');
       const elRev = document.getElementById('sbTotalRev');
       const elCogs = document.getElementById('sbTotalCogs');
+      const elSvc = document.getElementById('sbTotalServiceFee');
       const elProfit = document.getElementById('sbTotalProfit');
       if (elOrders) elOrders.textContent = `${filteredOrders.length} Transaksi`;
       if (elQty) elQty.textContent = `${totalQty} Porsi`;
       if (elRev) elRev.textContent = rp(totalRev);
       if (elCogs) elCogs.textContent = rp(totalCogs);
+      if (elSvc) elSvc.textContent = rp(filteredServiceFee);
       if (elProfit) elProfit.textContent = rp(totalProfit);
 
       const chipsEl = document.getElementById('salesBreakdownCatChips');
