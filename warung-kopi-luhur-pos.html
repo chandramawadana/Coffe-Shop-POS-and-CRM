@@ -3040,7 +3040,7 @@
       <div style="background:var(--bg-oat);padding:10px 16px;border-bottom:1px solid var(--border-hairline);display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div>
           <label style="font-size:10px;font-weight:700;color:var(--ink-muted);">Nama Pemesan:</label>
-          <input type="text" class="field" id="custSelfOrderName" placeholder="Contoh: Budi Santoso" style="width:100%;font-size:11px;padding:5px 8px;margin-top:2px;" />
+          <input type="text" class="field" id="custSelfOrderName" placeholder="Nama Pelanggan" style="width:100%;font-size:11px;padding:5px 8px;margin-top:2px;" />
         </div>
         <div>
           <label style="font-size:10px;font-weight:700;color:var(--ink-muted);">No. WhatsApp (Opsional):</label>
@@ -5183,7 +5183,19 @@
         const raw = localStorage.getItem('wkl_orders_v1');
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) return parsed.filter(o => !String(o.id || '').startsWith('ord-demo-'));
+          if (Array.isArray(parsed)) {
+            const cutoff = Date.now() - 12 * 3600 * 1000;
+            return parsed
+              .filter(o => !String(o.id || '').startsWith('ord-demo-'))
+              .map(o => {
+                const isOld = o.createdAt && new Date(o.createdAt).getTime() < cutoff;
+                const cleanCust = o.customer === 'Budi Santoso' ? 'Pelanggan' : o.customer;
+                const items = (isOld || o.customer === 'Budi Santoso')
+                  ? (o.items || []).map(it => ({ ...it, kdsStatus: 'DONE' }))
+                  : o.items;
+                return { ...o, customer: cleanCust, items };
+              });
+          }
         }
       } catch (e) {}
       return [];
@@ -8564,7 +8576,7 @@
                     ${o.table || (o.type === 'DINE_IN' ? 'Dine-In' : 'Takeaway')}
                   </span>
                 </div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:2px;">⏱️ ${elapsedText} • ${o.customer || 'Pelanggan'}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:2px;">⏱️ ${elapsedText} • ${(o.customer && o.customer !== 'Budi Santoso') ? o.customer : 'Pelanggan'}</div>
               </div>
               <div>${statusBadge}</div>
             </div>
