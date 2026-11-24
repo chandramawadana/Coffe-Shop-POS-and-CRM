@@ -8445,20 +8445,26 @@
     }
 
     function setKdsCooking(orderId, station) {
-      const allOrders = [...orders, ...openTabs];
-      const o = allOrders.find(x => x.id === orderId);
+      const inOrders = orders.find(x => x.id === orderId);
+      const inTabs = openTabs.find(x => x.id === orderId);
+      const o = inOrders || inTabs;
       if (o) {
         o.items.filter(it => it.station === station).forEach(it => it.kdsStatus = 'COOKING');
+        if (inOrders && typeof saveOrdersState === 'function') saveOrdersState();
+        if (inTabs && typeof saveOpenTabsState === 'function') saveOpenTabsState();
         renderKds(station);
         showToast(`Pesanan #${o.number} stasiun ${station} sedang diproses/dimasak!`);
       }
     }
 
     function completeKdsItem(orderId, station) {
-      const allOrders = [...orders, ...openTabs];
-      const o = allOrders.find(x => x.id === orderId);
+      const inOrders = orders.find(x => x.id === orderId);
+      const inTabs = openTabs.find(x => x.id === orderId);
+      const o = inOrders || inTabs;
       if (o) {
         o.items.filter(it => it.station === station).forEach(it => it.kdsStatus = 'DONE');
+        if (inOrders && typeof saveOrdersState === 'function') saveOrdersState();
+        if (inTabs && typeof saveOpenTabsState === 'function') saveOpenTabsState();
         renderKds(station);
         showToast(`✅ Pesanan #${o.number} stasiun ${station} selesai dibuat & siap disajikan!`);
       }
