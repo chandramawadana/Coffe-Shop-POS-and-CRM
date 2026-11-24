@@ -1799,7 +1799,7 @@
         <div class="page-container">
           <div class="page-header">
             <div>
-              <h2 class="serif">Kitchen Display System: <span class="italic">Stasiun Barista</span></h2>
+              <h2 class="serif">☕ Stasiun <span class="italic">Barista</span></h2>
               <p style="font-size:12px;color:var(--ink-muted);">Pesanan minuman kopi, manual brew &amp; non-kopi (Target &lt; 3 menit)</p>
             </div>
             <span class="badge-sky" id="kdsBaristaCount">0 Antrean</span>
@@ -1814,15 +1814,12 @@
           <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
             <div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <h2 class="serif" style="font-size:20px;color:var(--ink-espresso);">🍲 Kitchen Display System: <span class="italic">Dapur Cuanki</span></h2>
+                <h2 class="serif" style="font-size:20px;color:var(--ink-espresso);">🍲 Stasiun <span class="italic">Kitchen</span></h2>
                 <span class="badge" style="background:#DCFCE7;color:#166534;font-size:10px;padding:3px 8px;border-radius:999px;">● Papan Cuanki Resmi Aktif</span>
               </div>
               <p style="font-size:11.5px;color:var(--ink-muted);margin-top:2px;">Pesanan Cuanki Tanggal Tua, Icip2, Cuanki Luhur, Cuanki Duo, Kuah &amp; Topping (Target &lt; 5 menit)</p>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
-              <button class="btn-dark" style="padding:7px 14px;font-size:11px;background:var(--accent-gold);color:#FFF;border:none;border-radius:999px;cursor:pointer;font-weight:700;" onclick="simulateKitchenOrder()">
-                ➕ Tes Simulasi Order Cuanki
-              </button>
               <span class="badge-sky" id="kdsKitchenCount" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">0 Antrean</span>
             </div>
           </div>
@@ -5139,23 +5136,16 @@
     // 5. Data Pengeluaran Operasional & Harian (Termasuk Gaji, Sewa, Utilitas & Petty Cash)
     let pnlPeriod = 'LIVE'; // 'LIVE' or 'MONTHLY'
 
-    let dailyExpenses = [
-      // Beban Gaji & SDM
-      { id: 'exp-sal-1', time: '07:30', shift: 'PAGI', cashier: 'Kasir Utama', type: 'SALARY', category: 'Gaji Karyawan (Barista)', desc: 'Gaji Pokok Barista Utama (Shift Pagi)', amount: 2800000, isMonthly: true },
-      { id: 'exp-sal-2', time: '07:30', shift: 'PAGI', cashier: 'Kasir Utama', type: 'SALARY', category: 'Gaji Karyawan (Kasir & Kitchen)', desc: 'Gaji Pokok Kasir & Kitchen Helper', amount: 2500000, isMonthly: true },
-      { id: 'exp-sal-3', time: '12:00', shift: 'PAGI', cashier: 'Kasir Utama', type: 'SALARY', category: 'Uang Makan & Transport Shift', desc: 'Uang Makan 2 Staf Shift Pagi', amount: 40000, isMonthly: false },
-
-      // Beban Sewa, Utilitas & Pemeliharaan
-      { id: 'exp-fac-1', time: '08:00', shift: 'PAGI', cashier: 'Kasir Utama', type: 'FACILITY', category: 'Sewa Tempat / Outlet Kedai', desc: 'Alokasi Biaya Sewa Outlet Kedai Luhur', amount: 3500000, isMonthly: true },
-      { id: 'exp-fac-2', time: '08:15', shift: 'PAGI', cashier: 'Kasir Utama', type: 'FACILITY', category: 'Listrik PLN & Air Bersih', desc: 'Tagihan Listrik PLN Daya 5500VA & PDAM', amount: 1650000, isMonthly: true },
-      { id: 'exp-fac-3', time: '08:30', shift: 'PAGI', cashier: 'Kasir Utama', type: 'FACILITY', category: 'Internet Wi-Fi Kafe', desc: 'Paket Internet Fiber Dedicated 100Mbps', amount: 450000, isMonthly: true },
-      { id: 'exp-fac-4', time: '09:00', shift: 'PAGI', cashier: 'Kasir Utama', type: 'FACILITY', category: 'Servis & Perawatan Mesin Kopi', desc: 'Kalibrasi Grinder & Descaling Mesin Espresso', amount: 350000, isMonthly: true },
-
-      // Beban Operasional Harian Toko (Petty Cash Kas Laci)
-      { id: 'exp-day-1', time: '08:15', shift: 'PAGI', cashier: 'Kasir Utama', type: 'DAILY', category: 'Bahan Baku Darurat (Es Batu/Susu)', desc: 'Beli 2 sak Es Kristal Segar Supplier Warung', amount: 30000, isMonthly: false },
-      { id: 'exp-day-2', time: '10:45', shift: 'PAGI', cashier: 'Kasir Utama', type: 'DAILY', category: 'Gas LPG & Dapur Snack', desc: 'Refill Tabung Gas LPG 3kg Dapur Roti & Cireng', amount: 25000, isMonthly: false },
-      { id: 'exp-day-3', time: '13:30', shift: 'PAGI', cashier: 'Kasir Utama', type: 'DAILY', category: 'Kebersihan & Perlengkapan Toko', desc: 'Beli Tissue Meja & Sabun Cuci Foodgrade', amount: 20000, isMonthly: false }
-    ];
+    let dailyExpenses = (() => {
+      try {
+        const raw = localStorage.getItem('wkl_expenses_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+      return [];
+    })();
 
     // 6. Data Riwayat Handover Shift
     let shiftHandoverHistory = [
@@ -8474,39 +8464,6 @@
       }
     }
 
-    function simulateKitchenOrder() {
-      const num = String(orderSeq++).padStart(3, '0');
-      const table = 'Meja 0' + (Math.floor(Math.random() * 8) + 1);
-      const simulatedOrder = {
-        id: 'ord-' + Date.now(),
-        number: num,
-        type: 'DINE_IN',
-        table: table,
-        customer: 'Pelanggan ' + table,
-        items: [
-          { id: 'wkl-ck-03', name: 'Cuanki Luhur (Lengkap) 👍', cat: 'cuanki', type: 'food', station: 'KITCHEN', unitPrice: 28000, basePrice: 22000, qty: 1, cogs: 18400, mods: { kuah: 'TOMYAM', pedas: 'LV2' }, kdsStatus: 'QUEUED' },
-          { id: 'top-ck-ceker', name: 'Topping Ceker 👍', cat: 'penyempurna_cuanki', type: 'addon_food', station: 'KITCHEN', unitPrice: 2500, basePrice: 2500, qty: 1, cogs: 1200, mods: {}, kdsStatus: 'QUEUED' },
-          { id: 'wkl-rm-02', name: 'Kopi Susu Luhur', cat: 'racikan_master', type: 'drink', station: 'BARISTA', unitPrice: 18000, basePrice: 18000, qty: 1, cogs: 6700, mods: { temp: 'ICE', sweet: '100%', shot: 'SINGLE' }, kdsStatus: 'QUEUED' }
-        ],
-        total: 48500,
-        cogs: 17500,
-        revMinuman: 18000,
-        revMakanan: 30500,
-        cogsMinuman: 6800,
-        cogsMakanan: 10700,
-        discount: 0,
-        method: 'CASH',
-        shift: currentShift,
-        createdAt: new Date().toISOString()
-      };
-
-      orders.push(simulatedOrder);
-      renderKds('KITCHEN');
-      renderKds('BARISTA');
-      renderOwnerHub();
-      showToast(`🚀 Pesanan Cuanki #${num} (${table}) sukses terkirim ke Dapur Cuanki & Barista!`);
-    }
-
     // ==========================================
     // CUSTOMER DISPLAY (QRIS & LOYALTY)
     // ==========================================
@@ -10115,18 +10072,6 @@
             }
           });
         });
-
-        // Add simulated base volume if orders array is small for realistic reporting
-        if (catQty === 0) {
-          if (cat.key === 'kopi') { catQty = 42; catRev = 756000; catCogs = 277200; }
-          else if (cat.key === 'cuanki_paket') { catQty = 28; catRev = 490000; catCogs = 291200; }
-          else if (cat.key === 'cuanki') { catQty = 35; catRev = 280000; catCogs = 140000; }
-          else if (cat.key === 'teh_susu') { catQty = 19; catRev = 285000; catCogs = 95000; }
-          else if (cat.key === 'mocktail') { catQty = 14; catRev = 252000; catCogs = 84000; }
-          else if (cat.key === 'camilan') { catQty = 22; catRev = 264000; catCogs = 110000; }
-          else if (cat.key === 'penyempurna') { catQty = 15; catRev = 45000; catCogs = 15000; }
-          else if (cat.key === 'penyempurna_cuanki') { catQty = 18; catRev = 72000; catCogs = 36000; }
-        }
 
         const margin = catRev - catCogs;
         const marginPct = catRev > 0 ? Math.round((margin / catRev) * 100) : 0;
