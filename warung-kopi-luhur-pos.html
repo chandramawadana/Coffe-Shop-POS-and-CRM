@@ -1587,6 +1587,7 @@
                   ➕ Create Menu
                 </button>
                 <button class="btn-dark" style="background:var(--surface-card);color:var(--ink-espresso);border:1px solid var(--border-hairline);padding:5px 11px;font-size:11px;border-radius:999px;" onclick="openTableMgmtModal()" title="Buka Manajemen Meja Kedai">🪑 Meja (<span id="cashierTableCount">12</span>)</button>
+                <button class="btn-dark" style="background:#FFF7ED;color:#C2410C;border:1px solid #FDBA74;padding:5px 11px;font-size:11px;border-radius:999px;" onclick="openCashierExpenseModal()" title="Catat Data Pengeluaran Kasir (Jumlah, Item, Harga)">💸 Pengeluaran</button>
                 <button class="btn-dark" style="background:var(--surface-card);color:var(--ink-espresso);border:1px solid var(--border-hairline);padding:5px 11px;font-size:11px;border-radius:999px;" onclick="openTxHistoryModal()" title="Lihat Riwayat Transaksi Kasir">📜 Riwayat</button>
               </div>
             </div>
@@ -3086,6 +3087,59 @@
         <button type="button" class="btn-pay" id="btnSoConfirmPaid" style="display:none;width:100%;padding:12px;font-size:13px;border-radius:10px;background:#15803D;" onclick="completeCustomerSelfOrderPayment()">
           ✅ SAYA SUDAH BAYAR DI APLIKASI
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PENGELUARAN KASIR (JUMLAH, ITEM, HARGA) -->
+  <div class="modal-backdrop" id="cashierExpenseModal">
+    <div class="modal-box" style="max-width:640px;padding:24px;max-height:90vh;overflow-y:auto;display:block;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;">
+        <div>
+          <h3 class="serif" style="font-size:20px;margin:0;">💸 Data Pengeluaran Kasir</h3>
+          <p style="font-size:11.5px;color:var(--ink-muted);margin:3px 0 0;">Catat pengeluaran operasional (Jumlah, Item, Harga). Otomatis tersimpan &amp; masuk ke laporan Owner Hub.</p>
+        </div>
+        <button type="button" onclick="closeModal('cashierExpenseModal')" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="background:var(--bg-oat);padding:14px;border-radius:14px;border:1px solid var(--border-hairline);margin-bottom:16px;">
+        <div style="display:grid;grid-template-columns:1fr 90px 140px;gap:10px;align-items:end;">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">ITEM PENGELUARAN</label>
+            <input type="text" id="cashierExpItem" class="field" placeholder="Contoh: Es Batu Kristal / Gas LPG" style="width:100%;" />
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">JUMLAH</label>
+            <input type="number" id="cashierExpQty" class="field" value="1" min="1" step="any" style="width:100%;text-align:center;font-weight:700;" oninput="recalcCashierExpenseTotal()" />
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">HARGA SATUAN (RP)</label>
+            <input type="number" id="cashierExpPrice" class="field" placeholder="15000" min="0" step="any" style="width:100%;text-align:right;font-weight:700;" oninput="recalcCashierExpenseTotal()" />
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px dashed var(--border-hairline);flex-wrap:wrap;gap:8px;">
+          <div style="font-size:12px;color:var(--ink-muted);">
+            Total Pengeluaran: <strong id="cashierExpTotalPreview" style="font-size:15px;color:#C2410C;">Rp 0</strong>
+          </div>
+          <button type="button" class="btn-pay" style="width:auto;padding:9px 20px;font-size:12.5px;border-radius:10px;" onclick="saveCashierExpense()">💾 Simpan Pengeluaran</button>
+        </div>
+      </div>
+
+      <div style="font-size:11.5px;font-weight:800;color:var(--ink-muted);margin-bottom:8px;text-transform:uppercase;">Riwayat Pengeluaran Tercatat</div>
+      <div style="overflow-x:auto;border:1px solid var(--border-hairline);border-radius:12px;">
+        <table class="pnl-table" style="margin:0;">
+          <thead>
+            <tr>
+              <th>Jam</th>
+              <th>Item</th>
+              <th style="text-align:center;">Jumlah</th>
+              <th style="text-align:right;">Harga</th>
+              <th style="text-align:right;">Total</th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="cashierExpenseTableBody"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -4960,6 +5014,8 @@
         }
         if (Array.isArray(d.expenses)) {
           dailyExpenses = d.expenses;
+          localStorage.setItem('wkl_expenses_v1', JSON.stringify(dailyExpenses));
+          if (document.getElementById('cashierExpenseModal')?.classList.contains('open')) renderCashierExpenseList();
         }
         if (d.customers && typeof d.customers === 'object' && !Array.isArray(d.customers)) {
           customers = d.customers;
@@ -6442,14 +6498,116 @@
         isMonthly: isMonthly
       });
 
+      saveExpensesState();
       document.getElementById('expenseDesc').value = '';
       document.getElementById('expenseAmount').value = '';
       showToast(`Pengeluaran ${rp(amount)} (${desc}) berhasil dicatat!`);
       renderOwnerHub();
     }
 
+    function saveExpensesState() {
+      try { localStorage.setItem('wkl_expenses_v1', JSON.stringify(dailyExpenses)); } catch (e) {}
+      syncToServer('expenses', dailyExpenses);
+    }
+
+    function openCashierExpenseModal() {
+      document.getElementById('cashierExpItem').value = '';
+      document.getElementById('cashierExpQty').value = '1';
+      document.getElementById('cashierExpPrice').value = '';
+      recalcCashierExpenseTotal();
+      renderCashierExpenseList();
+      openModal('cashierExpenseModal');
+      setTimeout(() => document.getElementById('cashierExpItem')?.focus(), 80);
+    }
+
+    function recalcCashierExpenseTotal() {
+      const qty = Number(document.getElementById('cashierExpQty')?.value || 0);
+      const price = Number(document.getElementById('cashierExpPrice')?.value || 0);
+      const total = Math.max(0, Math.round(qty * price));
+      const el = document.getElementById('cashierExpTotalPreview');
+      if (el) el.textContent = rp(total);
+    }
+
+    function saveCashierExpense() {
+      const item = (document.getElementById('cashierExpItem')?.value || '').trim();
+      const qty = Number(document.getElementById('cashierExpQty')?.value || 0);
+      const price = Number(document.getElementById('cashierExpPrice')?.value || 0);
+      if (!item) return showToast('Nama item pengeluaran tidak boleh kosong!');
+      if (qty <= 0) return showToast('Jumlah harus lebih dari 0!');
+      if (price <= 0) return showToast('Harga satuan harus lebih dari Rp 0!');
+
+      const totalAmount = Math.round(qty * price);
+      dailyExpenses.unshift({
+        id: 'exp-' + Date.now(),
+        date: toLocalYmd(new Date()),
+        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+        shift: currentShift,
+        cashier: activeStaff?.name || currentUser?.name || 'Kasir',
+        type: 'DAILY',
+        category: 'Pengeluaran Kasir',
+        item: item,
+        qty: qty,
+        unitPrice: price,
+        desc: `${qty}x ${item} (@ ${rp(price)})`,
+        amount: totalAmount,
+        isMonthly: false
+      });
+
+      saveExpensesState();
+      document.getElementById('cashierExpItem').value = '';
+      document.getElementById('cashierExpQty').value = '1';
+      document.getElementById('cashierExpPrice').value = '';
+      recalcCashierExpenseTotal();
+      renderCashierExpenseList();
+      renderOwnerHub();
+      showToast(`✅ Pengeluaran ${qty}x ${item} (${rp(totalAmount)}) berhasil dicatat!`);
+    }
+
+    function renderCashierExpenseList() {
+      const tbody = document.getElementById('cashierExpenseTableBody');
+      if (!tbody) return;
+      const list = dailyExpenses.filter(e => !e.isMonthly);
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:18px;color:var(--ink-muted);font-size:12px;">Belum ada data pengeluaran tercatat.</td></tr>`;
+        return;
+      }
+      const total = list.reduce((s, e) => s + (e.amount || 0), 0);
+      tbody.innerHTML = list.map(e => {
+        const itemLabel = e.item || e.desc || '-';
+        const qtyLabel = e.qty || 1;
+        const unitPriceVal = e.unitPrice || e.amount || 0;
+        return `
+          <tr style="border-bottom:1px solid var(--border-hairline);font-size:12px;">
+            <td style="padding:8px 10px;font-family:monospace;">${e.time || '-'}</td>
+            <td style="padding:8px 10px;font-weight:700;color:var(--ink-espresso);">${itemLabel}</td>
+            <td style="padding:8px 10px;text-align:center;font-family:monospace;font-weight:700;">${qtyLabel}</td>
+            <td style="padding:8px 10px;text-align:right;font-family:monospace;">${rp(unitPriceVal)}</td>
+            <td style="padding:8px 10px;text-align:right;font-family:monospace;font-weight:800;color:#C2410C;">${rp(e.amount)}</td>
+            <td style="padding:8px 10px;text-align:center;">
+              <button type="button" onclick="deleteCashierExpense('${e.id}')" style="background:#FEE2E2;border:none;color:#991B1B;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:10.5px;font-weight:700;">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('') + `
+        <tr style="background:var(--bg-oat);font-weight:800;font-size:12px;border-top:2px solid var(--border-hairline);">
+          <td colspan="4" style="padding:9px 10px;">TOTAL PENGELUARAN</td>
+          <td style="padding:9px 10px;text-align:right;font-family:monospace;color:#C2410C;">${rp(total)}</td>
+          <td></td>
+        </tr>
+      `;
+    }
+
+    function deleteCashierExpense(expId) {
+      dailyExpenses = dailyExpenses.filter(e => e.id !== expId);
+      saveExpensesState();
+      renderCashierExpenseList();
+      renderOwnerHub();
+      showToast('Catatan pengeluaran dihapus.');
+    }
+
     function deleteExpense(expId) {
       dailyExpenses = dailyExpenses.filter(e => e.id !== expId);
+      saveExpensesState();
       showToast('Catatan pengeluaran dihapus.');
       renderOwnerHub();
     }
