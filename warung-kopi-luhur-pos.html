@@ -780,12 +780,84 @@
     }
 
     .cart-crm {
-      padding: 12px 16px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border-hairline);
       display: flex;
       flex-direction: column;
+      gap: 10px;
+      background: #FFFFFF;
+    }
+
+    .channel-segmented {
+      background: #F1F5F9;
+      border-radius: 12px;
+      padding: 3px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 2px;
+    }
+    .channel-seg-btn {
+      border: none;
+      background: transparent;
+      color: #475569;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 6px 3px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.15;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .channel-seg-btn small {
+      font-size: 8.5px;
+      font-weight: 600;
+      opacity: 0.78;
+    }
+    .channel-seg-btn.active {
+      background: var(--navy-900);
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(11, 29, 57, 0.22);
+    }
+
+    .cart-action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      background: var(--bg-oat);
+    }
+    .cart-action-pill {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 11px;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink-espresso);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      font-family: inherit;
+      box-shadow: 0 1px 2px rgba(15,23,42,0.03);
+    }
+    .cart-action-pill:hover {
+      border-color: #CBD5E1;
+      background: #F8FAFC;
+    }
+    .cart-auto-chip {
+      background: #F1F5F9;
+      color: #475569;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-size: 9.5px;
+      font-weight: 700;
+      margin-left: 4px;
     }
 
     .input-row {
@@ -901,10 +973,11 @@
     .cart-items {
       flex: 1;
       overflow-y: auto;
-      padding: 12px 16px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      background: #F8FAFC;
     }
 
     .cart-row {
@@ -1596,116 +1669,126 @@
               <button type="button" class="btn-dark" style="background:rgba(0,0,0,0.25);padding:5px 12px;font-size:11px;border-radius:999px;" onclick="toggleMobileCart(false)">✕ Tambah Menu</button>
             </div>
             <div class="cart-crm">
-              <div class="input-row">
-                <input type="tel" class="field" id="custPhone" placeholder="No. HP / WhatsApp Pelanggan..." value="" oninput="onCustPhoneInput(this.value)" />
-                <button class="btn-dark" onclick="lookupCustomer()">Cek</button>
-              </div>
-
-              <!-- VISUAL DIGITAL LOYALTY CARD -->
-              <div id="loyaltyCardWidget" class="loyalty-card-box is-collapsed">
-                <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleLoyaltyWidget()" title="Klik untuk tampilkan / sembunyikan kartu stamp">
-                  <div>
-                    <div style="font-size:9px;letter-spacing:0.8px;font-weight:800;color:var(--ink-muted);">LOYALTY • <span id="loyaltyCustName" style="color:var(--ink-espresso);">Belum Ada Member</span></div>
-                    <div id="loyaltyProgressText" style="font-size:10px;font-weight:700;color:#BC012E;">Input No. HP lalu klik Cek (0 / 10 Stamp)</div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:4px;">
-                    <span class="badge-sky" id="loyaltyCustVisits" style="font-size:9.5px;">0x</span>
-                    <span id="loyaltyToggleIcon" style="font-size:10px;color:var(--ink-muted);font-weight:800;">▼</span>
-                  </div>
-                </div>
-                
-                <!-- 7 Visual Stamp Circles (collapsible) -->
-                <div id="loyaltyStampBody" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-hairline);">
-                  <div class="stamp-grid" id="stampSlotsContainer"></div>
-                  <div style="display:flex;justify-content:flex-end;margin-top:4px;">
-                    <button class="btn-claim-reward" id="btnClaimReward" onclick="claimFreeDrinkReward()">🎁 Klaim Minuman Gratis</button>
-                  </div>
-                </div>
-              </div>
-
               <!-- Channel & Order Type Selector -->
-              <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
-                <button type="button" class="cat-pill active" id="channelDineIn" style="font-size:10px;padding:3px 8px;" onclick="setChannelOrder('DINE_IN')">🍽️ Dine-In</button>
-                <button type="button" class="cat-pill" id="channelTakeaway" style="font-size:10px;padding:3px 8px;" onclick="setChannelOrder('TAKEAWAY')">🥡 Takeaway</button>
-                <button type="button" class="cat-pill" id="channelGoFood" style="font-size:10px;padding:3px 8px;" onclick="setChannelOrder('GOFOOD')">🛵 GoFood (+20%)</button>
-                <button type="button" class="cat-pill" id="channelGrabFood" style="font-size:10px;padding:3px 8px;" onclick="setChannelOrder('GRABFOOD')">🛵 Grab (+20%)</button>
-                <button type="button" class="cat-pill" id="channelShopee" style="font-size:10px;padding:3px 8px;" onclick="setChannelOrder('SHOPEEFOOD')">🛵 Shopee (+20%)</button>
+              <div class="channel-segmented">
+                <button type="button" class="channel-seg-btn active" id="channelDineIn" onclick="setChannelOrder('DINE_IN')">Dine In</button>
+                <button type="button" class="channel-seg-btn" id="channelTakeaway" onclick="setChannelOrder('TAKEAWAY')">Takeaway</button>
+                <button type="button" class="channel-seg-btn" id="channelGoFood" onclick="setChannelOrder('GOFOOD')">GoFood<small>+20%</small></button>
+                <button type="button" class="channel-seg-btn" id="channelGrabFood" onclick="setChannelOrder('GRABFOOD')">Grab<small>+20%</small></button>
+                <button type="button" class="channel-seg-btn" id="channelShopee" onclick="setChannelOrder('SHOPEEFOOD')">Shopee<small>+20%</small></button>
               </div>
 
-              <div style="display:flex;gap:6px;align-items:center;">
-                <input type="text" class="field" id="tableNameInput" placeholder="No. Meja / Nama Pemesan (Contoh: Meja 03 - Budi)" style="flex:1;" />
-                <select class="field" id="cartTableQuickSelect" style="width:125px;font-size:11px;padding:8px 6px;font-weight:700;border-radius:10px;" onchange="onCartTableQuickSelect(this.value)">
-                  <option value="">Pilih Meja...</option>
+              <!-- 2 Pill Actions: + Member / WA & Meja: Pilih -->
+              <div class="cart-action-row">
+                <button type="button" class="cart-action-pill" id="cartMemberToggleBtn" onclick="const d=document.getElementById('memberCrmDrawer');d.style.display=d.style.display==='none'?'flex':'none';if(d.style.display==='flex')document.getElementById('custPhone')?.focus();">
+                  <span style="color:#DC2626;font-size:13px;">👤+</span>
+                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">+ Member / WA</span>
+                </button>
+                <select class="cart-action-pill" id="cartTableQuickSelect" onchange="onCartTableQuickSelect(this.value)" title="Pilih Meja">
+                  <option value="">🪑 Meja: Pilih</option>
                 </select>
+              </div>
+
+              <!-- Collapsible Member / WA & Custom Table Drawer -->
+              <div id="memberCrmDrawer" style="display:none;flex-direction:column;gap:8px;padding-top:4px;border-top:1px dashed var(--border-hairline);">
+                <div class="input-row">
+                  <input type="tel" class="field" id="custPhone" placeholder="No. HP / WhatsApp Pelanggan..." value="" oninput="onCustPhoneInput(this.value)" />
+                  <button class="btn-dark" onclick="lookupCustomer()">Cek</button>
+                </div>
+
+                <!-- VISUAL DIGITAL LOYALTY CARD -->
+                <div id="loyaltyCardWidget" class="loyalty-card-box is-collapsed">
+                  <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleLoyaltyWidget()" title="Klik untuk tampilkan / sembunyikan kartu stamp">
+                    <div>
+                      <div style="font-size:9px;letter-spacing:0.8px;font-weight:800;color:var(--ink-muted);">LOYALTY • <span id="loyaltyCustName" style="color:var(--ink-espresso);">Belum Ada Member</span></div>
+                      <div id="loyaltyProgressText" style="font-size:10px;font-weight:700;color:#BC012E;">Input No. HP lalu klik Cek (0 / 10 Stamp)</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;">
+                      <span class="badge-sky" id="loyaltyCustVisits" style="font-size:9.5px;">0x</span>
+                      <span id="loyaltyToggleIcon" style="font-size:10px;color:var(--ink-muted);font-weight:800;">▼</span>
+                    </div>
+                  </div>
+                  
+                  <!-- 7 Visual Stamp Circles (collapsible) -->
+                  <div id="loyaltyStampBody" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-hairline);">
+                    <div class="stamp-grid" id="stampSlotsContainer"></div>
+                    <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                      <button class="btn-claim-reward" id="btnClaimReward" onclick="claimFreeDrinkReward()">🎁 Klaim Minuman Gratis</button>
+                    </div>
+                  </div>
+                </div>
+
+                <input type="text" class="field" id="tableNameInput" placeholder="Catatan Meja / Nama Pemesan (Opsional)" />
               </div>
             </div>
 
             <div class="cart-items" id="cartItems"></div>
 
-            <div class="cart-footer">
-              <!-- Surcharges & Diskon Controls -->
-              <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:8px;padding:8px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px;">
+            <div class="cart-footer" style="background:#FFFFFF;padding:12px 14px;border-top:1px solid var(--border-hairline);">
+              <!-- Clean Rincian Biaya -->
+              <div style="font-size:11.5px;color:#475569;display:flex;flex-direction:column;gap:7px;margin-bottom:10px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span style="font-size:11px;font-weight:700;color:var(--ink-muted);">🏷️ Diskon / Promo:</span>
-                  <select class="field" id="cartDiscountSelect" style="font-size:11px;padding:3px 6px;width:150px;border-radius:6px;" onchange="onCartDiscountChange(this.value)">
-                    <option value="NONE">Tanpa Diskon (0%)</option>
-                    <option value="MEMBER_10">Member Toko (10%)</option>
-                    <option value="STAMP_FREE">Reward Buy 10 (Free 1 Kopi)</option>
-                    <option value="VOUCHER_5K">Voucher Rp 5.000</option>
-                    <option value="VOUCHER_10K">Voucher Rp 10.000</option>
-                    <option value="CUSTOM">Custom Nominal...</option>
-                  </select>
+                  <span>Subtotal (<span id="cartCount">0 item</span>)</span>
+                  <span id="cartRawSubtotal" style="font-weight:700;color:#0F172A;">Rp 0</span>
                 </div>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px dashed var(--border-hairline);">
-                  <label style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;color:var(--ink-muted);cursor:not-allowed;" title="Biaya layanan otomatis Rp 1.000 per transaksi dan tidak dapat diubah">
-                    <input type="checkbox" id="cartServiceFeeToggle" checked disabled style="accent-color:#0F2442;cursor:not-allowed;" />
-                    Biaya Layanan (Tetap Rp 1.000)
+
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                  <div style="display:flex;align-items:center;gap:5px;min-width:0;">
+                    <span style="color:#DC2626;">🏷️</span>
+                    <select id="cartDiscountSelect" onchange="onCartDiscountChange(this.value)" style="border:none;background:transparent;color:#DC2626;font-size:11.5px;font-weight:700;cursor:pointer;outline:none;padding:0;max-width:170px;font-family:inherit;">
+                      <option value="NONE">Tambah Promo (0%)</option>
+                      <option value="MEMBER_10">Member Toko (10%)</option>
+                      <option value="STAMP_FREE">Reward Buy 10 (Free 1 Kopi)</option>
+                      <option value="VOUCHER_5K">Voucher Rp 5.000</option>
+                      <option value="VOUCHER_10K">Voucher Rp 10.000</option>
+                      <option value="CUSTOM">Custom Nominal...</option>
+                    </select>
+                  </div>
+                  <div id="cartDiscountRow" style="display:flex;align-items:center;">
+                    <span id="cartDiscountAmt" style="font-weight:700;color:#15803D;">Rp 0</span>
+                  </div>
+                </div>
+
+                <div id="cartServiceRow" style="display:flex;justify-content:space-between;align-items:center;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#16A34A;display:inline-block;"></span>
+                    <input type="checkbox" id="cartServiceFeeToggle" checked disabled style="display:none;" />
+                    <span>Biaya Layanan (Tetap)</span>
+                    <span class="cart-auto-chip">Auto</span>
+                  </div>
+                  <span id="cartServiceAmt" style="font-weight:700;color:#0F172A;">Rp 0</span>
+                </div>
+
+                <div id="cartPlatformRow" style="display:none;justify-content:space-between;align-items:center;color:#D97706;">
+                  <span id="cartPlatformLabel">Platform Fee (20%)</span>
+                  <span id="cartPlatformAmt" style="font-weight:700;">+Rp 0</span>
+                </div>
+
+                <div id="cartPpnRow" style="display:flex;justify-content:space-between;align-items:center;">
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#16A34A;display:inline-block;"></span>
+                    <input type="checkbox" id="cartPpnToggle" onchange="togglePpn(this.checked)" style="accent-color:#0B1D39;width:13px;height:13px;cursor:pointer;" />
+                    <span>PPN PB1 (10%)</span>
                   </label>
-                  <label style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                    <input type="checkbox" id="cartPpnToggle" onchange="togglePpn(this.checked)" />
-                    PPN PB1 (10%)
-                  </label>
+                  <span id="cartPpnAmt" style="font-weight:700;color:#0F172A;">Rp 0</span>
                 </div>
               </div>
 
-              <!-- Rincian Biaya -->
-              <div style="font-size:11px;color:var(--ink-muted);display:flex;flex-direction:column;gap:3px;margin-bottom:6px;">
-                <div style="display:flex;justify-content:space-between;">
-                  <span>Subtotal Item (<span id="cartCount">0 item</span>):</span>
-                  <span id="cartRawSubtotal" style="font-family:monospace;font-weight:700;">Rp 0</span>
-                </div>
-                <div id="cartDiscountRow" style="display:none;justify-content:space-between;color:#15803D;">
-                  <span>Diskon Promo:</span>
-                  <span id="cartDiscountAmt" style="font-family:monospace;font-weight:700;">-Rp 0</span>
-                </div>
-                <div id="cartServiceRow" style="display:none;justify-content:space-between;color:var(--ink-espresso);">
-                  <span>Biaya Layanan (Otomatis):</span>
-                  <span id="cartServiceAmt" style="font-family:monospace;font-weight:700;">+Rp 1.000</span>
-                </div>
-                <div id="cartPlatformRow" style="display:none;justify-content:space-between;color:#D97706;">
-                  <span id="cartPlatformLabel">Platform Fee (20%):</span>
-                  <span id="cartPlatformAmt" style="font-family:monospace;font-weight:700;">+Rp 0</span>
-                </div>
-                <div id="cartPpnRow" style="display:none;justify-content:space-between;color:var(--ink-espresso);">
-                  <span>PPN Restoran PB1 (10%):</span>
-                  <span id="cartPpnAmt" style="font-family:monospace;font-weight:700;">+Rp 0</span>
-                </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border-hairline);padding-top:10px;">
+                <span style="font-weight:800;font-size:11px;letter-spacing:0.6px;color:#64748B;">TOTAL TAGIHAN</span>
+                <span style="font-weight:800;font-size:22px;color:#0B1D39;" id="cartTotal">Rp 0</span>
               </div>
 
-              <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border-hairline);padding-top:6px;">
-                <span class="serif" style="font-weight:700;font-size:16px;">Total Tagihan:</span>
-                <span style="font-weight:800;font-size:22px;color:var(--ink-espresso);" id="cartTotal">Rp 0</span>
-              </div>
-
-              <!-- Tombol Aksi: Simpan Open Bill & Bayar Sekarang -->
-              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-top:8px;">
-                <button type="button" class="btn-dark" id="btnSaveOpenBill" disabled style="background:#FFFFFF;color:#0F172A;padding:12px;font-size:12px;font-weight:700;border-radius:10px;cursor:pointer;border:1.5px solid #CBD5E1;" onclick="saveOpenBill()">
+              <!-- Tombol Aksi: Open Bill & Bayar Sekarang -->
+              <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:8px;margin-top:10px;">
+                <button type="button" class="btn-dark" id="btnSaveOpenBill" disabled style="background:#FFFFFF;color:#0F172A;padding:11px;font-size:12px;font-weight:700;border-radius:11px;cursor:pointer;border:1.5px solid #CBD5E1;" onclick="saveOpenBill()">
                   📑 Open Bill
                 </button>
-                <button type="button" class="btn-pay" id="btnPayNow" disabled onclick="openPaymentModal()" style="padding:12px;font-size:13px;border-radius:10px;">
+                <button type="button" class="btn-pay" id="btnPayNow" disabled onclick="openPaymentModal()" style="padding:11px;font-size:12.5px;border-radius:11px;">
                   💳 BAYAR SEKARANG
                 </button>
               </div>
+              <div style="text-align:center;font-size:10px;color:#94A3B8;margin-top:8px;">Warung Kopi Luhur • POS &amp; CRM</div>
             </div>
           </aside>
         </div>
@@ -6010,10 +6093,10 @@
         countEl.textContent = '0 item';
         totalEl.textContent = 'Rp 0';
         if (rawSubtotalEl) rawSubtotalEl.textContent = 'Rp 0';
-        if (discountRow) discountRow.style.display = 'none';
-        if (serviceRow) serviceRow.style.display = 'none';
+        if (discountAmtEl) discountAmtEl.textContent = 'Rp 0';
+        if (serviceAmtEl) serviceAmtEl.textContent = 'Rp 0';
         if (platformRow) platformRow.style.display = 'none';
-        if (ppnRow) ppnRow.style.display = 'none';
+        if (ppnAmtEl) ppnAmtEl.textContent = 'Rp 0';
         if (btnPay) btnPay.disabled = true;
         if (btnSaveTab) btnSaveTab.disabled = true;
         const mobCount = document.getElementById('mobileCartCount');
@@ -6036,21 +6119,13 @@
       if (rawSubtotalEl) rawSubtotalEl.textContent = rp(bill.rawSubtotal);
 
       if (discountRow && discountAmtEl) {
-        if (bill.discountAmt > 0) {
-          discountRow.style.display = 'flex';
-          discountAmtEl.textContent = `-${rp(bill.discountAmt)}`;
-        } else {
-          discountRow.style.display = 'none';
-        }
+        discountRow.style.display = 'flex';
+        discountAmtEl.textContent = bill.discountAmt > 0 ? `-${rp(bill.discountAmt)}` : 'Rp 0';
       }
 
       if (serviceRow && serviceAmtEl) {
-        if (bill.serviceAmt > 0) {
-          serviceRow.style.display = 'flex';
-          serviceAmtEl.textContent = `+${rp(bill.serviceAmt)}`;
-        } else {
-          serviceRow.style.display = 'none';
-        }
+        serviceRow.style.display = 'flex';
+        serviceAmtEl.textContent = bill.serviceAmt > 0 ? `+${rp(bill.serviceAmt)}` : 'Rp 0';
       }
 
       if (platformRow && platformAmtEl) {
@@ -6064,12 +6139,8 @@
       }
 
       if (ppnRow && ppnAmtEl) {
-        if (bill.ppnAmt > 0) {
-          ppnRow.style.display = 'flex';
-          ppnAmtEl.textContent = `+${rp(bill.ppnAmt)}`;
-        } else {
-          ppnRow.style.display = 'none';
-        }
+        ppnRow.style.display = 'flex';
+        ppnAmtEl.textContent = bill.ppnAmt > 0 ? `+${rp(bill.ppnAmt)}` : 'Rp 0';
       }
 
       container.innerHTML = cart.map((it, idx) => {
