@@ -1875,6 +1875,7 @@
             </div>
             <div style="display:flex;gap:8px;">
               <button class="btn-dark" style="padding:9px 14px;font-size:12px;background:#7E22CE;color:#FFF;border:none;" onclick="openMasterHppModal()">📦 Master Data HPP</button>
+              <button class="btn-dark" style="padding:9px 14px;font-size:12px;background:#0F2442;color:#FFF;border:none;" onclick="openMasterPackagingModal()">🛍️ Master Kemasan</button>
               <button class="btn-dark" style="padding:9px 14px;font-size:12px;" onclick="openRestockModal()">+ Restock Bahan</button>
               <button class="btn-pay" style="width:auto;padding:9px 18px;font-size:12px;" onclick="saveStockOpname()">💾 Simpan Rekonsiliasi Opname</button>
             </div>
@@ -1983,6 +1984,9 @@
               <p style="font-size:12px;color:var(--ink-muted);margin-top:4px;">Kelola seluruh varian menu kedai, daftarkan menu baru lengkap dengan HPP &amp; Harga Jual, tentukan stasiun KDS (Barista/Kitchen), serta pantau margin keuntungan.</p>
             </div>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <button class="btn-dark" style="background:var(--bg-oat);color:var(--ink-espresso);border:1px solid var(--border-hairline);padding:10px 18px;font-size:13px;border-radius:999px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="openMasterPackagingModal()">
+                🛍️ Master Kemasan
+              </button>
               <button class="btn-dark" style="background:var(--bg-oat);color:var(--ink-espresso);border:1px solid var(--border-hairline);padding:10px 18px;font-size:13px;border-radius:999px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="openManageCategoriesModal()">
                 🏷️ Kelola &amp; Edit Kategori
               </button>
@@ -3333,6 +3337,69 @@
     </div>
   </div>
 
+  <!-- MODAL: MASTER KEMASAN / PACKAGING -->
+  <div class="modal-backdrop" id="masterPackagingModal">
+    <div class="modal-box" style="max-width:740px;padding:24px;max-height:90vh;overflow-y:auto;display:block;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;">
+        <div>
+          <h3 class="serif" style="font-size:19px;margin:0;">🛍️ Master Data Kemasan / Packaging Takeaway</h3>
+          <p style="font-size:11.5px;color:var(--ink-muted);margin:3px 0 0;">Tambah, ubah harga, atau hapus item kemasan. Otomatis tampil di pilihan Kemasan saat Buat / Edit Menu.</p>
+        </div>
+        <button type="button" onclick="closeModal('masterPackagingModal')" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="background:var(--bg-oat);padding:14px;border-radius:12px;border:1px solid var(--border-hairline);margin-bottom:16px;">
+        <h4 style="font-size:12px;margin:0 0 8px;color:var(--ink-espresso);" id="masterPkgFormTitle">Tambah Kemasan Baru</h4>
+        <div style="display:grid;grid-template-columns:1.5fr 0.8fr 1fr 1.1fr auto;gap:8px;align-items:flex-end;">
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);">Nama Kemasan:</label>
+            <input type="text" class="field" id="pkgFormName" placeholder="Contoh: Cup 16oz + Lid" style="width:100%;margin-top:2px;" />
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);">Satuan:</label>
+            <select class="field" id="pkgFormUnit" style="width:100%;margin-top:2px;">
+              <option value="pcs">pcs</option>
+              <option value="set">set</option>
+              <option value="lembar">lembar</option>
+              <option value="pack">pack</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);">Harga Modal (Rp):</label>
+            <input type="number" class="field" id="pkgFormCost" placeholder="740" min="0" style="width:100%;margin-top:2px;" />
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);">Default Untuk:</label>
+            <select class="field" id="pkgFormDefault" style="width:100%;margin-top:2px;">
+              <option value="drink">Minuman</option>
+              <option value="food">Makanan / Cuanki</option>
+              <option value="none">Tidak Otomatis</option>
+            </select>
+          </div>
+          <div>
+            <button type="button" class="btn-pay" style="width:auto;padding:9px 14px;font-size:11.5px;border-radius:8px;" onclick="saveMasterPackaging()">💾 Simpan</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;border:1px solid var(--border-hairline);border-radius:10px;">
+        <table class="pnl-table" style="margin:0;">
+          <thead>
+            <tr>
+              <th style="width:36px;">No</th>
+              <th>Nama Kemasan</th>
+              <th>Satuan</th>
+              <th style="text-align:right;">Harga Modal</th>
+              <th>Default</th>
+              <th style="text-align:right;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="masterPackagingTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: LOGIN PORTAL (ROLE-BASED AUTH) -->
   <div class="modal-backdrop open" id="loginPortalModal">
     <div class="modal-box" style="max-width:440px;padding:28px 24px;box-shadow: 0 25px 60px rgba(36,28,22,0.4);max-height:90vh;overflow-y:auto;">
@@ -3941,54 +4008,12 @@
         <!-- Section 4: Kemasan & Packaging Takeaway -->
         <div style="background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:12px;padding:14px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap;">
             <span style="font-size:11.5px;font-weight:800;color:var(--ink-espresso);text-transform:uppercase;letter-spacing:0.5px;">3. Kemasan / Packaging Take Away</span>
-            <span style="font-size:10.5px;color:var(--ink-muted);">Biaya cup, tutup sealer, sedotan &amp; kantong plastik takeaway</span>
+            <button type="button" onclick="openMasterPackagingModal()" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">⚙️ Input / Edit Master Kemasan</button>
           </div>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;">
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="newPkgPlastik" checked onchange="recalcRecipeHpp(false)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Plastik Take away</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 100</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="newPkgSealer" checked onchange="recalcRecipeHpp(false)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Sealer Cup</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 50</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="newPkgStraw" checked onchange="recalcRecipeHpp(false)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Sedotan Steril</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 100</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="newPkgCup" checked onchange="recalcRecipeHpp(false)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Cup Luhur</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 740</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="newPkgCuankiCup" onchange="recalcRecipeHpp(false)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Cup + Sendok Cuanki</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 set @ Rp 1.600</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="newPkgCuankiPlastik" onchange="recalcRecipeHpp(false)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Plastik + Kresek Cuanki</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 set @ Rp 700</div>
-              </div>
-            </label>
-          </div>
+          <div id="newPackagingGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;"></div>
           <div style="text-align:right;margin-top:6px;font-size:11px;color:var(--ink-muted);">
             Subtotal Kemasan Takeaway: <strong id="newRecipePkgSubtotal" style="font-family:monospace;color:var(--ink-espresso);">Rp 990</strong>
           </div>
@@ -4165,54 +4190,12 @@
         <!-- Section 4: Kemasan & Packaging Takeaway (Edit) -->
         <div style="background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:12px;padding:14px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap;">
             <span style="font-size:11.5px;font-weight:800;color:var(--ink-espresso);text-transform:uppercase;letter-spacing:0.5px;">3. Kemasan / Packaging Take Away</span>
-            <span style="font-size:10.5px;color:var(--ink-muted);">Biaya cup, tutup sealer, sedotan &amp; kantong plastik takeaway</span>
+            <button type="button" onclick="openMasterPackagingModal()" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:700;cursor:pointer;">⚙️ Input / Edit Master Kemasan</button>
           </div>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;">
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="editPkgPlastik" checked onchange="recalcRecipeHpp(true)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Plastik Take away</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 100</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="editPkgSealer" checked onchange="recalcRecipeHpp(true)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Sealer Cup</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 50</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="editPkgStraw" checked onchange="recalcRecipeHpp(true)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Sedotan Steril</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 100</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="editPkgCup" checked onchange="recalcRecipeHpp(true)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Cup Luhur</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 pcs @ Rp 740</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="editPkgCuankiCup" onchange="recalcRecipeHpp(true)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Cup + Sendok Cuanki</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 set @ Rp 1.600</div>
-              </div>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
-              <input type="checkbox" id="editPkgCuankiPlastik" onchange="recalcRecipeHpp(true)" />
-              <div style="font-size:11px;">
-                <div style="font-weight:700;">Plastik + Kresek Cuanki</div>
-                <div style="color:var(--ink-muted);font-size:10px;">1 set @ Rp 700</div>
-              </div>
-            </label>
-          </div>
+          <div id="editPackagingGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;"></div>
           <div style="text-align:right;margin-top:6px;font-size:11px;color:var(--ink-muted);">
             Subtotal Kemasan Takeaway: <strong id="editRecipePkgSubtotal" style="font-family:monospace;color:var(--ink-espresso);">Rp 990</strong>
           </div>
@@ -5042,6 +5025,13 @@
           MASTER_RAW_MATERIALS = d.materials;
           localStorage.setItem('wkl_master_raw_materials', JSON.stringify(MASTER_RAW_MATERIALS));
           renderMasterMaterialsTable();
+        }
+        if (Array.isArray(d.packaging) && d.packaging.length > 0) {
+          MASTER_PACKAGING = d.packaging;
+          localStorage.setItem('wkl_master_packaging_v1', JSON.stringify(MASTER_PACKAGING));
+          renderMasterPackagingTable();
+          if (document.getElementById('addMenuModal')?.classList.contains('open')) renderPackagingCheckboxes(false);
+          if (document.getElementById('editMenuModal')?.classList.contains('open')) renderPackagingCheckboxes(true);
         }
 
         if (document.getElementById('view-users')?.classList.contains('active')) renderUserManagement();
@@ -7079,14 +7069,14 @@
       const ingSubtotalEl = document.getElementById(prefix + 'RecipeIngSubtotal');
       if (ingSubtotalEl) ingSubtotalEl.textContent = rp(Math.round(ingSubtotal));
 
-      // Calculate Packaging
+      // Calculate Packaging dynamically from Master Kemasan checkboxes
       let pkgCost = 0;
-      if (document.getElementById(prefix + 'PkgPlastik')?.checked) pkgCost += 100;
-      if (document.getElementById(prefix + 'PkgSealer')?.checked) pkgCost += 50;
-      if (document.getElementById(prefix + 'PkgStraw')?.checked) pkgCost += 100;
-      if (document.getElementById(prefix + 'PkgCup')?.checked) pkgCost += 740;
-      if (document.getElementById(prefix + 'PkgCuankiCup')?.checked) pkgCost += 1600;
-      if (document.getElementById(prefix + 'PkgCuankiPlastik')?.checked) pkgCost += 700;
+      const pkgGrid = document.getElementById(prefix + 'PackagingGrid');
+      if (pkgGrid) {
+        pkgGrid.querySelectorAll('.pkg-checkbox:checked').forEach(cb => {
+          pkgCost += Number(cb.dataset.cost || 0);
+        });
+      }
 
       const pkgSubtotalEl = document.getElementById(prefix + 'RecipePkgSubtotal');
       if (pkgSubtotalEl) pkgSubtotalEl.textContent = rp(pkgCost);
@@ -7206,12 +7196,20 @@
       }
 
       const packaging = [];
-      if (document.getElementById(prefix + 'PkgPlastik')?.checked) packaging.push({ name: 'Plastik Take away', qty: 1, unitCost: 100, cost: 100 });
-      if (document.getElementById(prefix + 'PkgSealer')?.checked) packaging.push({ name: 'Sealer Cup', qty: 1, unitCost: 50, cost: 50 });
-      if (document.getElementById(prefix + 'PkgStraw')?.checked) packaging.push({ name: 'Sedotan Steril', qty: 1, unitCost: 100, cost: 100 });
-      if (document.getElementById(prefix + 'PkgCup')?.checked) packaging.push({ name: 'Cup Luhur', qty: 1, unitCost: 740, cost: 740 });
-      if (document.getElementById(prefix + 'PkgCuankiCup')?.checked) packaging.push({ name: 'Cup + Sendok Cuanki', qty: 1, unitCost: 1600, cost: 1600 });
-      if (document.getElementById(prefix + 'PkgCuankiPlastik')?.checked) packaging.push({ name: 'Plastik + Kresek Cuanki', qty: 1, unitCost: 700, cost: 700 });
+      const pkgGrid = document.getElementById(prefix + 'PackagingGrid');
+      if (pkgGrid) {
+        pkgGrid.querySelectorAll('.pkg-checkbox:checked').forEach(cb => {
+          const unitCost = Number(cb.dataset.cost || 0);
+          packaging.push({
+            id: cb.dataset.pkgId || '',
+            name: cb.dataset.name || 'Kemasan',
+            qty: 1,
+            unit: cb.dataset.unit || 'pcs',
+            unitCost,
+            cost: unitCost
+          });
+        });
+      }
 
       return { ingredients, packaging };
     }
@@ -7232,23 +7230,9 @@
         if (cat === '__CUSTOM__') document.getElementById('newMenuCustomCatInput')?.focus();
       }
       if (cat === '__CUSTOM__') return;
-      if (cat === 'cuanki' || cat === 'penyempurna_cuanki') {
-        stationSel.value = 'KITCHEN';
-        if (document.getElementById('newPkgCuankiCup')) document.getElementById('newPkgCuankiCup').checked = true;
-        if (document.getElementById('newPkgCuankiPlastik')) document.getElementById('newPkgCuankiPlastik').checked = true;
-        if (document.getElementById('newPkgPlastik')) document.getElementById('newPkgPlastik').checked = false;
-        if (document.getElementById('newPkgSealer')) document.getElementById('newPkgSealer').checked = false;
-        if (document.getElementById('newPkgStraw')) document.getElementById('newPkgStraw').checked = false;
-        if (document.getElementById('newPkgCup')) document.getElementById('newPkgCup').checked = false;
-      } else {
-        stationSel.value = 'BARISTA';
-        if (document.getElementById('newPkgCuankiCup')) document.getElementById('newPkgCuankiCup').checked = false;
-        if (document.getElementById('newPkgCuankiPlastik')) document.getElementById('newPkgCuankiPlastik').checked = false;
-        if (document.getElementById('newPkgPlastik')) document.getElementById('newPkgPlastik').checked = true;
-        if (document.getElementById('newPkgSealer')) document.getElementById('newPkgSealer').checked = true;
-        if (document.getElementById('newPkgStraw')) document.getElementById('newPkgStraw').checked = true;
-        if (document.getElementById('newPkgCup')) document.getElementById('newPkgCup').checked = true;
-      }
+      const isFood = (cat === 'cuanki' || cat === 'penyempurna_cuanki');
+      stationSel.value = isFood ? 'KITCHEN' : 'BARISTA';
+      renderPackagingCheckboxes(false, isFood ? 'food' : 'drink');
       recalcRecipeHpp(false);
     }
 
@@ -7750,14 +7734,12 @@
         }
       }
 
-      // Packaging checkboxes
+      // Packaging checkboxes (from Master Kemasan)
       const isCuanki = p.cat === 'cuanki' || p.type === 'food';
-      document.getElementById('editPkgPlastik').checked = !isCuanki;
-      document.getElementById('editPkgSealer').checked = !isCuanki;
-      document.getElementById('editPkgStraw').checked = !isCuanki;
-      document.getElementById('editPkgCup').checked = !isCuanki;
-      document.getElementById('editPkgCuankiCup').checked = isCuanki;
-      document.getElementById('editPkgCuankiPlastik').checked = isCuanki;
+      const savedPkgNames = Array.isArray(p.packaging) && p.packaging.length > 0
+        ? p.packaging.map(x => x.name)
+        : null;
+      renderPackagingCheckboxes(true, savedPkgNames || (isCuanki ? 'food' : 'drink'));
 
       recalcRecipeHpp(true);
       document.getElementById('editMenuModal').classList.add('open');
@@ -10695,6 +10677,177 @@
 
       closeModal('userProfileModal');
       showToast(wantsPwdChange ? '✅ Foto profil & password berhasil diperbarui!' : '✅ Profil berhasil diperbarui!');
+    }
+
+    // ==========================================
+    // MASTER KEMASAN / PACKAGING TAKEAWAY
+    // ==========================================
+    const DEFAULT_MASTER_PACKAGING = [
+      { id: 'pkg-plastik', name: 'Plastik Take away', unit: 'pcs', unitCost: 100, defaultFor: 'drink' },
+      { id: 'pkg-sealer', name: 'Sealer Cup', unit: 'pcs', unitCost: 50, defaultFor: 'drink' },
+      { id: 'pkg-straw', name: 'Sedotan Steril', unit: 'pcs', unitCost: 100, defaultFor: 'drink' },
+      { id: 'pkg-cup', name: 'Cup Luhur', unit: 'pcs', unitCost: 740, defaultFor: 'drink' },
+      { id: 'pkg-cuanki-cup', name: 'Cup + Sendok Cuanki', unit: 'set', unitCost: 1600, defaultFor: 'food' },
+      { id: 'pkg-cuanki-plastik', name: 'Plastik + Kresek Cuanki', unit: 'set', unitCost: 700, defaultFor: 'food' }
+    ];
+
+    let MASTER_PACKAGING = (() => {
+      try {
+        const raw = localStorage.getItem('wkl_master_packaging_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return DEFAULT_MASTER_PACKAGING.map(p => ({ ...p }));
+    })();
+
+    let editPkgId = null;
+
+    function saveMasterPackagingState() {
+      try { localStorage.setItem('wkl_master_packaging_v1', JSON.stringify(MASTER_PACKAGING)); } catch (e) {}
+      syncToServer('packaging', MASTER_PACKAGING);
+    }
+
+    function renderPackagingCheckboxes(isEdit, selectedNamesOrMode) {
+      const prefix = isEdit ? 'edit' : 'new';
+      const grid = document.getElementById(prefix + 'PackagingGrid');
+      if (!grid) return;
+
+      let checkedSet = null;
+      let mode = 'drink';
+      if (Array.isArray(selectedNamesOrMode)) {
+        checkedSet = new Set(selectedNamesOrMode.map(n => String(n || '').trim().toLowerCase()));
+      } else if (typeof selectedNamesOrMode === 'string') {
+        mode = selectedNamesOrMode;
+      } else {
+        // Preserve currently checked items if refreshing
+        const cur = Array.from(grid.querySelectorAll('.pkg-checkbox:checked')).map(cb => String(cb.dataset.name || '').trim().toLowerCase());
+        if (cur.length > 0) checkedSet = new Set(cur);
+      }
+
+      grid.innerHTML = MASTER_PACKAGING.map(pkg => {
+        const isChecked = checkedSet
+          ? checkedSet.has(String(pkg.name || '').trim().toLowerCase())
+          : pkg.defaultFor === mode;
+        return `
+          <label style="display:flex;align-items:center;gap:8px;background:var(--bg-oat);padding:8px 12px;border-radius:8px;border:1px solid var(--border-hairline);cursor:pointer;">
+            <input type="checkbox" class="pkg-checkbox" data-pkg-id="${pkg.id}" data-name="${pkg.name.replace(/"/g, '&quot;')}" data-unit="${pkg.unit}" data-cost="${pkg.unitCost}" ${isChecked ? 'checked' : ''} onchange="recalcRecipeHpp(${isEdit})" />
+            <div style="font-size:11px;">
+              <div style="font-weight:700;">${pkg.name}</div>
+              <div style="color:var(--ink-muted);font-size:10px;">1 ${pkg.unit} @ ${rp(pkg.unitCost)}</div>
+            </div>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function openMasterPackagingModal() {
+      if (!currentUser || !hasAnyRole(currentUser, ['SUPERADMIN', 'MANAGER', 'OWNER'])) {
+        showToast('⛔ Hanya Supervisor, Owner, atau Superadmin yang berhak mengelola Master Kemasan!');
+        return;
+      }
+      editPkgId = null;
+      document.getElementById('masterPkgFormTitle').textContent = 'Tambah Kemasan Baru';
+      document.getElementById('pkgFormName').value = '';
+      document.getElementById('pkgFormUnit').value = 'pcs';
+      document.getElementById('pkgFormCost').value = '';
+      document.getElementById('pkgFormDefault').value = 'drink';
+      renderMasterPackagingTable();
+      openModal('masterPackagingModal');
+    }
+
+    function renderMasterPackagingTable() {
+      const tbody = document.getElementById('masterPackagingTableBody');
+      if (!tbody) return;
+      const defaultLabels = { drink: 'Minuman', food: 'Makanan / Cuanki', none: 'Manual' };
+      tbody.innerHTML = MASTER_PACKAGING.map((p, idx) => `
+        <tr style="border-bottom:1px solid var(--border-hairline);font-size:12px;">
+          <td style="padding:8px 10px;">${idx + 1}</td>
+          <td style="padding:8px 10px;font-weight:700;color:var(--ink-espresso);">${p.name}</td>
+          <td style="padding:8px 10px;"><span class="badge-sky" style="font-size:10px;">${p.unit}</span></td>
+          <td style="padding:8px 10px;text-align:right;font-family:monospace;font-weight:800;color:#0284C7;">${rp(p.unitCost)}</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--ink-muted);">${defaultLabels[p.defaultFor] || 'Manual'}</td>
+          <td style="padding:8px 10px;text-align:right;white-space:nowrap;">
+            <button type="button" style="background:#0284C7;color:#FFF;padding:4px 9px;font-size:10.5px;border:none;border-radius:6px;cursor:pointer;margin-right:4px;" onclick="editMasterPackaging('${p.id}')">✏️ Edit</button>
+            <button type="button" style="background:#FEE2E2;color:#991B1B;padding:4px 9px;font-size:10.5px;border:none;border-radius:6px;cursor:pointer;" onclick="deleteMasterPackaging('${p.id}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function saveMasterPackaging() {
+      const name = (document.getElementById('pkgFormName')?.value || '').trim();
+      const unit = document.getElementById('pkgFormUnit')?.value || 'pcs';
+      const unitCost = Number(document.getElementById('pkgFormCost')?.value || 0);
+      const defaultFor = document.getElementById('pkgFormDefault')?.value || 'drink';
+
+      if (!name) return showToast('Nama kemasan tidak boleh kosong!');
+      if (unitCost < 0) return showToast('Harga modal kemasan tidak valid!');
+
+      if (editPkgId) {
+        const pkg = MASTER_PACKAGING.find(p => p.id === editPkgId);
+        if (pkg) {
+          pkg.name = name;
+          pkg.unit = unit;
+          pkg.unitCost = unitCost;
+          pkg.defaultFor = defaultFor;
+        }
+        showToast(`✅ Kemasan "${name}" (${rp(unitCost)}) berhasil diupdate!`);
+      } else {
+        MASTER_PACKAGING.push({
+          id: 'pkg-' + Date.now(),
+          name,
+          unit,
+          unitCost,
+          defaultFor
+        });
+        showToast(`✅ Kemasan baru "${name}" (${rp(unitCost)}) ditambahkan ke Master!`);
+      }
+
+      saveMasterPackagingState();
+      editPkgId = null;
+      document.getElementById('masterPkgFormTitle').textContent = 'Tambah Kemasan Baru';
+      document.getElementById('pkgFormName').value = '';
+      document.getElementById('pkgFormCost').value = '';
+      renderMasterPackagingTable();
+      if (document.getElementById('addMenuModal')?.classList.contains('open')) {
+        renderPackagingCheckboxes(false);
+        recalcRecipeHpp(false);
+      }
+      if (document.getElementById('editMenuModal')?.classList.contains('open')) {
+        renderPackagingCheckboxes(true);
+        recalcRecipeHpp(true);
+      }
+    }
+
+    function editMasterPackaging(id) {
+      const pkg = MASTER_PACKAGING.find(p => p.id === id);
+      if (!pkg) return;
+      editPkgId = pkg.id;
+      document.getElementById('masterPkgFormTitle').textContent = `Edit Kemasan: ${pkg.name}`;
+      document.getElementById('pkgFormName').value = pkg.name;
+      document.getElementById('pkgFormUnit').value = pkg.unit;
+      document.getElementById('pkgFormCost').value = pkg.unitCost;
+      document.getElementById('pkgFormDefault').value = pkg.defaultFor || 'none';
+    }
+
+    function deleteMasterPackaging(id) {
+      const pkg = MASTER_PACKAGING.find(p => p.id === id);
+      if (!pkg) return;
+      if (!confirm(`Hapus kemasan "${pkg.name}" dari Master Kemasan?`)) return;
+      MASTER_PACKAGING = MASTER_PACKAGING.filter(p => p.id !== id);
+      saveMasterPackagingState();
+      renderMasterPackagingTable();
+      if (document.getElementById('addMenuModal')?.classList.contains('open')) {
+        renderPackagingCheckboxes(false);
+        recalcRecipeHpp(false);
+      }
+      if (document.getElementById('editMenuModal')?.classList.contains('open')) {
+        renderPackagingCheckboxes(true);
+        recalcRecipeHpp(true);
+      }
+      showToast('Item kemasan berhasil dihapus dari Master.');
     }
 
     function openFaqGuideModal() {
