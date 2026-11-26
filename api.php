@@ -35,7 +35,9 @@ $allowedKeys = [
     'categories',
     'categoryLabels',
     'materials',
-    'packaging'
+    'packaging',
+    'hppTemplates',
+    'ingredients'
 ];
 
 $action = $_GET['action'] ?? '';

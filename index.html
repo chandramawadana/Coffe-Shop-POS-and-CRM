@@ -1478,6 +1478,9 @@
           <span class="dot-live"></span>
           <span>LAN Ready</span>
         </div>
+        <button type="button" class="pill-status" style="cursor:pointer;background:rgba(59,130,246,0.22);color:#BFDBFE;border-color:rgba(147,197,253,0.4);font-weight:700;" onclick="openFaqGuideModal()" title="Panduan Lengkap &amp; FAQ Cara Pakai POS CRM">
+          📖 Panduan Cara Pakai
+        </button>
         <button class="pill-status" style="cursor:pointer;font-weight:700;" onclick="openShiftModal()" id="shiftHeaderBtn">
           <span id="activeShiftLabel">☀️ Shift Pagi</span>
         </button>
@@ -1647,6 +1650,8 @@
                   <button class="mod-btn" id="mod-pedas-LV3" onclick="setModifier('pedas','LV3')">🌶️ Level 3 (Ekstra)</button>
                 </div>
               </div>
+              <!-- Varian Custom Menu -->
+              <div class="modifier-grid" id="modGridCustomVariants" style="display:none;margin-top:4px;"></div>
             </div>
 
             <div class="menu-scroll">
@@ -1903,7 +1908,7 @@
                     <th>Stok Sistem</th>
                     <th>Batas Kritis (Min)</th>
                     <th>Status Stok</th>
-                    <th>Hasil Timbang Fisik</th>
+                    <th>Input Stok Fisik &amp; Satuan</th>
                     <th>Selisih (Variance)</th>
                   </tr>
                 </thead>
@@ -3400,6 +3405,20 @@
     </div>
   </div>
 
+  <!-- MODAL: KELOLA / EDIT / HAPUS TEMPLATE HPP -->
+  <div class="modal-backdrop" id="manageHppTemplatesModal" style="z-index:1030;">
+    <div class="modal-box" style="max-width:680px;padding:24px;max-height:90vh;overflow-y:auto;display:block;">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;">
+        <div>
+          <h3 class="serif" style="font-size:19px;margin:0;">⚡ Kelola Template Skema HPP</h3>
+          <p style="font-size:11.5px;color:var(--ink-muted);margin:3px 0 0;">Ubah nama/harga/HPP template yang sudah ada atau hapus dari daftar preset cepat.</p>
+        </div>
+        <button type="button" onclick="closeModal('manageHppTemplatesModal')" style="background:none;border:none;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <div id="manageHppTemplatesList" style="display:block;"></div>
+    </div>
+  </div>
+
   <!-- MODAL: LOGIN PORTAL (ROLE-BASED AUTH) -->
   <div class="modal-backdrop open" id="loginPortalModal">
     <div class="modal-box" style="max-width:440px;padding:28px 24px;box-shadow: 0 25px 60px rgba(36,28,22,0.4);max-height:90vh;overflow-y:auto;">
@@ -3939,32 +3958,32 @@
               </select>
             </div>
           </div>
-          <div style="margin-top:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Deskripsi / Komposisi Singkat Produk:</label>
-            <input type="text" class="field" id="newMenuDesc" placeholder="Contoh: Perpaduan espresso pekat dengan sari daun pandan segar dan susu lembut." style="width:100%;margin-top:4px;" />
+          <div style="margin-top:10px;display:grid;grid-template-columns:1.4fr 1fr auto;gap:10px;align-items:end;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Deskripsi / Komposisi Singkat Produk:</label>
+              <input type="text" class="field" id="newMenuDesc" placeholder="Contoh: Perpaduan espresso pekat dengan sari daun pandan segar dan susu lembut." style="width:100%;margin-top:4px;" />
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Varian Menu (Opsional):</label>
+              <input type="text" class="field" id="newMenuVariants" placeholder="cth: Kuah Laksa (+5000), Tomyam (+6000)" style="width:100%;margin-top:4px;" />
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;background:var(--bg-oat);padding:8px 12px;border-radius:10px;border:1px solid var(--border-hairline);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;">
+              <input type="checkbox" id="newMenuInStock" checked />
+              Stok Tersedia
+            </label>
           </div>
         </div>
 
         <!-- Section 2: Preset Template Cepat -->
         <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:12px;padding:12px 14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
             <span style="font-size:11px;font-weight:800;color:var(--ink-espresso);text-transform:uppercase;letter-spacing:0.5px;">⚡ Muat Template Skema HPP Cepat (Buku Resep):</span>
-            <span style="font-size:10px;color:var(--ink-muted);">Klik untuk auto-fill komposisi sesuai formula Excel</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button type="button" class="cat-pill" style="font-size:10.5px;padding:3px 9px;background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;" onclick="saveCurrentAsHppTemplate(false)">💾 Simpan sbg Template</button>
+              <button type="button" class="cat-pill" style="font-size:10.5px;padding:3px 9px;" onclick="openManageHppTemplatesModal()">⚙️ Edit / Hapus Template</button>
+            </div>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('kopi_susu_luhur', false)">☕ Kopi Susu Luhur</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('kopi_susu_mula', false)">☕ Kopi Susu Mula</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('butterscotch', false)">☕ Butterscotch / Regal</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('latte', false)">☕ Latte</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('americano', false)">☕ Americano</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('kopi_apel', false)">🍹 Es Kopi Apel/Berry</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('matcha', false)">🍵 Teh Hijau (Matcha)</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_tanggal_tua', false)">🍲 Cuanki Tanggal Tua</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_icip2', false)">🍲 Cuanki Icip2</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_luhur', false)">🍲 Cuanki Luhur Lengkap</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_duo', false)">🍲 Cuanki Duo (2 CTT)</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEE2E2;color:#991B1B;border-color:#FCA5A5;" onclick="clearHppTable(false)">✕ Kosongkan Tabel</button>
-          </div>
+          <div id="newHppTemplateBar" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
         </div>
 
         <!-- Section 3: Tabel Komposisi Bahan Baku (Excel Sheet Schema) -->
@@ -4123,30 +4142,32 @@
               </select>
             </div>
           </div>
-          <div style="margin-top:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Deskripsi / Komposisi Singkat Produk:</label>
-            <input type="text" class="field" id="editMenuDesc" style="width:100%;margin-top:4px;" />
+          <div style="margin-top:10px;display:grid;grid-template-columns:1.4fr 1fr auto;gap:10px;align-items:end;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Deskripsi / Komposisi Singkat Produk:</label>
+              <input type="text" class="field" id="editMenuDesc" style="width:100%;margin-top:4px;" />
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--ink-muted);">Varian Menu (Opsional):</label>
+              <input type="text" class="field" id="editMenuVariants" placeholder="cth: Less Syrup (+0), Extra Syrup (+3000)" style="width:100%;margin-top:4px;" />
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;background:var(--bg-oat);padding:8px 12px;border-radius:10px;border:1px solid var(--border-hairline);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;">
+              <input type="checkbox" id="editMenuInStock" checked />
+              Stok Tersedia
+            </label>
           </div>
         </div>
 
         <!-- Section 2: Preset Template Cepat (Edit) -->
         <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:12px;padding:12px 14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
             <span style="font-size:11px;font-weight:800;color:var(--ink-espresso);text-transform:uppercase;letter-spacing:0.5px;">⚡ Ganti dengan Template Resep Resmi:</span>
-            <span style="font-size:10px;color:var(--ink-muted);">Gunakan formula standar dari buku resep</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button type="button" class="cat-pill" style="font-size:10.5px;padding:3px 9px;background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;" onclick="saveCurrentAsHppTemplate(true)">💾 Simpan sbg Template</button>
+              <button type="button" class="cat-pill" style="font-size:10.5px;padding:3px 9px;" onclick="openManageHppTemplatesModal()">⚙️ Edit / Hapus Template</button>
+            </div>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('kopi_susu_luhur', true)">☕ Kopi Susu Luhur</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('kopi_susu_mula', true)">☕ Kopi Susu Mula</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('butterscotch', true)">☕ Butterscotch / Regal</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('latte', true)">☕ Latte</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;" onclick="applyHppTemplate('americano', true)">☕ Americano</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_tanggal_tua', true)">🍲 Cuanki Tanggal Tua</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_icip2', true)">🍲 Cuanki Icip2</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_luhur', true)">🍲 Cuanki Luhur Lengkap</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEF3C7;color:#92400E;border-color:#F59E0B;" onclick="applyHppTemplate('cuanki_duo', true)">🍲 Cuanki Duo (2 CTT)</button>
-            <button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEE2E2;color:#991B1B;border-color:#FCA5A5;" onclick="clearHppTable(true)">✕ Kosongkan Tabel</button>
-          </div>
+          <div id="editHppTemplateBar" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
         </div>
 
         <!-- Section 3: Tabel Komposisi Bahan Baku (Edit) -->
@@ -4349,7 +4370,7 @@
     } catch (e) {}
 
     // TEMPLATE RESEP RESMI DARI BUKU RESEP EXCEL
-    const HPP_RECIPE_TEMPLATES = {
+    let HPP_RECIPE_TEMPLATES = {
       kopi_susu_luhur: {
         name: 'Kopi Susu Luhur',
         cat: 'racikan_master',
@@ -5033,6 +5054,17 @@
           if (document.getElementById('addMenuModal')?.classList.contains('open')) renderPackagingCheckboxes(false);
           if (document.getElementById('editMenuModal')?.classList.contains('open')) renderPackagingCheckboxes(true);
         }
+        if (d.hppTemplates && typeof d.hppTemplates === 'object' && !Array.isArray(d.hppTemplates)) {
+          HPP_RECIPE_TEMPLATES = d.hppTemplates;
+          localStorage.setItem('wkl_hpp_templates_v1', JSON.stringify(HPP_RECIPE_TEMPLATES));
+          renderHppTemplateButtons();
+        }
+        if (Array.isArray(d.ingredients) && d.ingredients.length > 0) {
+          INGREDIENTS.length = 0;
+          d.ingredients.forEach(x => INGREDIENTS.push(x));
+          localStorage.setItem('wkl_ingredients_v1', JSON.stringify(INGREDIENTS));
+          if (document.getElementById('view-inventory')?.classList.contains('active')) renderInventory();
+        }
 
         if (document.getElementById('view-users')?.classList.contains('active')) renderUserManagement();
         if (document.getElementById('view-promo-mgmt')?.classList.contains('active')) renderPromoManagement();
@@ -5546,18 +5578,21 @@
         }
 
         const inCart = cart.some(it => it.id === p.id);
+        const isOutOfStock = p.inStock === false;
+        const hasVariants = Array.isArray(p.variants) && p.variants.length > 0;
 
         return `
-          <div class="menu-card card-${cardType} ${inCart ? 'in-cart' : ''}" data-prod-id="${p.id}" onclick="addToCart('${p.id}')">
+          <div class="menu-card card-${cardType} ${inCart ? 'in-cart' : ''}" data-prod-id="${p.id}" onclick="addToCart('${p.id}')" style="${isOutOfStock ? 'opacity:0.55;filter:grayscale(0.35);' : ''}">
             <div>
-              <div class="menu-tag-wrap">
+              <div class="menu-tag-wrap" style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
                 <div class="menu-tag">${subTag}</div>
+                ${isOutOfStock ? '<span style="background:#FEE2E2;color:#991B1B;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;">HABIS</span>' : (hasVariants ? `<span style="background:#EFF6FF;color:#1D4ED8;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;">${p.variants.length} Varian</span>` : '')}
               </div>
               <div class="menu-name">${p.name}</div>
             </div>
             <div class="menu-price-row">
               <span class="menu-price">${rp(p.price)}</span>
-              <span class="menu-add-btn">+</span>
+              <span class="menu-add-btn">${isOutOfStock ? '✕' : '+'}</span>
             </div>
           </div>
         `;
@@ -5570,6 +5605,10 @@
     function addToCart(prodId) {
       const p = PRODUCTS.find(x => x.id === prodId);
       if (!p) return;
+      if (p.inStock === false) {
+        showToast(`⛔ Menu "${p.name}" sedang HABIS! Ubah ketersediaan stok di Kelola Menu.`);
+        return;
+      }
 
       const isAddon = (p.cat === 'penyempurna' || p.cat === 'penyempurna_cuanki');
       const existingIdx = cart.findIndex(it => it.id === prodId && JSON.stringify(it.mods) === JSON.stringify({}));
@@ -5630,16 +5669,31 @@
       if (!it.mods) it.mods = {};
       it.mods[group] = val;
 
-      // Recalculate price with mods
+      // Recalculate price with mods + custom variant
       let extra = 0;
       if (it.mods.shot === 'DOUBLE') extra += 4000;
       if (it.mods.milk === 'OAT') extra += 5000;
       if (it.mods.kuah === 'LAKSA') extra += 5000;
       if (it.mods.kuah === 'TOMYAM') extra += 6000;
+      if (it.customVariantDelta) extra += Number(it.customVariantDelta || 0);
       it.unitPrice = it.basePrice + extra;
 
       renderCart();
       renderModifierBar();
+    }
+
+    function setCustomVariantModifier(varName, delta) {
+      if (selectedCartIdx === null || !cart[selectedCartIdx]) return;
+      const it = cart[selectedCartIdx];
+      if (!it.mods) it.mods = {};
+      if (it.mods.varian === varName) {
+        delete it.mods.varian;
+        it.customVariantDelta = 0;
+      } else {
+        it.mods.varian = varName;
+        it.customVariantDelta = Number(delta || 0);
+      }
+      setModifier('_recalc', null);
     }
 
     function renderModifierBar() {
@@ -5648,12 +5702,14 @@
       const priceEl = document.getElementById('modSelectedPrice');
       const gridDrink = document.getElementById('modGridDrink');
       const gridCuanki = document.getElementById('modGridCuanki');
+      const gridCustom = document.getElementById('modGridCustomVariants');
 
       if (!it) {
         if (nameEl) nameEl.textContent = 'Pilih item di keranjang';
         if (priceEl) priceEl.textContent = '';
         if (gridDrink) gridDrink.style.display = 'flex';
         if (gridCuanki) gridCuanki.style.display = 'none';
+        if (gridCustom) gridCustom.style.display = 'none';
         document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
         return;
       }
@@ -5682,6 +5738,20 @@
             btn.classList.toggle('active', btn.id === `mod-${group}-${cur}`);
           });
         });
+      }
+
+      const prod = PRODUCTS.find(p => p.id === it.id);
+      if (gridCustom) {
+        if (prod && Array.isArray(prod.variants) && prod.variants.length > 0) {
+          gridCustom.style.display = 'flex';
+          gridCustom.innerHTML = `<div class="mod-group">` + prod.variants.map(v => {
+            const active = it.mods && it.mods.varian === v.name;
+            const deltaLabel = v.priceDelta > 0 ? ` (+${rp(v.priceDelta)})` : '';
+            return `<button type="button" class="mod-btn ${active ? 'active' : ''}" onclick="setCustomVariantModifier('${v.name.replace(/'/g, "\\'")}', ${v.priceDelta || 0})">✨ ${v.name}${deltaLabel}</button>`;
+          }).join('') + `</div>`;
+        } else {
+          gridCustom.style.display = 'none';
+        }
       }
     }
 
@@ -6643,16 +6713,42 @@
           <tr>
             <td><strong>${ing.name}</strong></td>
             <td><span class="badge-sky" style="background:var(--bg-oat-dark);">${ing.cat}</span></td>
-            <td style="font-family:monospace;font-weight:700;">${ing.stock.toFixed(1)} ${ing.unit}</td>
+            <td style="font-family:monospace;font-weight:700;">${Number(ing.stock || 0).toFixed(1)} ${ing.unit}</td>
             <td style="font-family:monospace;color:var(--ink-muted);">${ing.min} ${ing.unit}</td>
             <td>${statusHtml}</td>
-            <td><input type="number" class="field" style="width:100px;" id="opname-${i}" value="${ing.stock}" oninput="updateOpnameVar(${i})" /></td>
+            <td>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <input type="number" step="any" class="field" style="width:90px;padding:5px 8px;" id="opname-${i}" value="${ing.stock}" oninput="updateOpnameVar(${i})" />
+                <select class="field" style="width:76px;padding:5px 4px;font-size:11px;font-weight:700;" onchange="changeIngredientUnit(${i}, this.value)" title="Ubah satuan stok (porsi / pcs / g / ml)">
+                  <option value="g" ${ing.unit === 'g' ? 'selected' : ''}>g</option>
+                  <option value="ml" ${ing.unit === 'ml' ? 'selected' : ''}>ml</option>
+                  <option value="pcs" ${ing.unit === 'pcs' ? 'selected' : ''}>pcs</option>
+                  <option value="porsi" ${ing.unit === 'porsi' ? 'selected' : ''}>porsi</option>
+                  <option value="pack" ${ing.unit === 'pack' ? 'selected' : ''}>pack</option>
+                  <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
+                  <option value="liter" ${ing.unit === 'liter' ? 'selected' : ''}>liter</option>
+                </select>
+              </div>
+            </td>
             <td id="var-${i}" style="font-family:monospace;font-weight:700;color:var(--accent-green);">0.0 (0.0%)</td>
           </tr>
         `;
       }).join('');
 
       renderHppTable();
+    }
+
+    function changeIngredientUnit(i, newUnit) {
+      if (!INGREDIENTS[i]) return;
+      INGREDIENTS[i].unit = newUnit;
+      saveIngredientsState();
+      renderInventory();
+      showToast(`Satuan "${INGREDIENTS[i].name}" diubah menjadi /${newUnit}`);
+    }
+
+    function saveIngredientsState() {
+      try { localStorage.setItem('wkl_ingredients_v1', JSON.stringify(INGREDIENTS)); } catch (e) {}
+      syncToServer('ingredients', INGREDIENTS);
     }
 
     function updateOpnameVar(i) {
@@ -6670,8 +6766,9 @@
         const val = document.getElementById(`opname-${i}`)?.value;
         if (val !== undefined) ing.stock = Number(val);
       });
+      saveIngredientsState();
       renderInventory();
-      showToast('Stok opname harian berhasil direkonsiliasi!');
+      showToast('Stok opname harian berhasil direkonsiliasi & disimpan!');
     }
 
     function openRestockModal() {
@@ -6891,6 +6988,7 @@
                 <span style="font-weight:700;color:var(--ink-espresso);font-size:12.5px;">${p.name}</span>
                 ${typeBadge}
                 ${p.isCustom ? '<span style="background:#FEF3C7;color:#B45309;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;">BARU</span>' : ''}
+                ${Array.isArray(p.variants) && p.variants.length > 0 ? `<span style="background:#EFF6FF;color:#1D4ED8;font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;">${p.variants.length} Varian</span>` : ''}
               </div>
               <div style="font-size:10.5px;color:var(--ink-muted);line-height:1.3;margin-top:2px;">${p.desc}</div>
             </td>
@@ -6907,9 +7005,9 @@
               </span>
             </td>
             <td style="text-align:center;padding:12px 8px;">
-              <span class="badge" style="background:#DCFCE7;color:#166534;font-size:9.5px;padding:2px 7px;border-radius:999px;font-weight:700;">
-                ● Aktif
-              </span>
+              <button type="button" onclick="toggleMenuAvailability('${p.id}')" class="badge" style="border:none;cursor:pointer;background:${p.inStock === false ? '#FEE2E2' : '#DCFCE7'};color:${p.inStock === false ? '#991B1B' : '#166534'};font-size:9.5px;padding:4px 9px;border-radius:999px;font-weight:800;" title="Klik untuk ubah ketersediaan stok">
+                ${p.inStock === false ? '⛔ Habis' : '● Tersedia'}
+              </button>
             </td>
             <td style="text-align:center;padding:12px 8px;">
               <div style="display:flex;gap:4px;justify-content:center;">
@@ -7185,7 +7283,7 @@
           const custom = tr.querySelector('.recipe-mat-custom');
           const name = select.value === 'CUSTOM' ? custom.value.trim() : select.value;
           const qty = Number(tr.querySelector('.recipe-qty-input')?.value || 0);
-          const unit = tr.querySelector('.recipe-unit-label')?.textContent || 'g';
+          const unit = tr.querySelector('.recipe-unit-select')?.value || tr.querySelector('.recipe-unit-label')?.textContent || 'g';
           const unitCost = Number(tr.querySelector('.recipe-cost-input')?.value || 0);
           const cost = Math.round(qty * unitCost);
 
@@ -7623,7 +7721,12 @@
         }
         const descEl = document.getElementById('newMenuDesc');
         if (descEl) descEl.value = '';
+        const varEl = document.getElementById('newMenuVariants');
+        if (varEl) varEl.value = '';
+        const stockEl = document.getElementById('newMenuInStock');
+        if (stockEl) stockEl.checked = true;
 
+        renderHppTemplateButtons();
         applyHppTemplate('kopi_susu_luhur', false);
         syncNewMenuTypeStation();
       } catch (err) {
@@ -7633,6 +7736,33 @@
       if (modal) modal.classList.add('open');
     }
 
+    function parseVariantsInput(str) {
+      return String(str || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(part => {
+          const m = part.match(/^(.+?)\s*\(\s*\+?(\d+)\s*\)\s*$/);
+          if (m) return { name: m[1].trim(), priceDelta: Number(m[2]) };
+          return { name: part, priceDelta: 0 };
+        });
+    }
+
+    function formatVariantsInput(variants) {
+      if (!Array.isArray(variants) || variants.length === 0) return '';
+      return variants.map(v => v.priceDelta > 0 ? `${v.name} (+${v.priceDelta})` : v.name).join(', ');
+    }
+
+    function toggleMenuAvailability(productId) {
+      const p = PRODUCTS.find(x => x.id === productId);
+      if (!p) return;
+      p.inStock = p.inStock === false ? true : false;
+      saveProductsState();
+      renderMenuMgmtTable();
+      renderMenu();
+      showToast(p.inStock ? `✅ Menu "${p.name}" kini TERSEDIA di Kasir.` : `⛔ Menu "${p.name}" ditandai HABIS.`);
+    }
+
     function saveNewMenu() {
       const name = document.getElementById('newMenuName').value.trim();
       let cat = document.getElementById('newMenuCat').value;
@@ -7640,6 +7770,8 @@
       const price = Number(document.getElementById('newMenuPrice').value || 0);
       const cogs = Number(document.getElementById('newMenuCogs').value || 0);
       const desc = document.getElementById('newMenuDesc').value.trim() || 'Menu racikan spesial Warung Kopi Luhur.';
+      const variants = parseVariantsInput(document.getElementById('newMenuVariants')?.value || '');
+      const inStock = document.getElementById('newMenuInStock')?.checked !== false;
 
       if (!name) return showToast('Nama menu tidak boleh kosong!');
       if (cat === '__CUSTOM__') {
@@ -7667,6 +7799,8 @@
         price: price,
         cogs: cogs,
         desc: desc,
+        variants: variants,
+        inStock: inStock,
         recipe: recipeData.ingredients,
         packaging: recipeData.packaging,
         isCustom: true
@@ -7705,6 +7839,9 @@
       document.getElementById('editMenuPrice').value = p.price;
       document.getElementById('editMenuCogs').value = p.cogs;
       document.getElementById('editMenuDesc').value = p.desc;
+      if (document.getElementById('editMenuVariants')) document.getElementById('editMenuVariants').value = formatVariantsInput(p.variants);
+      if (document.getElementById('editMenuInStock')) document.getElementById('editMenuInStock').checked = p.inStock !== false;
+      renderHppTemplateButtons();
       document.getElementById('editMenuSub').textContent = `Kategori: ${getCategoryLabel(p.cat)} • Stasiun: ${p.station}`;
       delete document.getElementById('editMenuCogs').dataset.manual;
 
@@ -7756,6 +7893,8 @@
       const price = Number(document.getElementById('editMenuPrice').value || 0);
       const cogs = Number(document.getElementById('editMenuCogs').value || 0);
       const desc = document.getElementById('editMenuDesc').value.trim();
+      const variants = parseVariantsInput(document.getElementById('editMenuVariants')?.value || '');
+      const inStock = document.getElementById('editMenuInStock')?.checked !== false;
 
       if (!name) return showToast('Nama menu tidak boleh kosong!');
       if (cat === '__CUSTOM__') {
@@ -7781,6 +7920,8 @@
       p.price = price;
       p.cogs = cogs;
       if (desc) p.desc = desc;
+      p.variants = variants;
+      p.inStock = inStock;
       p.recipe = recipeData.ingredients;
       p.packaging = recipeData.packaging;
 
@@ -10524,34 +10665,34 @@
       },
       {
         cat: 'MENU',
-        badge: '🏷️ Menu & Edit Kategori',
-        q: '7. Bagaimana cara membuat menu baru, menambah kategori, dan mengedit nama kategori?',
+        badge: '🏷️ Menu, Kategori, Varian & Stok',
+        q: '7. Bagaimana cara membuat menu, mengedit kategori, mengatur varian, dan menandai stok Habis?',
         a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
-              <li><strong>Buat Menu Baru:</strong> Buka tab <code>🍽️ Kelola Menu</code> (atau tombol <code>➕ Create Menu</code> di Kasir) → klik <code>➕ Create Menu Baru</code>. Isi Nama, Stasiun KDS (Barista/Kitchen), Harga Jual, dan Kategori.</li>
-              <li><strong>Tambah Kategori Manual:</strong> Di dropdown Kategori (baik saat Buat Menu maupun Edit Menu), pilih opsi <strong><code>+ Ketik Kategori Baru...</code></strong> lalu ketik nama kategori baru. Saat disimpan, kategori otomatis muncul di bar Kasir POS.</li>
-              <li><strong>Edit Nama Kategori yang Sudah Ada:</strong> Di tab <code>🍽️ Kelola Menu</code>, klik tombol <strong><code>🏷️ Kelola &amp; Edit Kategori</code></strong>. Anda bisa mengubah nama kategori bawaan maupun kategori tambahan, lalu klik <code>💾 Simpan Perubahan Kategori</code>.</li>
+              <li><strong>Buat / Edit Menu:</strong> Buka tab <code>🍽️ Kelola Menu</code> → klik <code>➕ Create Menu Baru</code> atau <code>✏️ Edit</code> pada menu.</li>
+              <li><strong>Edit Nama Kategori yang Sudah Ada:</strong> Di tab <code>🍽️ Kelola Menu</code>, klik tombol <strong><code>🏷️ Kelola &amp; Edit Kategori</code></strong> untuk mengubah nama kategori bawaan maupun kategori tambahan. Untuk membuat kategori baru langsung saat input/edit menu, pilih <code>➕ Input Kategori Baru Manual...</code>.</li>
+              <li><strong>Input Varian Menu:</strong> Isi kolom <em>Varian Menu (Opsional)</em>, misal: <code>Kuah Laksa (+5000), Kuah Tomyam (+6000)</code> atau <code>Less Syrup (+0), Extra Syrup (+3000), Extra Espresso (+4000)</code>. Di Kasir POS, varian akan muncul otomatis di bar Fast Modifier saat item dipilih.</li>
+              <li><strong>Ketersediaan Stok (Tersedia / Habis):</strong> Di tabel <code>🍽️ Kelola Menu</code> (kolom Status) atau di form Buat/Edit Menu, klik badge <strong><code>● Tersedia</code> / <code>⛔ Habis</code></strong>. Menu berstatus Habis otomatis terkunci di Kasir POS agar tidak bisa dipesan.</li>
             </ol>`
       },
       {
         cat: 'MENU',
-        badge: '🧪 Formula HPP (BOM) & Master Bahan',
-        q: '8. Bagaimana cara menyusun skema HPP (BOM) & otomatis menyimpan bahan custom ke Master?',
+        badge: '🧪 Template HPP, Master Bahan & Kemasan',
+        q: '8. Bagaimana cara edit/hapus Template HPP, auto-save bahan custom (seperti Chili Oil), & Master Kemasan?',
         a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
-              <li><strong>Tambah Bahan di Paling Atas:</strong> Saat membuat/mengedit menu, klik <code>+ Tambah Bahan</code>. Baris bahan baru langsung muncul di <strong>baris paling atas tabel BOM</strong> agar mudah langsung diisi.</li>
-              <li><strong>Pilih Master atau Bahan Custom Manual:</strong> Pilih bahan dari daftar Master Bahan Baku, atau pilih <strong><code>+ Bahan Custom Manual</code></strong> lalu ketik nama bahan, jumlah, satuan, dan harga beli satuan.</li>
-              <li><strong>Auto-Save ke Master:</strong> Ketika menu disimpan, bahan baru / custom manual tersebut <strong>otomatis masuk ke Master Bahan Baku</strong> sehingga bisa langsung dipilih ulang di menu lain.</li>
-              <li><strong>Kelola Master Bahan Baku:</strong> Buka tab <code>📦 Stok &amp; BOM</code> untuk memantau stok, menambah, mengedit harga kemasan, atau menghapus bahan baku master.</li>
+              <li><strong>Edit / Hapus Template HPP:</strong> Di modal Buat/Edit Menu, klik <strong><code>⚙️ Edit / Hapus Template</code></strong> untuk mengubah nama, harga jual, atau HPP template yang sudah ada, maupun menghapusnya. Gunakan <strong><code>💾 Simpan sbg Template</code></strong> untuk menyimpan racikan saat ini menjadi template baru.</li>
+              <li><strong>+ Bahan Custom Manual Auto-Save ke Master:</strong> Klik <code>+ Tambah Bahan</code> (baris baru muncul di paling atas), pilih <code>+ Bahan Custom Manual</code>, ketik nama (mis. <em>Chili Oil</em>), jumlah, satuan, dan harga satuan. Saat menu disimpan, bahan tersebut <strong>otomatis tersimpan di Master Bahan Baku</strong> dan langsung muncul di dropdown pembuatan menu berikutnya (mis. <em>Bakmi</em>).</li>
+              <li><strong>Input &amp; Edit Kemasan (Master Kemasan):</strong> Di bagian <em>3. Kemasan / Packaging Take Away</em> (atau di tab Stok &amp; BOM / Kelola Menu), klik <strong><code>⚙️ Input / Edit Master Kemasan</code></strong> untuk menambah item kemasan baru, mengubah harga modal kemasan, atau menghapus kemasan.</li>
+              <li><strong>Penyesuaian Satuan Stok (/porsi, /pcs, g, ml):</strong> Di tab <code>📦 Stok &amp; BOM</code>, kolom <em>Input Stok Fisik &amp; Satuan</em> menyediakan pilihan satuan (<code>porsi</code>, <code>pcs</code>, <code>g</code>, <code>ml</code>, <code>pack</code>) agar sesuai dengan hitungan stok fisik kedai.</li>
             </ol>`
       },
       {
         cat: 'OWNER',
         badge: '📊 Owner Hub & Filter Penjualan',
-        q: '9. Bagaimana cara melihat penjualan per kategori/menu berdasarkan tanggal & Total HPP Keseluruhan?',
+        q: '9. Bagaimana cara melihat filter & sort penjualan per kategori berdasarkan periode waktu + Total HPP?',
         a: `<ol style="margin:6px 0 0 18px;line-height:1.65;">
-              <li><strong>Buka Owner Hub:</strong> Klik tab <code>📊 Owner Hub</code>. Di bagian atas tersedia 5 KPI utama (Omzet, Total HPP, Laba Kotor, Pengeluaran, Laba Bersih).</li>
-              <li><strong>Filter Tanggal &amp; Sort Penjualan:</strong> Pada panel <strong><code>🧾 Rekap Penjualan per Kategori &amp; Menu</code></strong>, atur <em>Dari Tanggal</em> &amp; <em>Sampai Tanggal</em> (atau klik preset <code>Hari Ini</code> / <code>7 Hari</code> / <code>Bulan Ini</code> / <code>Semua</code>).</li>
-              <li><strong>Rincian per Kategori &amp; Menu:</strong> Anda dapat memfilter kategori tertentu (atau klik kartu ringkasan kategori) dan mengurutkan berdasarkan <em>Terlaris (Qty Terbanyak)</em>, <em>Omzet Tertinggi</em>, <em>Total HPP Tertinggi</em>, atau <em>Laba Kotor Tertinggi</em>. Di dalamnya langsung terlihat jumlah terjual tiap menu beserta <strong>Total HPP Keseluruhan</strong>.</li>
-              <li><strong>Riwayat Transaksi &amp; Export CSV:</strong> Scroll ke bawah untuk melihat riwayat struk per hari, filter metode bayar, dan tombol <code>⬇️ Export CSV</code>.</li>
+              <li><strong>Buka Owner Hub:</strong> Klik tab <code>📊 Owner Hub</code>. Di bagian atas tersedia KPI utama (Omzet, Total HPP, Laba Kotor, Pengeluaran, <strong>Biaya Layanan Rp 1.000/trx</strong>, dan Laba Bersih).</li>
+              <li><strong>Filter Periode Tanggal &amp; Sort Penjualan:</strong> Pada panel <strong><code>🧾 Rekap Penjualan per Kategori &amp; Menu</code></strong>, atur <em>Dari Tanggal</em> &amp; <em>Sampai Tanggal</em> (atau klik preset <code>Hari Ini</code> / <code>7 Hari</code> / <code>Bulan Ini</code> / <code>Semua</code>).</li>
+              <li><strong>Filter Kategori &amp; Urutan:</strong> Pilih kategori pada dropdown <em>Filter Kategori</em> (atau klik kartu ringkasan kategori) lalu pilih urutan (<em>Terlaris</em>, <em>Omzet Tertinggi</em>, <em>Total HPP Tertinggi</em>, <em>Laba Kotor Tertinggi</em>, atau <em>Nama A-Z</em>).</li>
             </ol>`
       },
       {
@@ -10848,6 +10989,133 @@
         recalcRecipeHpp(true);
       }
       showToast('Item kemasan berhasil dihapus dari Master.');
+    }
+
+    // ==========================================
+    // KELOLA / EDIT / HAPUS TEMPLATE HPP
+    // ==========================================
+    try {
+      const savedTmplRaw = localStorage.getItem('wkl_hpp_templates_v1');
+      if (savedTmplRaw) {
+        const parsedTmpl = JSON.parse(savedTmplRaw);
+        if (parsedTmpl && typeof parsedTmpl === 'object' && !Array.isArray(parsedTmpl)) {
+          HPP_RECIPE_TEMPLATES = parsedTmpl;
+        }
+      }
+      const savedIngRaw = localStorage.getItem('wkl_ingredients_v1');
+      if (savedIngRaw) {
+        const parsedIng = JSON.parse(savedIngRaw);
+        if (Array.isArray(parsedIng) && parsedIng.length > 0) {
+          INGREDIENTS.length = 0;
+          parsedIng.forEach(x => INGREDIENTS.push(x));
+        }
+      }
+    } catch (e) {}
+
+    function saveHppTemplatesState() {
+      try { localStorage.setItem('wkl_hpp_templates_v1', JSON.stringify(HPP_RECIPE_TEMPLATES)); } catch (e) {}
+      syncToServer('hppTemplates', HPP_RECIPE_TEMPLATES);
+    }
+
+    function renderHppTemplateButtons() {
+      const entries = Object.entries(HPP_RECIPE_TEMPLATES);
+      const makeHtml = (isEdit) => entries.map(([key, t]) => {
+        const isFood = t.station === 'KITCHEN' || t.cat === 'cuanki';
+        const style = isFood ? 'background:#FEF3C7;color:#92400E;border-color:#F59E0B;' : '';
+        const icon = isFood ? '🍲' : '☕';
+        return `<button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;${style}" onclick="applyHppTemplate('${key}', ${isEdit})">${icon} ${t.name}</button>`;
+      }).join('') + `<button type="button" class="cat-pill" style="font-size:10.5px;padding:4px 10px;background:#FEE2E2;color:#991B1B;border-color:#FCA5A5;" onclick="clearHppTable(${isEdit})">✕ Kosongkan Tabel</button>`;
+
+      const barNew = document.getElementById('newHppTemplateBar');
+      const barEdit = document.getElementById('editHppTemplateBar');
+      if (barNew) barNew.innerHTML = makeHtml(false);
+      if (barEdit) barEdit.innerHTML = makeHtml(true);
+    }
+
+    function saveCurrentAsHppTemplate(isEdit) {
+      const prefix = isEdit ? 'edit' : 'new';
+      const name = (document.getElementById(prefix + 'MenuName')?.value || '').trim();
+      const cat = document.getElementById(prefix + 'MenuCat')?.value || 'racikan_master';
+      const station = document.getElementById(prefix + 'MenuStation')?.value || 'BARISTA';
+      const price = Number(document.getElementById(prefix + 'MenuPrice')?.value || 0);
+      const cogs = Number(document.getElementById(prefix + 'MenuCogs')?.value || 0);
+      if (!name) return showToast('Isi Nama Menu terlebih dahulu untuk disimpan sebagai Template!');
+
+      const recipeData = collectRecipeData(isEdit);
+      const key = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '') || ('tmpl_' + Date.now());
+      HPP_RECIPE_TEMPLATES[key] = {
+        name,
+        cat,
+        station,
+        price,
+        cogs,
+        pkg: { plastik: station !== 'KITCHEN', sealer: station !== 'KITCHEN', straw: station !== 'KITCHEN', cup: station !== 'KITCHEN', cuanki: station === 'KITCHEN' },
+        ingredients: recipeData.ingredients
+      };
+      saveHppTemplatesState();
+      renderHppTemplateButtons();
+      showToast(`✅ Template HPP "${name}" berhasil disimpan!`);
+    }
+
+    function openManageHppTemplatesModal() {
+      renderManageHppTemplatesList();
+      openModal('manageHppTemplatesModal');
+    }
+
+    function renderManageHppTemplatesList() {
+      const box = document.getElementById('manageHppTemplatesList');
+      if (!box) return;
+      const entries = Object.entries(HPP_RECIPE_TEMPLATES);
+      if (entries.length === 0) {
+        box.innerHTML = `<div style="text-align:center;padding:24px;color:var(--ink-muted);font-size:12px;">Belum ada template HPP tersimpan.</div>`;
+        return;
+      }
+      box.innerHTML = entries.map(([key, t]) => `
+        <div style="display:grid;grid-template-columns:1.5fr 100px 100px auto;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--border-hairline);border-radius:10px;background:var(--surface-card);margin-bottom:8px;">
+          <div>
+            <input type="text" class="field" id="tmplName-${key}" value="${String(t.name || '').replace(/"/g, '&quot;')}" style="width:100%;padding:6px 8px;font-size:12px;font-weight:700;" />
+            <div style="font-size:10px;color:var(--ink-muted);margin-top:3px;">${(t.ingredients || []).length} bahan • ${t.station || 'BARISTA'}</div>
+          </div>
+          <div>
+            <div style="font-size:9.5px;color:var(--ink-muted);font-weight:700;">Harga</div>
+            <input type="number" class="field" id="tmplPrice-${key}" value="${t.price || 0}" style="width:100%;padding:6px 8px;font-size:11.5px;" />
+          </div>
+          <div>
+            <div style="font-size:9.5px;color:var(--ink-muted);font-weight:700;">HPP</div>
+            <input type="number" class="field" id="tmplCogs-${key}" value="${t.cogs || 0}" style="width:100%;padding:6px 8px;font-size:11.5px;" />
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button type="button" onclick="updateHppTemplateItem('${key}')" style="background:#0284C7;color:#FFF;border:none;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">💾</button>
+            <button type="button" onclick="deleteHppTemplateItem('${key}')" style="background:#FEE2E2;color:#991B1B;border:none;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateHppTemplateItem(key) {
+      const t = HPP_RECIPE_TEMPLATES[key];
+      if (!t) return;
+      const name = (document.getElementById(`tmplName-${key}`)?.value || '').trim();
+      const price = Number(document.getElementById(`tmplPrice-${key}`)?.value || 0);
+      const cogs = Number(document.getElementById(`tmplCogs-${key}`)?.value || 0);
+      if (!name) return showToast('Nama template tidak boleh kosong!');
+      t.name = name;
+      t.price = price;
+      t.cogs = cogs;
+      saveHppTemplatesState();
+      renderHppTemplateButtons();
+      showToast(`✅ Template "${name}" berhasil diperbarui!`);
+    }
+
+    function deleteHppTemplateItem(key) {
+      const t = HPP_RECIPE_TEMPLATES[key];
+      if (!t) return;
+      if (!confirm(`Hapus template HPP "${t.name}" dari daftar?`)) return;
+      delete HPP_RECIPE_TEMPLATES[key];
+      saveHppTemplatesState();
+      renderHppTemplateButtons();
+      renderManageHppTemplatesList();
+      showToast(`Template "${t.name}" telah dihapus.`);
     }
 
     function openFaqGuideModal() {
