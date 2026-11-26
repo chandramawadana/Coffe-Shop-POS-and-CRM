@@ -3785,7 +3785,7 @@
 
   <!-- MODAL: RIWAYAT TRANSAKSI (AKSES KASIR, SUPERVISOR, OWNER & SUPERADMIN) -->
   <div class="modal-backdrop" id="txHistoryModal" style="z-index:1005;">
-    <div class="modal-box" style="max-width:760px;padding:22px;">
+    <div class="modal-box" style="max-width:780px;padding:22px;max-height:90vh;overflow-y:auto;display:block;">
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;margin-bottom:12px;gap:8px;flex-wrap:wrap;">
         <div>
           <div class="serif" style="font-size:18px;font-weight:700;">📜 Riwayat Transaksi</div>
@@ -3815,7 +3815,7 @@
         <button type="button" class="cat-pill" data-txm="SPLIT" onclick="setTxMethodFilter('SPLIT', this)">✂️ Split Bill</button>
       </div>
 
-      <div id="modalTxHistoryAccordion" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;"></div>
+      <div id="modalTxHistoryAccordion" style="display:block;"></div>
     </div>
   </div>
 
@@ -8118,7 +8118,7 @@
         const dateLabel = dObj.toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
 
         return `
-          <div style="border:1px solid var(--border-hairline);border-radius:14px;overflow:hidden;background:var(--surface-card);">
+          <div style="border:1px solid var(--border-hairline);border-radius:14px;overflow:hidden;background:var(--surface-card);margin-bottom:10px;flex-shrink:0;">
             <div onclick="toggleTxDateGroup('${key}')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-oat);cursor:pointer;font-size:13px;">
               <strong style="color:var(--ink-espresso);">${dateLabel} <span style="font-size:11px;font-weight:600;color:var(--ink-muted);">(${rows.length} transaksi)</span></strong>
               <div style="display:flex;align-items:center;gap:10px;">
