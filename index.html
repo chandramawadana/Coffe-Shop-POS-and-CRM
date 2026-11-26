@@ -3342,6 +3342,55 @@
     </div>
   </div>
 
+  <!-- MODAL: EDIT MASTER BAHAN BAKU POPUP -->
+  <div class="modal-backdrop" id="editMasterMatModal" style="z-index:1035;">
+    <div class="modal-box" style="max-width:520px;padding:22px;">
+      <div class="modal-head" style="margin-bottom:14px;">
+        <div>
+          <h3 id="editMatPopupTitle">✏️ Edit Bahan Baku</h3>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Perubahan harga beli, isi kemasan &amp; satuan otomatis memperbarui HPP di semua resep</div>
+        </div>
+        <button class="modal-close" onclick="closeModal('editMasterMatModal')">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-size:0.74rem;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px;">Nama Bahan Baku</label>
+          <input type="text" id="editMatPopupName" placeholder="Contoh: Arabika Luhur" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:0.86rem;box-sizing:border-box;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:0.74rem;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px;">Satuan Dasar</label>
+            <select id="editMatPopupUnit" onchange="recalcEditMatPopupUnitCost()" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.86rem;background:var(--surface);color:var(--text-primary);box-sizing:border-box;">
+              <option value="g">Gram (g)</option>
+              <option value="ml">Mililiter (ml)</option>
+              <option value="pcs">Pcs / Buah</option>
+              <option value="butir">Butir</option>
+              <option value="porsi">Porsi</option>
+              <option value="set">Set</option>
+              <option value="shot">Shot</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.74rem;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px;">Isi Kemasan Beli</label>
+            <input type="number" id="editMatPopupPackQty" min="0.01" step="any" oninput="recalcEditMatPopupUnitCost()" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:0.86rem;box-sizing:border-box;">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:0.74rem;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px;">Harga Beli Kemasan (Rp)</label>
+          <input type="number" id="editMatPopupPackPrice" min="0" step="100" oninput="recalcEditMatPopupUnitCost()" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:0.86rem;box-sizing:border-box;">
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.78rem;color:var(--text-secondary);font-weight:600;">Kalkulasi HPP per Satuan:</span>
+          <strong id="editMatPopupUnitCost" style="font-size:0.95rem;color:var(--info);">Rp 0 / g</strong>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px;">
+        <button class="btn" onclick="closeModal('editMasterMatModal')" style="background:var(--bg);border:1px solid var(--border);color:var(--text-secondary);padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;">Batal</button>
+        <button class="btn btn-primary" onclick="saveEditMasterMatPopup()" style="padding:9px 18px;border-radius:8px;font-weight:700;">💾 Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: MASTER KEMASAN / PACKAGING -->
   <div class="modal-backdrop" id="masterPackagingModal">
     <div class="modal-box" style="max-width:740px;padding:24px;max-height:90vh;overflow-y:auto;display:block;">
@@ -10282,16 +10331,55 @@
       return addedCount;
     }
 
+    function recalcEditMatPopupUnitCost() {
+      const qty = Number(document.getElementById('editMatPopupPackQty')?.value) || 0;
+      const price = Number(document.getElementById('editMatPopupPackPrice')?.value) || 0;
+      const unit = document.getElementById('editMatPopupUnit')?.value || 'g';
+      const cost = qty > 0 ? price / qty : 0;
+      const el = document.getElementById('editMatPopupUnitCost');
+      if (el) el.textContent = `${rp(Math.round(cost * 1000) / 1000)} / ${unit}`;
+    }
+
     function editMasterRawMaterial(id) {
       const mat = MASTER_RAW_MATERIALS.find(m => (m.id && m.id === id) || m.name === id);
       if (!mat) return;
       editMatId = mat.id || mat.name;
-      document.getElementById('masterMatFormTitle').textContent = `Edit Bahan: ${mat.name}`;
-      document.getElementById('matFormName').value = mat.name;
-      document.getElementById('matFormUnit').value = mat.unit;
-      document.getElementById('matFormPackQty').value = mat.packQty;
-      document.getElementById('matFormPackPrice').value = mat.packPrice;
-      recalcMatFormUnitCost();
+      const titleEl = document.getElementById('editMatPopupTitle');
+      if (titleEl) titleEl.textContent = `✏️ Edit Bahan: ${mat.name}`;
+      document.getElementById('editMatPopupName').value = mat.name;
+      document.getElementById('editMatPopupUnit').value = mat.unit || 'g';
+      document.getElementById('editMatPopupPackQty').value = mat.packQty;
+      document.getElementById('editMatPopupPackPrice').value = mat.packPrice;
+      recalcEditMatPopupUnitCost();
+      openModal('editMasterMatModal');
+    }
+
+    function saveEditMasterMatPopup() {
+      if (!editMatId) return;
+      const name = document.getElementById('editMatPopupName').value.trim();
+      const unit = document.getElementById('editMatPopupUnit').value;
+      const packQty = Number(document.getElementById('editMatPopupPackQty').value);
+      const packPrice = Number(document.getElementById('editMatPopupPackPrice').value);
+      if (!name || packQty <= 0 || packPrice < 0) {
+        return showToast('⚠️ Nama, isi kemasan (>0), dan harga beli harus valid!');
+      }
+      const idx = MASTER_RAW_MATERIALS.findIndex(m => (m.id && m.id === editMatId) || m.name === editMatId);
+      if (idx === -1) return showToast('⚠️ Data bahan baku tidak ditemukan');
+      const unitCost = packQty > 0 ? Math.round((packPrice / packQty) * 10000) / 10000 : 0;
+      MASTER_RAW_MATERIALS[idx] = {
+        ...MASTER_RAW_MATERIALS[idx],
+        name,
+        unit,
+        packQty,
+        packPrice,
+        unitCost
+      };
+      editMatId = null;
+      saveMasterMaterialsState();
+      renderMasterMaterialsTable();
+      if (typeof renderHppTable === 'function') renderHppTable();
+      closeModal('editMasterMatModal');
+      showToast(`✅ Perubahan "${name}" berhasil disimpan!`);
     }
 
     function deleteMasterRawMaterial(id) {
