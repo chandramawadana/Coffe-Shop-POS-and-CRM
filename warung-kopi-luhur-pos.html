@@ -2146,7 +2146,7 @@
         <div class="page-container">
           <div class="page-header">
             <div>
-              <h2 class="serif">Owner Hub: <span class="italic">Laporan Keuangan Laba Rugi &amp; Pengeluaran Harian</span></h2>
+              <h2 style="font-size:20px;font-weight:800;color:var(--ink-espresso);margin:0;">Owner Hub: Laporan Keuangan Laba Rugi &amp; Pengeluaran Harian</h2>
               <p style="font-size:12px;color:var(--ink-muted);">Profit &amp; Loss Real-Time, Biaya Operasional (Petty Cash), HPP &amp; Rekonsiliasi Kas Shift</p>
             </div>
             <div style="display:flex;gap:8px;">
@@ -2159,60 +2159,60 @@
             <div class="grid-cards" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
               <div class="panel-card">
                 <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">TOTAL OMZET PENJUALAN</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;" id="ownerRevenue">Rp 92.000</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:var(--ink-espresso);" id="ownerRevenue">Rp 92.000</div>
                 <div style="font-size:11px;font-weight:700;" id="ownerOrderCount">2 Transaksi Selesai</div>
               </div>
               <div class="panel-card">
                 <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">TOTAL HPP AKTUAL (COGS)</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:var(--accent-red);" id="ownerCogs">Rp 32.800</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:var(--accent-red);" id="ownerCogs">Rp 32.800</div>
                 <div style="font-size:11px;color:var(--ink-muted);" id="ownerCogsBreakdown">Minuman &amp; Makanan</div>
               </div>
               <div class="panel-card">
                 <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">LABA KOTOR (GROSS PROFIT)</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:var(--accent-green);" id="ownerProfit">Rp 59.200</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:var(--accent-green);" id="ownerProfit">Rp 59.200</div>
                 <div style="font-size:11px;font-weight:700;" id="ownerMarginPct">Gross Margin: 64%</div>
               </div>
               <div class="panel-card">
                 <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">PENGELUARAN HARIAN (OPEX)</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:#C2410C;" id="ownerTotalExpense">Rp 55.000</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:#C2410C;" id="ownerTotalExpense">Rp 55.000</div>
                 <div style="font-size:11px;color:var(--ink-muted);" id="ownerExpenseCount">2 Catatan Petty Cash</div>
               </div>
               <div class="panel-card" style="background:#EFF6FF;border:1px solid #BFDBFE;">
                 <div style="font-size:11px;font-weight:800;color:#1E40AF;">BIAYA LAYANAN (RP 1.000/TRX)</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:#1D4ED8;" id="ownerServiceFee">Rp 0</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:#1D4ED8;" id="ownerServiceFee">Rp 0</div>
                 <div style="font-size:11px;font-weight:700;color:#1E40AF;" id="ownerServiceFeeCount">0 Transaksi × Rp 1.000</div>
               </div>
               <div class="panel-card" style="background:#FFF7ED;border:1px solid #FED7AA;">
                 <div style="font-size:11px;font-weight:800;color:#9A3412;">TOTAL DISKON / PROMO</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:#C2410C;" id="ownerTotalDiscount">Rp 0</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:#C2410C;" id="ownerTotalDiscount">Rp 0</div>
                 <div style="font-size:11px;font-weight:700;color:#9A3412;" id="ownerDiscountCount">0 Transaksi Pakai Promo</div>
               </div>
               <div class="panel-card" style="background:#FFFFFF;border:1.5px solid #BC012E;box-shadow:0 3px 10px rgba(188,1,46,0.12);">
                 <div style="font-size:11px;font-weight:800;color:var(--ink-espresso);">LABA BERSIH (NET PROFIT)</div>
-                <div class="serif" style="font-size:24px;font-weight:800;margin:6px 0;color:var(--ink-espresso);" id="ownerNetProfit">Rp 4.200</div>
+                <div style="font-size:23px;font-weight:800;margin:6px 0;color:var(--ink-espresso);" id="ownerNetProfit">Rp 4.200</div>
                 <div style="font-size:11px;font-weight:800;color:var(--accent-green);" id="ownerNetMarginPct">Net Margin: 5%</div>
               </div>
             </div>
 
             <!-- GRAFIK REPORTING: PRODUK TERLARIS & KINERJA KEUANGAN -->
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;margin-bottom:20px;">
+            <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
               <!-- Chart 1: Produk Terlaris -->
-              <div class="panel-card" style="display:flex;flex-direction:column;gap:12px;">
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:12px;flex:1 1 290px;min-width:0;">
                 <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
                   <div>
-                    <h3 class="serif" style="font-size:16px;margin:0;">🏆 Grafik Produk Terlaris</h3>
-                    <div style="font-size:11px;color:var(--ink-muted);">Peringkat penjualan menu &amp; kontribusi keuntungan</div>
+                    <h3 style="font-size:15px;font-weight:800;color:var(--ink-espresso);margin:0;">🏆 Produk Terlaris</h3>
+                    <div style="font-size:11px;color:var(--ink-muted);">Peringkat penjualan menu &amp; kontribusi laba kotor</div>
                   </div>
-                  <span class="badge-sky" id="ownerTopProdBadge">Top 6</span>
+                  <span style="background:#BC012E;color:#FFF;font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;" id="ownerTopProdBadge">Top 6</span>
                 </div>
-                <div id="ownerTopProductsChart" style="display:flex;flex-direction:column;gap:10px;"></div>
+                <div id="ownerTopProductsChart" style="display:flex;flex-direction:column;gap:0;"></div>
               </div>
 
-              <!-- Chart 2: Omzet, Gross Profit, Pengeluaran & Net Profit -->
-              <div class="panel-card" style="display:flex;flex-direction:column;gap:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
+              <!-- Chart 2: Omzet, Gross Profit, Pengeluaran & Net Profit + Donut Margin -->
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:12px;flex:2 1 480px;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;flex-wrap:wrap;gap:8px;">
                   <div>
-                    <h3 class="serif" style="font-size:16px;margin:0;">📊 Grafik Keuntungan &amp; Arus Kas</h3>
+                    <h3 style="font-size:15px;font-weight:800;color:var(--ink-espresso);margin:0;">📊 Grafik Keuntungan &amp; Arus Kas</h3>
                     <div style="font-size:11px;color:var(--ink-muted);">Perbandingan Omzet, Gross Profit, Pengeluaran &amp; Net Profit</div>
                   </div>
                   <span class="badge-sky" id="ownerChartPeriodBadge">Harian</span>
@@ -2221,11 +2221,37 @@
               </div>
             </div>
 
+            <!-- RINGKASAN 3 KARTU: LABA RUGI, ARUS KAS & TREN LABA BERSIH 7 HARI -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;margin-bottom:20px;">
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:10px;padding:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
+                  <h3 style="font-size:14.5px;font-weight:800;color:var(--ink-espresso);margin:0;">🧾 Laporan Laba Rugi</h3>
+                  <span style="font-size:11px;font-weight:700;color:var(--ink-muted);" id="ownerMiniPnlBadge">Ringkasan</span>
+                </div>
+                <div id="ownerMiniPnlBox"></div>
+              </div>
+
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:10px;padding:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
+                  <h3 style="font-size:14.5px;font-weight:800;color:var(--ink-espresso);margin:0;">⇄ Arus Kas (Cash Flow)</h3>
+                  <span style="font-size:11px;font-weight:700;color:var(--ink-muted);">Shift &amp; Periode</span>
+                </div>
+                <div id="ownerCashFlowBox"></div>
+              </div>
+
+              <div class="panel-card" style="display:flex;flex-direction:column;gap:10px;padding:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:8px;">
+                  <h3 style="font-size:14.5px;font-weight:800;color:var(--ink-espresso);margin:0;">📈 Tren Laba Bersih (7 Hari Terakhir)</h3>
+                </div>
+                <div id="ownerNetTrendBox"></div>
+              </div>
+            </div>
+
             <!-- REKAP PENJUALAN PER KATEGORI & MENU (FILTER TANGGAL, SORT, TOTAL HPP KESELURUHAN) -->
             <div class="panel-card" style="margin-bottom:20px;">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--border-hairline);padding-bottom:12px;margin-bottom:14px;">
                 <div>
-                  <h3 class="serif" style="font-size:18px;margin:0;">🧾 Rekap Penjualan per Kategori &amp; Menu <span class="italic">(Filter Tanggal &amp; Total HPP)</span></h3>
+                  <h3 style="font-size:17px;font-weight:800;color:var(--ink-espresso);margin:0;">🧾 Rekap Penjualan per Kategori &amp; Menu (Filter Tanggal &amp; Total HPP)</h3>
                   <p style="font-size:11.5px;color:var(--ink-muted);margin:3px 0 0;">Pantau jumlah porsi terjual per kategori &amp; per menu dalam rentang tanggal tertentu beserta Total HPP Keseluruhan.</p>
                 </div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -2329,7 +2355,7 @@
             <div class="pnl-container" style="margin-bottom:20px;">
               <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-hairline);padding-bottom:10px;flex-wrap:wrap;gap:8px;">
                 <div>
-                  <h3 class="serif" style="font-size:18px;">Laporan Keuangan Laba Rugi <span class="italic">(Profit &amp; Loss Statement)</span></h3>
+                  <h3 style="font-size:17px;font-weight:800;color:var(--ink-espresso);margin:0;">Laporan Keuangan Laba Rugi (Profit &amp; Loss Statement)</h3>
                   <p style="font-size:11px;color:var(--ink-muted);">Struktur akuntansi lengkap: Pemasukan &minus; HPP = Laba Kotor &minus; Beban Operasional (Gaji, Sewa, Utilitas, Kas Kecil) = Laba Bersih</p>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -2431,7 +2457,7 @@
                     <td colspan="4">A. Beban Gaji Karyawan &amp; Ketenagakerjaan (Labor Cost)</td>
                   </tr>
                   <tbody id="pnlSalaryRows"></tbody>
-                  <tr class="pnl-sub-row" style="font-size:11px;font-style:italic;color:var(--ink-muted);">
+                  <tr class="pnl-sub-row" style="font-size:11px;color:var(--ink-muted);">
                     <td style="padding-left:24px;">Subtotal Beban Gaji &amp; SDM</td>
                     <td></td>
                     <td style="text-align:right;color:#C2410C;" id="pnlSubtotalSalary">Rp 0</td>
@@ -2443,7 +2469,7 @@
                     <td colspan="4">B. Beban Sewa Outlet, Utilitas &amp; Pemeliharaan (Facility &amp; Utilities)</td>
                   </tr>
                   <tbody id="pnlFacilityRows"></tbody>
-                  <tr class="pnl-sub-row" style="font-size:11px;font-style:italic;color:var(--ink-muted);">
+                  <tr class="pnl-sub-row" style="font-size:11px;color:var(--ink-muted);">
                     <td style="padding-left:24px;">Subtotal Sewa, Utilitas &amp; Maintenance</td>
                     <td></td>
                     <td style="text-align:right;color:#C2410C;" id="pnlSubtotalFacility">Rp 0</td>
@@ -2455,7 +2481,7 @@
                     <td colspan="4">C. Beban Operasional Harian Toko &amp; Kas Kecil (Petty Cash)</td>
                   </tr>
                   <tbody id="pnlDailyRows"></tbody>
-                  <tr class="pnl-sub-row" style="font-size:11px;font-style:italic;color:var(--ink-muted);">
+                  <tr class="pnl-sub-row" style="font-size:11px;color:var(--ink-muted);">
                     <td style="padding-left:24px;">Subtotal Operasional Harian Toko</td>
                     <td></td>
                     <td style="text-align:right;color:#C2410C;" id="pnlSubtotalDaily">Rp 55.000</td>
@@ -2520,7 +2546,7 @@
             <div class="grid-cards">
               <div class="panel-card">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                  <h3 class="serif" style="font-size:16px;">Catat Pengeluaran Kas Harian <span class="italic">(Petty Cash)</span></h3>
+                  <h3 style="font-size:15.5px;font-weight:800;color:var(--ink-espresso);margin:0;">Catat Pengeluaran Kas Harian (Petty Cash)</h3>
                   <span class="badge-sky">Kas Keluar Laci</span>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
@@ -2563,7 +2589,7 @@
               <!-- DAFTAR PENGELUARAN HARIAN -->
               <div class="panel-card" style="display:flex;flex-direction:column;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                  <h3 class="serif" style="font-size:16px;">Daftar Pengeluaran Hari Ini</h3>
+                  <h3 style="font-size:15.5px;font-weight:800;color:var(--ink-espresso);margin:0;">Daftar Pengeluaran Hari Ini</h3>
                   <strong style="color:#C2410C;font-size:13px;" id="expenseTotalPill">Total: Rp 55.000</strong>
                 </div>
                 <div style="flex:1;overflow-y:auto;max-height:260px;">
@@ -2587,7 +2613,7 @@
             <div class="panel-card" style="margin-top:20px;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                 <div>
-                  <h3 class="serif" style="font-size:17px;">Rekonsiliasi Kas Laci Kasir <span class="italic">(Cash Drawer Float &amp; Variance)</span></h3>
+                  <h3 style="font-size:16px;font-weight:800;color:var(--ink-espresso);margin:0;">Rekonsiliasi Kas Laci Kasir (Cash Drawer Float &amp; Variance)</h3>
                   <p style="font-size:11px;color:var(--ink-muted);">Sinkronisasi Modal Awal + Penjualan Tunai - Pengeluaran Kas = Kas Seharusnya</p>
                 </div>
                 <button class="btn-dark" onclick="openShiftModal()">Buka Menu Handover Shift</button>
@@ -8434,68 +8460,238 @@
         if (sorted.length === 0) {
           prodBox.innerHTML = `<div style="text-align:center;color:var(--ink-muted);padding:24px;font-size:12px;">Belum ada data penjualan produk.</div>`;
         } else {
-          const maxQty = Math.max(1, sorted[0].qty);
-          const barColors = ['#BC012E', '#D97706', '#15803D', '#0284C7', '#7C3AED', '#4B5563'];
-          prodBox.innerHTML = sorted.map((p, idx) => {
-            const pct = Math.max(8, Math.round((p.qty / maxQty) * 100));
-            const color = barColors[idx % barColors.length];
-            const icon = (p.type === 'food' || p.type === 'addon_food') ? '🍲' : '☕';
-            return `
-              <div style="display:flex;flex-direction:column;gap:4px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;gap:8px;">
-                  <span style="font-weight:700;color:var(--ink-espresso);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                    <span style="display:inline-block;min-width:20px;color:${color};font-weight:800;">#${idx + 1}</span> ${icon} ${p.name}
-                  </span>
-                  <span style="font-weight:800;color:${color};white-space:nowrap;">${p.qty} terjual</span>
-                </div>
-                <div style="width:100%;height:10px;background:var(--bg-oat-dark);border-radius:999px;overflow:hidden;">
-                  <div style="width:${pct}%;height:100%;background:${color};border-radius:999px;transition:width 0.3s ease;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-muted);">
-                  <span>Omzet: <strong>${rp(p.rev)}</strong></span>
-                  <span style="color:#15803D;">Laba Kotor: <strong>${rp(p.profit)}</strong></span>
-                </div>
-              </div>`;
-          }).join('');
+          prodBox.innerHTML = sorted.map((p, idx) => `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 2px;border-bottom:${idx < sorted.length - 1 ? '1px solid var(--border-hairline)' : 'none'};gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                <span style="width:22px;height:22px;border-radius:50%;background:#BC012E;color:#FFF;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${idx + 1}</span>
+                <div style="font-size:12.5px;font-weight:700;color:var(--ink-espresso);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:12px;font-weight:800;color:#BC012E;">${p.qty} terjual</div>
+                <div style="font-size:10.5px;color:var(--ink-muted);">Laba Kotor: <strong style="color:var(--ink-espresso);">${rp(p.profit)}</strong></div>
+              </div>
+            </div>
+          `).join('');
         }
       }
 
-      // 2. Grafik Keuangan (Omzet, Gross Profit, Total Pengeluaran, Net Profit)
+      // 2. Grafik Keuangan (Bar Chart + Donut Margin + Bottom 3-Stat Strip)
       const finBox = document.getElementById('ownerFinanceChart');
       if (finBox) {
         const periodBadge = document.getElementById('ownerChartPeriodBadge');
-        if (periodBadge) {
-          const sYmd = document.getElementById('pnlStartDate')?.value || '';
-          const eYmd = document.getElementById('pnlEndDate')?.value || '';
-          periodBadge.textContent = pnlPeriod === 'MONTHLY' ? 'Bulanan' : (pnlPeriod === 'WEEKLY' ? 'Mingguan' : (pnlPeriod === 'CUSTOM' && sYmd ? `${sYmd} s/d ${eYmd || sYmd}` : 'Harian'));
-        }
+        const sYmd = document.getElementById('pnlStartDate')?.value || '';
+        const eYmd = document.getElementById('pnlEndDate')?.value || '';
+        const periodTxt = pnlPeriod === 'MONTHLY' ? 'Bulanan' : (pnlPeriod === 'WEEKLY' ? 'Mingguan' : (pnlPeriod === 'CUSTOM' && sYmd ? `${sYmd} s/d ${eYmd || sYmd}` : 'Harian'));
+        if (periodBadge) periodBadge.textContent = periodTxt;
+
         const metrics = [
-          { label: 'Omzet', sub: 'Total Penjualan', val: totalRev, color: '#BC012E', bg: '#FDF2F4' },
-          { label: 'Gross Profit', sub: `Margin ${grossMarginPct}%`, val: grossProfit, color: '#15803D', bg: '#DCFCE7' },
-          { label: 'Pengeluaran', sub: 'Beban OPEX', val: totalExpenses, color: '#C2410C', bg: '#FFEDD5' },
-          { label: 'Net Profit', sub: `Net ${netMarginPct}%`, val: netProfit, color: netProfit >= 0 ? '#111827' : '#B91C1C', bg: netProfit >= 0 ? '#F3F4F6' : '#FEE2E2' }
+          { label: 'Omzet', sub: 'Total Penjualan', val: totalRev, color: '#BC012E' },
+          { label: 'Gross Profit', sub: `Margin ${grossMarginPct}%`, val: grossProfit, color: '#15803D' },
+          { label: 'Pengeluaran', sub: 'Beban OPEX', val: totalExpenses, color: '#C2410C' },
+          { label: 'Net Profit', sub: `Margin ${netMarginPct}%`, val: netProfit, color: netProfit >= 0 ? '#0F2942' : '#B91C1C' }
         ];
-        const maxVal = Math.max(1, ...metrics.map(m => Math.abs(m.val)));
+        const maxVal = Math.max(1000, ...metrics.map(m => Math.abs(m.val)));
+        const yTicks = [1, 0.75, 0.5, 0.25, 0].map(r => Math.round(maxVal * r));
+
+        const totalCosts = Math.max(0, totalCogs + totalExpenses);
+        const safeNetForDonut = Math.max(0, netProfit);
+        const donutTotal = Math.max(1, safeNetForDonut + totalCosts);
+        const netArcPct = Math.round((safeNetForDonut / donutTotal) * 100);
+        const costArcPct = 100 - netArcPct;
+        const r = 42;
+        const circ = 2 * Math.PI * r;
+        const netDash = (netArcPct / 100) * circ;
 
         finBox.innerHTML = `
-          <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;align-items:end;height:185px;padding:14px 8px 6px;background:var(--bg-oat);border-radius:14px;border:1px solid var(--border-hairline);">
-            ${metrics.map(m => {
-              const barH = Math.max(8, Math.round((Math.abs(m.val) / maxVal) * 115));
-              return `
-                <div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;">
-                  <div style="font-size:10px;font-weight:800;color:${m.color};text-align:center;line-height:1.15;">${rp(m.val)}</div>
-                  <div style="width:100%;max-width:44px;height:${barH}px;background:${m.color};border-radius:8px 8px 4px 4px;box-shadow:0 3px 8px rgba(0,0,0,0.1);transition:height 0.3s ease;"></div>
-                  <div style="text-align:center;">
-                    <div style="font-size:10.5px;font-weight:800;color:var(--ink-espresso);line-height:1.15;">${m.label}</div>
-                    <div style="font-size:9px;color:var(--ink-muted);">${m.sub}</div>
+          <div style="display:grid;grid-template-columns:minmax(260px, 1.7fr) minmax(200px, 1fr);gap:14px;align-items:center;">
+            <!-- Bar Chart with Y-Axis & Gridlines -->
+            <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:12px;padding:14px 12px 10px;">
+              <div style="display:flex;gap:8px;height:185px;">
+                <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:9.5px;color:var(--ink-muted);text-align:right;padding-bottom:32px;min-width:62px;">
+                  ${yTicks.map(v => `<span>${rp(v)}</span>`).join('')}
+                </div>
+                <div style="position:relative;flex:1;display:flex;flex-direction:column;">
+                  <div style="position:relative;flex:1;display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;align-items:end;padding:0 6px;">
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;">
+                      ${yTicks.map(() => `<div style="border-top:1px dashed #E2E8F0;width:100%;"></div>`).join('')}
+                    </div>
+                    ${metrics.map(m => {
+                      const barH = Math.max(6, Math.round((Math.abs(m.val) / maxVal) * 124));
+                      return `
+                        <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;">
+                          <div style="font-size:10px;font-weight:800;color:var(--ink-espresso);text-align:center;white-space:nowrap;">${rp(m.val)}</div>
+                          <div style="width:100%;max-width:46px;height:${barH}px;background:${m.color};border-radius:6px 6px 2px 2px;transition:height 0.3s ease;"></div>
+                        </div>`;
+                    }).join('')}
                   </div>
-                </div>`;
-            }).join('')}
+                  <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;padding:6px 6px 0;text-align:center;">
+                    ${metrics.map(m => `
+                      <div>
+                        <div style="font-size:10.5px;font-weight:800;color:var(--ink-espresso);line-height:1.15;">${m.label}</div>
+                        <div style="font-size:9px;color:var(--ink-muted);">${m.sub}</div>
+                      </div>`).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Donut Chart + Legend -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:10px;background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:12px;height:100%;min-height:185px;">
+              <div style="position:relative;width:112px;height:112px;flex-shrink:0;">
+                <svg viewBox="0 0 112 112" width="112" height="112" style="transform:rotate(-90deg);">
+                  <circle cx="56" cy="56" r="${r}" fill="none" stroke="#DC2626" stroke-width="18"></circle>
+                  <circle cx="56" cy="56" r="${r}" fill="none" stroke="#0F2942" stroke-width="18" stroke-dasharray="${netDash.toFixed(1)} ${circ.toFixed(1)}"></circle>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+                  <div style="font-size:17px;font-weight:800;color:var(--ink-espresso);line-height:1.1;">${netMarginPct}%</div>
+                  <div style="font-size:9.5px;color:var(--ink-muted);font-weight:600;">Net Margin</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;font-size:11px;">
+                <div style="display:flex;align-items:flex-start;gap:7px;">
+                  <span style="width:10px;height:10px;border-radius:3px;background:#0F2942;margin-top:3px;flex-shrink:0;"></span>
+                  <div>
+                    <div style="font-weight:800;color:var(--ink-espresso);">Laba Bersih</div>
+                    <div style="font-size:10.5px;color:var(--ink-muted);">${rp(netProfit)} (${netMarginPct}%)</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:7px;">
+                  <span style="width:10px;height:10px;border-radius:3px;background:#DC2626;margin-top:3px;flex-shrink:0;"></span>
+                  <div>
+                    <div style="font-weight:800;color:var(--ink-espresso);">Total Biaya</div>
+                    <div style="font-size:10.5px;color:var(--ink-muted);">${rp(totalCosts)} (${costArcPct}%)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 12px;background:var(--bg-oat);border-radius:10px;border:1px solid var(--border-hairline);font-size:11px;">
-            <span>Total HPP (COGS): <strong style="color:#BC012E;">${rp(totalCogs)}</strong></span>
-            <span>Gross Margin: <strong style="color:#15803D;">${grossMarginPct}%</strong></span>
-            <span>Net Margin: <strong style="color:${netProfit >= 0 ? '#15803D' : '#B91C1C'};">${netMarginPct}%</strong></span>
+
+          <!-- Bottom 3-Stat Strip -->
+          <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;">
+            <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:10.5px;color:var(--ink-muted);font-weight:700;">Total HPP (COGS)</span>
+              <strong style="font-size:14px;color:#BC012E;">${rp(totalCogs)}</strong>
+            </div>
+            <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:10.5px;color:var(--ink-muted);font-weight:700;">Gross Margin</span>
+              <strong style="font-size:14px;color:#15803D;">${grossMarginPct}%</strong>
+            </div>
+            <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:10.5px;color:var(--ink-muted);font-weight:700;">Net Margin</span>
+              <strong style="font-size:14px;color:${netProfit >= 0 ? '#15803D' : '#B91C1C'};">${netMarginPct}%</strong>
+            </div>
+          </div>`;
+      }
+
+      // 3. Bottom Summary Cards: Mini P&L, Cash Flow, 7-Day Net Profit Trend
+      const miniPnlBadge = document.getElementById('ownerMiniPnlBadge');
+      if (miniPnlBadge) miniPnlBadge.textContent = pnlPeriod === 'MONTHLY' ? 'Bulanan' : (pnlPeriod === 'WEEKLY' ? '7 Hari' : (pnlPeriod === 'CUSTOM' ? 'Custom' : 'Harian'));
+
+      const miniPnlBox = document.getElementById('ownerMiniPnlBox');
+      if (miniPnlBox) {
+        miniPnlBox.innerHTML = `
+          <div style="display:flex;flex-direction:column;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;padding:7px 8px;border-bottom:1px solid var(--border-hairline);">
+              <span style="color:var(--ink-muted);">Omzet Penjualan</span>
+              <strong style="color:var(--ink-espresso);">${rp(totalRev)}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:7px 8px;border-bottom:1px solid var(--border-hairline);">
+              <span style="color:var(--ink-muted);">Harga Pokok Penjualan (HPP)</span>
+              <strong style="color:#BC012E;">(${rp(totalCogs)})</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px;background:#EFF6FF;border-radius:6px;margin:4px 0;">
+              <strong style="color:#0F2942;">Gross Profit (Laba Kotor)</strong>
+              <strong style="color:#0F2942;">${rp(grossProfit)}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:7px 8px;border-bottom:1px solid var(--border-hairline);">
+              <span style="color:var(--ink-muted);">Pengeluaran Operasional (Opex)</span>
+              <strong style="color:#C2410C;">(${rp(totalExpenses)})</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 12px;background:#0F2942;color:#FFF;border-radius:8px;margin-top:6px;">
+              <strong>Laba Bersih (Net Profit)</strong>
+              <strong>${rp(netProfit)}</strong>
+            </div>
+          </div>`;
+      }
+
+      const cashFlowBox = document.getElementById('ownerCashFlowBox');
+      if (cashFlowBox) {
+        const openCash = Number(shiftOpeningFloat) || 0;
+        const endCash = openCash + totalRev - totalExpenses;
+        cashFlowBox.innerHTML = `
+          <div style="display:flex;flex-direction:column;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;padding:8px;background:#ECFDF5;border-radius:6px;margin-bottom:4px;">
+              <strong style="color:#166534;">Saldo Awal Kas</strong>
+              <strong style="color:#15803D;">${rp(openCash)}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:7px 8px;border-bottom:1px solid var(--border-hairline);">
+              <span style="color:var(--ink-muted);"><span style="color:#15803D;font-weight:800;">+</span> Penerimaan (Omzet)</span>
+              <strong style="color:var(--ink-espresso);">${rp(totalRev)}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:7px 8px;border-bottom:1px solid var(--border-hairline);">
+              <span style="color:var(--ink-muted);"><span style="color:#BC012E;font-weight:800;">&minus;</span> Pengeluaran Operasional</span>
+              <strong style="color:#BC012E;">(${rp(totalExpenses)})</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 12px;background:#0F2942;color:#FFF;border-radius:8px;margin-top:10px;">
+              <strong>Saldo Akhir Kas</strong>
+              <strong>${rp(endCash)}</strong>
+            </div>
+          </div>`;
+      }
+
+      const trendBox = document.getElementById('ownerNetTrendBox');
+      if (trendBox) {
+        const endRefStr = document.getElementById('pnlEndDate')?.value || toLocalYmd(new Date());
+        const endRef = new Date(endRefStr + 'T12:00:00');
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(endRef.getFullYear(), endRef.getMonth(), endRef.getDate() - i);
+          const ymd = toLocalYmd(d);
+          const dayOrders = orders.filter(o => toLocalYmd(o.createdAt || Date.now()) === ymd);
+          const dayExps = dailyExpenses.filter(e => !e.isMonthly && getExpenseYmd(e) === ymd);
+          const dRev = dayOrders.reduce((s, o) => s + (o.total || 0), 0);
+          const dCogs = dayOrders.reduce((s, o) => s + (o.cogs || 0), 0);
+          const dExp = dayExps.reduce((s, e) => s + (e.amount || 0), 0);
+          const dNet = dRev - dCogs - dExp;
+          const lbl = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+          days.push({ ymd, lbl, net: dNet });
+        }
+        const maxNet = Math.max(10000, ...days.map(d => Math.abs(d.net)));
+        const w = 320, h = 135, padL = 12, padR = 12, padT = 22, padB = 22;
+        const plotW = w - padL - padR;
+        const plotH = h - padT - padB;
+        const pts = days.map((d, idx) => {
+          const x = padL + (idx / 6) * plotW;
+          const y = padT + plotH - (Math.max(0, d.net) / maxNet) * plotH;
+          return { x, y, ...d };
+        });
+        const polyPts = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+        const areaPts = `${pts[0].x.toFixed(1)},${(padT + plotH).toFixed(1)} ${polyPts} ${pts[pts.length - 1].x.toFixed(1)},${(padT + plotH).toFixed(1)}`;
+        const lastPt = pts[pts.length - 1];
+
+        trendBox.innerHTML = `
+          <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:10px;padding:8px;">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+              <span style="background:#BC012E;color:#FFF;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:6px;">${rp(lastPt.net)}</span>
+            </div>
+            <svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block;overflow:visible;">
+              <defs>
+                <linearGradient id="netTrendGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#BC012E" stop-opacity="0.22"></stop>
+                  <stop offset="100%" stop-color="#BC012E" stop-opacity="0.02"></stop>
+                </linearGradient>
+              </defs>
+              ${[0, 0.5, 1].map(r => {
+                const gy = padT + plotH * r;
+                return `<line x1="${padL}" y1="${gy}" x2="${w - padR}" y2="${gy}" stroke="#E2E8F0" stroke-dasharray="3 3" />`;
+              }).join('')}
+              <polygon points="${areaPts}" fill="url(#netTrendGrad)"></polygon>
+              <polyline points="${polyPts}" fill="none" stroke="#BC012E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+              ${pts.map(p => `
+                <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="#BC012E" stroke="#FFF" stroke-width="1.5"></circle>
+                <text x="${p.x.toFixed(1)}" y="${(h - 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="#64748B" font-weight="600">${p.lbl}</text>
+              `).join('')}
+            </svg>
           </div>`;
       }
     }
