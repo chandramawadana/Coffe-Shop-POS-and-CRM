@@ -2333,9 +2333,15 @@
                   <p style="font-size:11px;color:var(--ink-muted);">Struktur akuntansi lengkap: Pemasukan &minus; HPP = Laba Kotor &minus; Beban Operasional (Gaji, Sewa, Utilitas, Kas Kecil) = Laba Bersih</p>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                  <button class="cat-pill active" id="pnlPeriodDaily" onclick="setPnlPeriod('DAILY')">☀️ Per Hari (Hari Ini / Shift)</button>
-                  <button class="cat-pill" id="pnlPeriodWeekly" onclick="setPnlPeriod('WEEKLY')">📅 Per Minggu (7 Hari Terakhir)</button>
-                  <button class="cat-pill" id="pnlPeriodMonthly" onclick="setPnlPeriod('MONTHLY')">📆 Per Bulan (Bulan Ini + Gaji)</button>
+                  <button class="cat-pill active" id="pnlPeriodDaily" onclick="setPnlPeriod('DAILY')">☀️ Hari Ini</button>
+                  <button class="cat-pill" id="pnlPeriodWeekly" onclick="setPnlPeriod('WEEKLY')">📅 7 Hari</button>
+                  <button class="cat-pill" id="pnlPeriodMonthly" onclick="setPnlPeriod('MONTHLY')">📆 Bulan Ini</button>
+                  <button class="cat-pill" id="pnlPeriodCustom" onclick="setPnlPeriod('CUSTOM')">🗓️ Custom</button>
+                  <div style="display:inline-flex;align-items:center;gap:4px;background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:10px;padding:3px 8px;">
+                    <input type="date" id="pnlStartDate" onchange="onPnlCustomDateChange()" style="border:none;background:transparent;font-size:11.5px;font-weight:600;color:var(--ink-espresso);outline:none;cursor:pointer;" title="Tanggal Mulai">
+                    <span style="font-size:11px;color:var(--ink-muted);">s/d</span>
+                    <input type="date" id="pnlEndDate" onchange="onPnlCustomDateChange()" style="border:none;background:transparent;font-size:11.5px;font-weight:600;color:var(--ink-espresso);outline:none;cursor:pointer;" title="Tanggal Akhir">
+                  </div>
                 </div>
               </div>
 
@@ -8148,11 +8154,53 @@
     // ==========================================
     // OWNER HUB REPORTING & PNL CALCULATION
     // ==========================================
+    function syncPnlDateRangeFromPreset(period) {
+      const startEl = document.getElementById('pnlStartDate');
+      const endEl = document.getElementById('pnlEndDate');
+      if (!startEl || !endEl) return;
+      const now = new Date();
+      const todayYmd = toLocalYmd(now);
+      if (period === 'DAILY' || period === 'LIVE') {
+        startEl.value = todayYmd;
+        endEl.value = todayYmd;
+      } else if (period === 'WEEKLY') {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+        startEl.value = toLocalYmd(d);
+        endEl.value = todayYmd;
+      } else if (period === 'MONTHLY') {
+        startEl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+        endEl.value = todayYmd;
+      }
+      startEl.dataset.initialized = '1';
+    }
+
     function setPnlPeriod(period) {
       pnlPeriod = period;
-      document.getElementById('pnlPeriodDaily')?.classList.toggle('active', period === 'DAILY');
+      document.getElementById('pnlPeriodDaily')?.classList.toggle('active', period === 'DAILY' || period === 'LIVE');
       document.getElementById('pnlPeriodWeekly')?.classList.toggle('active', period === 'WEEKLY');
       document.getElementById('pnlPeriodMonthly')?.classList.toggle('active', period === 'MONTHLY');
+      document.getElementById('pnlPeriodCustom')?.classList.toggle('active', period === 'CUSTOM');
+      if (period !== 'CUSTOM') {
+        syncPnlDateRangeFromPreset(period);
+      } else {
+        const startEl = document.getElementById('pnlStartDate');
+        if (startEl && !startEl.value) syncPnlDateRangeFromPreset('DAILY');
+        startEl?.focus();
+      }
+      renderOwnerHub();
+    }
+
+    function onPnlCustomDateChange() {
+      const startEl = document.getElementById('pnlStartDate');
+      const endEl = document.getElementById('pnlEndDate');
+      if (startEl && endEl && startEl.value && endEl.value && startEl.value > endEl.value) {
+        endEl.value = startEl.value;
+      }
+      pnlPeriod = 'CUSTOM';
+      document.getElementById('pnlPeriodDaily')?.classList.remove('active');
+      document.getElementById('pnlPeriodWeekly')?.classList.remove('active');
+      document.getElementById('pnlPeriodMonthly')?.classList.remove('active');
+      document.getElementById('pnlPeriodCustom')?.classList.add('active');
       renderOwnerHub();
     }
 
@@ -8462,7 +8510,9 @@
       if (finBox) {
         const periodBadge = document.getElementById('ownerChartPeriodBadge');
         if (periodBadge) {
-          periodBadge.textContent = pnlPeriod === 'MONTHLY' ? 'Bulanan' : (pnlPeriod === 'WEEKLY' ? 'Mingguan' : 'Harian');
+          const sYmd = document.getElementById('pnlStartDate')?.value || '';
+          const eYmd = document.getElementById('pnlEndDate')?.value || '';
+          periodBadge.textContent = pnlPeriod === 'MONTHLY' ? 'Bulanan' : (pnlPeriod === 'WEEKLY' ? 'Mingguan' : (pnlPeriod === 'CUSTOM' && sYmd ? `${sYmd} s/d ${eYmd || sYmd}` : 'Harian'));
         }
         const metrics = [
           { label: 'Omzet', sub: 'Total Penjualan', val: totalRev, color: '#BC012E', bg: '#FDF2F4' },
@@ -8495,8 +8545,30 @@
       }
     }
 
+    function getExpenseYmd(e) {
+      if (e && e.createdAt) return toLocalYmd(e.createdAt);
+      const m = String((e && e.id) || '').match(/^exp-(\d{10,})$/);
+      if (m) return toLocalYmd(Number(m[1]));
+      return '';
+    }
+
     function renderOwnerHub() {
-      const allOrders = [...orders];
+      const pnlStartEl = document.getElementById('pnlStartDate');
+      const pnlEndEl = document.getElementById('pnlEndDate');
+      if (pnlStartEl && !pnlStartEl.dataset.initialized) {
+        syncPnlDateRangeFromPreset(pnlPeriod || 'DAILY');
+      }
+      const pnlStartYmd = pnlStartEl?.value || '';
+      const pnlEndYmd = pnlEndEl?.value || '';
+
+      const allOrders = orders.filter(o => {
+        if (!pnlStartYmd && !pnlEndYmd) return true;
+        const dStr = toLocalYmd(o.createdAt || Date.now());
+        if (!dStr) return true;
+        if (pnlStartYmd && dStr < pnlStartYmd) return false;
+        if (pnlEndYmd && dStr > pnlEndYmd) return false;
+        return true;
+      });
       const revDrinks = allOrders.reduce((s, o) => s + (o.revMinuman || 0), 0);
       const revFoods = allOrders.reduce((s, o) => s + (o.revMakanan || 0), 0);
       const totalServiceFee = allOrders.reduce((s, o) => s + (o.serviceFee || 0), 0);
@@ -8509,8 +8581,17 @@
       const grossProfit = totalRev - totalCogs;
       const grossMarginPct = totalRev > 0 ? Math.round((grossProfit / totalRev) * 100) : 0;
 
-      // Filter daily expenses
-      const filteredExp = dailyExpenses.filter(e => pnlPeriod === 'MONTHLY' ? true : !e.isMonthly);
+      // Filter daily expenses by period & date range
+      const includeMonthlyExp = pnlPeriod === 'MONTHLY' || (pnlPeriod === 'CUSTOM' && pnlStartYmd && pnlEndYmd && pnlStartYmd !== pnlEndYmd);
+      const filteredExp = dailyExpenses.filter(e => {
+        if (e.isMonthly) return includeMonthlyExp;
+        if (!pnlStartYmd && !pnlEndYmd) return true;
+        const dStr = getExpenseYmd(e);
+        if (!dStr) return true;
+        if (pnlStartYmd && dStr < pnlStartYmd) return false;
+        if (pnlEndYmd && dStr > pnlEndYmd) return false;
+        return true;
+      });
       const totalExpenses = filteredExp.reduce((s, e) => s + (e.amount || 0), 0);
       const netProfit = grossProfit - totalExpenses;
       const netMarginPct = totalRev > 0 ? Math.round((netProfit / totalRev) * 100) : 0;
