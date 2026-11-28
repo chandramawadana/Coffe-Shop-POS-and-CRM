@@ -2595,15 +2595,27 @@
 
               <!-- DAFTAR PENGELUARAN HARIAN -->
               <div class="panel-card" style="display:flex;flex-direction:column;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                  <h3 style="font-size:15.5px;font-weight:800;color:var(--ink-espresso);margin:0;">Daftar Pengeluaran Hari Ini</h3>
-                  <strong style="color:#C2410C;font-size:13px;" id="expenseTotalPill">Total: Rp 55.000</strong>
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+                  <h3 style="font-size:15.5px;font-weight:800;color:var(--ink-espresso);margin:0;">Daftar Pengeluaran</h3>
+                  <strong style="color:#C2410C;font-size:13px;" id="expenseTotalPill">Total: Rp 0</strong>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding:8px 10px;background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:10px;">
+                  <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                    <button type="button" class="cat-pill active" id="expFilterTodayBtn" onclick="setExpenseFilterPreset('TODAY')" style="padding:4px 10px;font-size:11px;">Hari Ini</button>
+                    <button type="button" class="cat-pill" id="expFilter7DBtn" onclick="setExpenseFilterPreset('7D')" style="padding:4px 10px;font-size:11px;">7 Hari</button>
+                    <button type="button" class="cat-pill" id="expFilterAllBtn" onclick="setExpenseFilterPreset('ALL')" style="padding:4px 10px;font-size:11px;">Semua</button>
+                  </div>
+                  <div style="display:inline-flex;align-items:center;gap:4px;background:var(--surface-card);border:1px solid var(--border-hairline);border-radius:8px;padding:3px 7px;">
+                    <input type="date" id="expFilterStart" onchange="onExpenseCustomDateChange()" style="border:none;background:transparent;font-size:11px;font-weight:600;color:var(--ink-espresso);outline:none;cursor:pointer;" title="Tanggal Mulai">
+                    <span style="font-size:10.5px;color:var(--ink-muted);">s/d</span>
+                    <input type="date" id="expFilterEnd" onchange="onExpenseCustomDateChange()" style="border:none;background:transparent;font-size:11px;font-weight:600;color:var(--ink-espresso);outline:none;cursor:pointer;" title="Tanggal Akhir">
+                  </div>
                 </div>
                 <div style="flex:1;overflow-y:auto;max-height:260px;">
                   <table>
                     <thead>
                       <tr>
-                        <th>Jam</th>
+                        <th>Tgl / Jam</th>
                         <th>Kategori</th>
                         <th>Keterangan</th>
                         <th style="text-align:right;">Nominal</th>
@@ -8706,10 +8718,95 @@
     }
 
     function getExpenseYmd(e) {
+      if (e && e.date && /^\d{4}-\d{2}-\d{2}$/.test(e.date)) return e.date;
       if (e && e.createdAt) return toLocalYmd(e.createdAt);
       const m = String((e && e.id) || '').match(/^exp-(\d{10,})$/);
       if (m) return toLocalYmd(Number(m[1]));
       return '';
+    }
+
+    function setExpenseFilterPreset(preset) {
+      const startEl = document.getElementById('expFilterStart');
+      const endEl = document.getElementById('expFilterEnd');
+      const now = new Date();
+      const todayYmd = toLocalYmd(now);
+      if (startEl && endEl) {
+        if (preset === 'TODAY') {
+          startEl.value = todayYmd;
+          endEl.value = todayYmd;
+        } else if (preset === '7D') {
+          const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+          startEl.value = toLocalYmd(d);
+          endEl.value = todayYmd;
+        } else if (preset === 'ALL') {
+          startEl.value = '';
+          endEl.value = '';
+        }
+        startEl.dataset.initialized = '1';
+      }
+      document.getElementById('expFilterTodayBtn')?.classList.toggle('active', preset === 'TODAY');
+      document.getElementById('expFilter7DBtn')?.classList.toggle('active', preset === '7D');
+      document.getElementById('expFilterAllBtn')?.classList.toggle('active', preset === 'ALL');
+      renderExpenseListTable();
+    }
+
+    function onExpenseCustomDateChange() {
+      const startEl = document.getElementById('expFilterStart');
+      const endEl = document.getElementById('expFilterEnd');
+      if (startEl && endEl && startEl.value && endEl.value && startEl.value > endEl.value) {
+        endEl.value = startEl.value;
+      }
+      if (startEl) startEl.dataset.initialized = '1';
+      document.getElementById('expFilterTodayBtn')?.classList.remove('active');
+      document.getElementById('expFilter7DBtn')?.classList.remove('active');
+      document.getElementById('expFilterAllBtn')?.classList.remove('active');
+      renderExpenseListTable();
+    }
+
+    function renderExpenseListTable() {
+      const expTbody = document.getElementById('dailyExpensesTableBody');
+      if (!expTbody) return;
+      const startEl = document.getElementById('expFilterStart');
+      const endEl = document.getElementById('expFilterEnd');
+      if (startEl && !startEl.dataset.initialized) {
+        const todayYmd = toLocalYmd(new Date());
+        startEl.value = todayYmd;
+        if (endEl) endEl.value = todayYmd;
+        startEl.dataset.initialized = '1';
+      }
+      const startVal = startEl?.value || '';
+      const endVal = endEl?.value || '';
+
+      const list = dailyExpenses.filter(e => {
+        if (!startVal && !endVal) return true;
+        const dStr = getExpenseYmd(e);
+        if (!dStr) return true;
+        if (startVal && dStr < startVal) return false;
+        if (endVal && dStr > endVal) return false;
+        return true;
+      });
+
+      if (list.length === 0) {
+        expTbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--ink-muted);padding:18px;font-size:11.5px;">Belum ada catatan pengeluaran pada rentang tanggal ini.</td></tr>`;
+      } else {
+        expTbody.innerHTML = list.map(e => {
+          const ymd = getExpenseYmd(e);
+          const dateShort = ymd ? ymd.slice(5).split('-').reverse().join('/') : '';
+          return `
+            <tr>
+              <td style="white-space:nowrap;">${dateShort ? `<span style="font-size:10px;color:var(--ink-muted);">${dateShort}</span> ` : ''}${e.time || ''}</td>
+              <td><span class="badge-sky">${e.category}</span></td>
+              <td>${e.desc}</td>
+              <td style="text-align:right;font-weight:700;color:#C2410C;">${rp(e.amount)}</td>
+              <td><button onclick="deleteExpense('${e.id}')" style="background:#FEE2E2;border:none;color:#991B1B;padding:3px 6px;border-radius:4px;cursor:pointer;font-size:10px;">✕ Hapus</button></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const listTotal = list.reduce((s, e) => s + (e.amount || 0), 0);
+      const expTotalPill = document.getElementById('expenseTotalPill');
+      if (expTotalPill) expTotalPill.textContent = `Total: ${rp(listTotal)}`;
     }
 
     function renderOwnerHub() {
@@ -8903,22 +9000,8 @@
       const pnlNetProfitPctEl = document.getElementById('pnlNetProfitPct');
       if (pnlNetProfitPctEl) pnlNetProfitPctEl.textContent = `${netMarginPct}%`;
 
-      // Render daily expenses table list
-      const expTbody = document.getElementById('dailyExpensesTableBody');
-      if (expTbody) {
-        expTbody.innerHTML = dailyExpenses.map(e => `
-          <tr>
-            <td>${e.time}</td>
-            <td><span class="badge-sky">${e.category}</span></td>
-            <td>${e.desc}</td>
-            <td style="text-align:right;font-weight:700;color:#C2410C;">${rp(e.amount)}</td>
-            <td><button onclick="deleteExpense('${e.id}')" style="background:#FEE2E2;border:none;color:#991B1B;padding:3px 6px;border-radius:4px;cursor:pointer;font-size:10px;">✕ Hapus</button></td>
-          </tr>
-        `).join('');
-      }
-
-      const expTotalPill = document.getElementById('expenseTotalPill');
-      if (expTotalPill) expTotalPill.textContent = `Total: ${rp(totalExpenses)}`;
+      // Render daily expenses table list (with date filter)
+      renderExpenseListTable();
 
       // Cash Recon
       const cashSales = allOrders.filter(o => o.method === 'CASH').reduce((s, o) => s + o.total, 0);
