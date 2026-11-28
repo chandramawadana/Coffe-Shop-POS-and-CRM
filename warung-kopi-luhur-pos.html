@@ -1381,28 +1381,39 @@
       #cartDiscountSelect { width: 130px !important; }
     }
 
+    .owner-fin-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.7fr) minmax(200px, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
     @media (max-width: 720px) {
-      /* HP & Small Tablet: full-screen catalog + bottom cart drawer */
-      .topbar { padding: 6px 10px; gap: 6px; }
+      /* HP Portrait (Android & iPhone): proporsional, padat, tanpa overflow */
       .topbar {
         height: auto;
         flex-wrap: wrap;
-        padding: 8px 12px;
+        padding: 6px 10px;
+        gap: 5px;
       }
-      .topbar-search-wrap { order: 3; max-width: 100%; flex: 1 1 100%; }
+      .brand-avatar { width: 28px; height: 28px; }
+      .topbar-search-wrap { order: 3; max-width: 100%; flex: 1 1 100%; margin-top: 2px; }
+      .topbar-search-wrap input { padding: 6px 10px 6px 30px; font-size: 12px; }
       .app-body-row { flex-direction: column; }
       .brand .badge-sky, .brand-text-wrap { display: none; }
       .header-actions {
+        flex: 1;
         justify-content: flex-end;
         flex-wrap: wrap;
-        gap: 5px;
+        gap: 4px;
       }
       .header-actions .pill-status {
         display: inline-flex;
-        padding: 4px 8px;
-        font-size: 10.5px;
+        padding: 3px 7px;
+        font-size: 10px;
+        line-height: 1.2;
       }
-      .user-pill { margin-left: auto; max-width: 165px; }
+      .user-pill { margin-left: auto; max-width: 145px; padding: 3px 8px; font-size: 10.5px; }
       .nav-tabs {
         width: 100%;
         min-width: 0;
@@ -1411,18 +1422,27 @@
         flex-wrap: nowrap;
         justify-content: flex-start;
         overflow-x: auto;
-        padding: 6px 10px;
+        padding: 5px 8px;
+        gap: 4px;
         -webkit-overflow-scrolling: touch;
       }
+      .nav-tab { padding: 6px 10px; font-size: 11px; white-space: nowrap; }
       .sidebar-divider, .sidebar-bottom { display: none; }
+      .page-header { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+      .page-header h2 { font-size: 16px !important; line-height: 1.25; }
+      .page-body { padding: 10px !important; }
       .cashier-layout { flex-direction: column; }
-      .catalog-pane { flex: 1 1 100%; min-height: 0; border-right: none; }
+      .catalog-pane { flex: 1 1 100%; min-height: 0; border-right: none; padding-bottom: 68px; }
       .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-      .menu-card { padding: 10px 10px; min-height: 100px; }
+      .menu-card { padding: 9px; min-height: 92px; }
       .menu-tag-wrap { padding-right: 0; margin-top: 0; }
-      .menu-name { font-size: 12.5px; }
+      .menu-name { font-size: 12px; line-height: 1.25; }
+      .menu-price { font-size: 12.5px; }
       #menuSearch { width: 100% !important; min-width: 120px; flex: 1; }
-      .mobile-cart-bar { display: flex; }
+      .mobile-cart-bar {
+        display: flex;
+        padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+      }
       .cart-pane { display: none; }
       .cart-pane.mobile-open {
         display: flex;
@@ -1436,7 +1456,42 @@
       }
       .cart-pane.mobile-open .mobile-cart-head { display: flex; }
       .cart-pane.mobile-open .cart-crm { max-height: 36dvh; overflow-y: auto; }
-      .modal-box { border-radius: 16px; max-height: 94dvh; }
+      /* Owner Hub & Grids on Mobile Portrait */
+      #view-owner .grid-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+      }
+      #view-owner .grid-cards > .panel-card {
+        padding: 10px 11px !important;
+      }
+      #view-owner .grid-cards > .panel-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+      }
+      #view-owner .grid-cards > .panel-card > div:nth-child(2) {
+        font-size: 17px !important;
+        margin: 4px 0 !important;
+      }
+      .owner-fin-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .pnl-container { padding: 10px !important; overflow-x: auto; }
+      .pnl-table { font-size: 10.5px; }
+      .pnl-table th, .pnl-table td { padding: 6px 5px; }
+      .kds-ticket { width: 100% !important; max-width: 100%; }
+      .modal-box {
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        padding: 14px !important;
+        border-radius: 16px;
+        max-height: 92dvh;
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .header-actions .pill-status { font-size: 9.5px; padding: 3px 6px; }
+      .cat-pill { padding: 5px 9px; font-size: 11px; }
+      input[type="date"] { max-width: 118px; font-size: 10.5px !important; }
     }
   </style>
 </head>
@@ -8524,7 +8579,7 @@
         const netDash = (netArcPct / 100) * circ;
 
         finBox.innerHTML = `
-          <div style="display:grid;grid-template-columns:minmax(260px, 1.7fr) minmax(200px, 1fr);gap:14px;align-items:center;">
+          <div class="owner-fin-grid">
             <!-- Bar Chart with Y-Axis & Gridlines -->
             <div style="background:var(--bg-oat);border:1px solid var(--border-hairline);border-radius:12px;padding:14px 12px 10px;">
               <div style="display:flex;gap:8px;height:185px;">
